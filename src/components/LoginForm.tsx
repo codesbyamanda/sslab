@@ -10,8 +10,8 @@ const LoginForm = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Simular login - redirecionar para dashboard
-    navigate("/dashboard");
+    // Simular login - redirecionar para seleção de serviços
+    navigate("/services");
   };
 
   return (
