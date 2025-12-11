@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, Save, Plus, Printer } from "lucide-react";
+import { ArrowLeft, Save, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,6 +15,8 @@ import ConveniosTab from "@/components/atendimentos/ConveniosTab";
 import GeralTab from "@/components/atendimentos/GeralTab";
 import MedicosTab from "@/components/atendimentos/MedicosTab";
 import ServicosTab from "@/components/atendimentos/ServicosTab";
+import PaymentsModal from "@/components/atendimentos/PaymentsModal";
+import PrintingModal from "@/components/atendimentos/PrintingModal";
 
 interface Patient {
   id: number;
@@ -58,6 +60,9 @@ interface Servico {
   medicoSolicitante: string;
   valor: number;
 }
+
+// Convênios que exigem pagamento no ato
+const CONVENIOS_PAGAMENTO_ATO = ["Particular", "Pagamento no Ato", "Caixa"];
 
 const AtendimentoCadastro = () => {
   const navigate = useNavigate();
@@ -116,6 +121,10 @@ const AtendimentoCadastro = () => {
   const [servicos, setServicos] = useState<Servico[]>([]);
   const [nextServicoId, setNextServicoId] = useState(1);
 
+  // Payment flow states
+  const [showPaymentsModal, setShowPaymentsModal] = useState(false);
+  const [showPrintingModal, setShowPrintingModal] = useState(false);
+
   // Load mock data for editing
   useEffect(() => {
     if (isEditing) {
@@ -163,6 +172,20 @@ const AtendimentoCadastro = () => {
     }));
   }, [geralData.adicionalDias]);
 
+  // Check if any convenio requires payment at time of service
+  const requiresPayment = () => {
+    return convenios.some((c) =>
+      CONVENIOS_PAGAMENTO_ATO.some((cpa) => c.nome.toLowerCase().includes(cpa.toLowerCase()))
+    );
+  };
+
+  // Calculate total value of services
+  const calcularValorTotal = () => {
+    return servicos
+      .filter((s) => s.situacao !== "cancelado")
+      .reduce((acc, s) => acc + s.valor, 0);
+  };
+
   const handleAddConvenio = (convenio: Omit<Convenio, "id">) => {
     setConvenios([...convenios, { ...convenio, id: Date.now() }]);
   };
@@ -191,10 +214,22 @@ const AtendimentoCadastro = () => {
   };
 
   const handleSave = () => {
-    toast({
-      title: "Requisição salva",
-      description: `Requisição ${numeroRequisicao} salva com sucesso.`,
-    });
+    // Check if requires payment
+    if (requiresPayment() && calcularValorTotal() > 0) {
+      setShowPaymentsModal(true);
+    } else {
+      // Go directly to printing
+      setShowPrintingModal(true);
+    }
+  };
+
+  const handlePaymentsComplete = () => {
+    setShowPaymentsModal(false);
+    setShowPrintingModal(true);
+  };
+
+  const handlePrintingClose = () => {
+    setShowPrintingModal(false);
     navigate("/atendimento/atendimentos");
   };
 
@@ -425,6 +460,24 @@ const AtendimentoCadastro = () => {
           </Card>
         </main>
       </div>
+
+      {/* Payments Modal */}
+      <PaymentsModal
+        open={showPaymentsModal}
+        onClose={() => setShowPaymentsModal(false)}
+        onComplete={handlePaymentsComplete}
+        valorTotal={calcularValorTotal()}
+        pacienteNome={selectedPatient?.nome || "Paciente não selecionado"}
+        requisicaoNumero={numeroRequisicao}
+      />
+
+      {/* Printing Modal */}
+      <PrintingModal
+        open={showPrintingModal}
+        onClose={handlePrintingClose}
+        requisicaoNumero={numeroRequisicao}
+        pacienteNome={selectedPatient?.nome || "Paciente não selecionado"}
+      />
     </div>
   );
 };
