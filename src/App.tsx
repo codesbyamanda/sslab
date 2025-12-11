@@ -23,6 +23,7 @@ import RelatorioDevedores from "./pages/relatorios/RelatorioDevedores";
 import RelatorioPromessaEntrega from "./pages/relatorios/RelatorioPromessaEntrega";
 import RelatorioItensPendentes from "./pages/relatorios/RelatorioItensPendentes";
 import RelatorioFaturamentos from "./pages/relatorios/RelatorioFaturamentos";
+import Configuracoes from "./pages/Configuracoes";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -54,6 +55,7 @@ const App = () => (
           <Route path="/atendimento/relatorios/promessa" element={<RelatorioPromessaEntrega />} />
           <Route path="/atendimento/relatorios/pendentes" element={<RelatorioItensPendentes />} />
           <Route path="/atendimento/relatorios/faturamentos" element={<RelatorioFaturamentos />} />
+          <Route path="/atendimento/configuracoes" element={<Configuracoes />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
