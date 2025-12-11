@@ -26,6 +26,7 @@ export default {
         petroleo: {
           DEFAULT: "hsl(var(--petroleo))",
           dark: "hsl(var(--petroleo-dark))",
+          light: "hsl(var(--petroleo-light))",
         },
         "cinza-profissional": "hsl(var(--cinza-profissional))",
         "cinza-claro": "hsl(var(--cinza-claro))",
@@ -53,6 +54,14 @@ export default {
           DEFAULT: "hsl(var(--accent))",
           foreground: "hsl(var(--accent-foreground))",
         },
+        warning: {
+          DEFAULT: "hsl(var(--warning))",
+          foreground: "hsl(var(--warning-foreground))",
+        },
+        success: {
+          DEFAULT: "hsl(var(--success))",
+          foreground: "hsl(var(--success-foreground))",
+        },
         popover: {
           DEFAULT: "hsl(var(--popover))",
           foreground: "hsl(var(--popover-foreground))",
@@ -70,6 +79,7 @@ export default {
           "accent-foreground": "hsl(var(--sidebar-accent-foreground))",
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
+          muted: "hsl(var(--sidebar-muted))",
         },
       },
       borderRadius: {
@@ -78,8 +88,11 @@ export default {
         sm: "calc(var(--radius) - 4px)",
       },
       boxShadow: {
+        xs: "0 1px 2px rgba(0, 0, 0, 0.04)",
+        sm: "0 2px 4px rgba(0, 0, 0, 0.04)",
         premium: "0 4px 18px rgba(0, 0, 0, 0.06)",
         "premium-hover": "0 6px 24px rgba(0, 0, 0, 0.08)",
+        navbar: "0 1px 3px rgba(0, 0, 0, 0.05)",
       },
       keyframes: {
         "accordion-down": {
@@ -91,14 +104,28 @@ export default {
           to: { height: "0" },
         },
         "fade-in": {
-          from: { opacity: "0", transform: "translateY(10px)" },
+          from: { opacity: "0", transform: "translateY(8px)" },
           to: { opacity: "1", transform: "translateY(0)" },
+        },
+        "fade-in-up": {
+          from: { opacity: "0", transform: "translateY(16px)" },
+          to: { opacity: "1", transform: "translateY(0)" },
+        },
+        "slide-in-left": {
+          from: { opacity: "0", transform: "translateX(-16px)" },
+          to: { opacity: "1", transform: "translateX(0)" },
+        },
+        shimmer: {
+          "100%": { transform: "translateX(100%)" },
         },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        "fade-in": "fade-in 0.4s ease-out",
+        "fade-in": "fade-in 0.3s ease-out",
+        "fade-in-up": "fade-in-up 0.4s ease-out",
+        "slide-in-left": "slide-in-left 0.3s ease-out",
+        shimmer: "shimmer 2s infinite",
       },
     },
   },

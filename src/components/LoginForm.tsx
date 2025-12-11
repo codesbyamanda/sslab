@@ -1,14 +1,17 @@
 import { useState } from "react";
 import { Mail, Lock, Eye, EyeOff } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Login attempt:", { email, password });
+    // Simular login - redirecionar para dashboard
+    navigate("/dashboard");
   };
 
   return (
@@ -69,7 +72,7 @@ const LoginForm = () => {
       </div>
 
       {/* Submit Button */}
-      <button type="submit" className="btn-primary-premium mt-6">
+      <button type="submit" className="btn-primary-premium w-full mt-6">
         Acessar
       </button>
 
