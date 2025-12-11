@@ -28,6 +28,7 @@ import RelatorioPromessaEntrega from "./pages/relatorios/RelatorioPromessaEntreg
 import RelatorioItensPendentes from "./pages/relatorios/RelatorioItensPendentes";
 import RelatorioFaturamentos from "./pages/relatorios/RelatorioFaturamentos";
 import Configuracoes from "./pages/Configuracoes";
+import SaudeFaturamento from "./pages/SaudeFaturamento";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -64,7 +65,9 @@ const App = () => (
           <Route path="/atendimento/relatorios/pendentes" element={<RelatorioItensPendentes />} />
           <Route path="/atendimento/relatorios/faturamentos" element={<RelatorioFaturamentos />} />
           <Route path="/atendimento/configuracoes" element={<Configuracoes />} />
+          <Route path="/faturamento" element={<SaudeFaturamento />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          <Route path="*" element={<NotFound />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
