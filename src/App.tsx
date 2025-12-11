@@ -32,6 +32,7 @@ import SaudeFaturamento from "./pages/SaudeFaturamento";
 import PreFaturamento from "./pages/PreFaturamento";
 import Faturamento from "./pages/Faturamento";
 import SaudeFinanceiro from "./pages/SaudeFinanceiro";
+import ReceitasReceber from "./pages/financeiro/ReceitasReceber";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -72,7 +73,8 @@ const App = () => (
           <Route path="/faturamento/pre-faturamento" element={<PreFaturamento />} />
           <Route path="/faturamento/faturamento" element={<Faturamento />} />
           <Route path="/financeiro" element={<SaudeFinanceiro />} />
-          <Route path="/financeiro/receitas" element={<SaudeFinanceiro />} />
+          <Route path="/financeiro/receitas" element={<ReceitasReceber />} />
+          <Route path="/financeiro/cheques" element={<SaudeFinanceiro />} />
           <Route path="/financeiro/cheques" element={<SaudeFinanceiro />} />
           <Route path="/financeiro/transacoes-cartao" element={<SaudeFinanceiro />} />
           <Route path="/financeiro/depositos" element={<SaudeFinanceiro />} />
