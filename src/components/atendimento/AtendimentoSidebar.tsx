@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 
 const menuItems = [
   { title: "Dashboard", url: "/atendimento", icon: LayoutDashboard },
+  { title: "Hub de Atendimento", url: "/atendimento/hub", icon: Activity },
   { title: "Atendimentos", url: "/atendimento/atendimentos", icon: ClipboardList },
   { title: "Pacientes", url: "/atendimento/pacientes", icon: Users },
   { title: "Profissionais", url: "/atendimento/profissionais", icon: UserCog },
