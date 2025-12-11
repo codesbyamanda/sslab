@@ -29,6 +29,7 @@ import RelatorioItensPendentes from "./pages/relatorios/RelatorioItensPendentes"
 import RelatorioFaturamentos from "./pages/relatorios/RelatorioFaturamentos";
 import Configuracoes from "./pages/Configuracoes";
 import SaudeFaturamento from "./pages/SaudeFaturamento";
+import PreFaturamento from "./pages/PreFaturamento";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -66,6 +67,7 @@ const App = () => (
           <Route path="/atendimento/relatorios/faturamentos" element={<RelatorioFaturamentos />} />
           <Route path="/atendimento/configuracoes" element={<Configuracoes />} />
           <Route path="/faturamento" element={<SaudeFaturamento />} />
+          <Route path="/faturamento/pre-faturamento" element={<PreFaturamento />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
           <Route path="*" element={<NotFound />} />
