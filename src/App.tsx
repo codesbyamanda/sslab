@@ -31,6 +31,7 @@ import Configuracoes from "./pages/Configuracoes";
 import SaudeFaturamento from "./pages/SaudeFaturamento";
 import PreFaturamento from "./pages/PreFaturamento";
 import Faturamento from "./pages/Faturamento";
+import SaudeFinanceiro from "./pages/SaudeFinanceiro";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -70,6 +71,19 @@ const App = () => (
           <Route path="/faturamento" element={<SaudeFaturamento />} />
           <Route path="/faturamento/pre-faturamento" element={<PreFaturamento />} />
           <Route path="/faturamento/faturamento" element={<Faturamento />} />
+          <Route path="/financeiro" element={<SaudeFinanceiro />} />
+          <Route path="/financeiro/receitas" element={<SaudeFinanceiro />} />
+          <Route path="/financeiro/cheques" element={<SaudeFinanceiro />} />
+          <Route path="/financeiro/transacoes-cartao" element={<SaudeFinanceiro />} />
+          <Route path="/financeiro/depositos" element={<SaudeFinanceiro />} />
+          <Route path="/financeiro/repasse-cartao" element={<SaudeFinanceiro />} />
+          <Route path="/financeiro/contas-pagar" element={<SaudeFinanceiro />} />
+          <Route path="/financeiro/cheques-emitidos" element={<SaudeFinanceiro />} />
+          <Route path="/financeiro/caixas" element={<SaudeFinanceiro />} />
+          <Route path="/financeiro/contas-correntes" element={<SaudeFinanceiro />} />
+          <Route path="/financeiro/transferencias-caixas" element={<SaudeFinanceiro />} />
+          <Route path="/financeiro/transferencias-bancarias" element={<SaudeFinanceiro />} />
+          <Route path="/financeiro/configuracoes" element={<SaudeFinanceiro />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
           <Route path="*" element={<NotFound />} />
