@@ -14,6 +14,8 @@ import RecebimentoDetalhe from "./pages/RecebimentoDetalhe";
 import ImpressaoLaudos from "./pages/ImpressaoLaudos";
 import Orcamentos from "./pages/Orcamentos";
 import OrcamentoCadastro from "./pages/OrcamentoCadastro";
+import Profissionais from "./pages/Profissionais";
+import ProfissionalCadastro from "./pages/ProfissionalCadastro";
 import FinanceiroCaixa from "./pages/FinanceiroCaixa";
 import FinanceiroRegistros from "./pages/FinanceiroRegistros";
 import FinanceiroTransferencia from "./pages/FinanceiroTransferencia";
@@ -48,6 +50,8 @@ const App = () => (
           <Route path="/atendimento/laudos" element={<ImpressaoLaudos />} />
           <Route path="/atendimento/orcamento" element={<Orcamentos />} />
           <Route path="/atendimento/orcamento/:id" element={<OrcamentoCadastro />} />
+          <Route path="/atendimento/profissionais" element={<Profissionais />} />
+          <Route path="/atendimento/profissionais/:id" element={<ProfissionalCadastro />} />
           <Route path="/atendimento/financeiro/caixa" element={<FinanceiroCaixa />} />
           <Route path="/atendimento/financeiro/registros" element={<FinanceiroRegistros />} />
           <Route path="/atendimento/financeiro/transferencia" element={<FinanceiroTransferencia />} />
