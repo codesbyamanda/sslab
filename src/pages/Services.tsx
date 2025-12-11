@@ -59,8 +59,11 @@ const Services = () => {
   const navigate = useNavigate();
 
   const handleServiceClick = (service: string) => {
-    // Navigate to dashboard or specific service
-    navigate("/dashboard");
+    if (service === "Saúde Atendimento") {
+      navigate("/atendimento");
+    } else {
+      navigate("/dashboard");
+    }
   };
 
   return (
