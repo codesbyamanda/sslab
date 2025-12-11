@@ -57,7 +57,7 @@ const mainMenuItems = [
   },
   { 
     title: "Atendimento", 
-    url: "/atendimento/requisicoes", 
+    url: "/atendimento/atendimentos", 
     icon: ClipboardList,
     tooltip: "Gerar requisições a partir de solicitações médicas"
   },
