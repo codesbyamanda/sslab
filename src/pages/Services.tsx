@@ -59,8 +59,14 @@ const Services = () => {
   const navigate = useNavigate();
 
   const handleServiceClick = (service: string) => {
-    // Todos os serviços vão para atendimento por enquanto
-    navigate("/atendimento");
+    if (service === "Saúde Atendimento") {
+      navigate("/atendimento");
+    } else if (service === "Saúde Faturamento") {
+      navigate("/faturamento");
+    } else {
+      // Outros módulos ainda não implementados
+      navigate("/atendimento");
+    }
   };
 
   return (
