@@ -15,6 +15,14 @@ import ImpressaoLaudos from "./pages/ImpressaoLaudos";
 import FinanceiroCaixa from "./pages/FinanceiroCaixa";
 import FinanceiroRegistros from "./pages/FinanceiroRegistros";
 import FinanceiroTransferencia from "./pages/FinanceiroTransferencia";
+import RelatorioAtendimentoDiario from "./pages/relatorios/RelatorioAtendimentoDiario";
+import RelatorioAtendimentoConvenio from "./pages/relatorios/RelatorioAtendimentoConvenio";
+import RelatorioAtendimentoParticular from "./pages/relatorios/RelatorioAtendimentoParticular";
+import RelatorioMovimentacaoFinanceira from "./pages/relatorios/RelatorioMovimentacaoFinanceira";
+import RelatorioDevedores from "./pages/relatorios/RelatorioDevedores";
+import RelatorioPromessaEntrega from "./pages/relatorios/RelatorioPromessaEntrega";
+import RelatorioItensPendentes from "./pages/relatorios/RelatorioItensPendentes";
+import RelatorioFaturamentos from "./pages/relatorios/RelatorioFaturamentos";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -38,6 +46,14 @@ const App = () => (
           <Route path="/atendimento/financeiro/caixa" element={<FinanceiroCaixa />} />
           <Route path="/atendimento/financeiro/registros" element={<FinanceiroRegistros />} />
           <Route path="/atendimento/financeiro/transferencia" element={<FinanceiroTransferencia />} />
+          <Route path="/atendimento/relatorios/diario" element={<RelatorioAtendimentoDiario />} />
+          <Route path="/atendimento/relatorios/convenio" element={<RelatorioAtendimentoConvenio />} />
+          <Route path="/atendimento/relatorios/particular" element={<RelatorioAtendimentoParticular />} />
+          <Route path="/atendimento/relatorios/financeiro" element={<RelatorioMovimentacaoFinanceira />} />
+          <Route path="/atendimento/relatorios/devedores" element={<RelatorioDevedores />} />
+          <Route path="/atendimento/relatorios/promessa" element={<RelatorioPromessaEntrega />} />
+          <Route path="/atendimento/relatorios/pendentes" element={<RelatorioItensPendentes />} />
+          <Route path="/atendimento/relatorios/faturamentos" element={<RelatorioFaturamentos />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
