@@ -1,11 +1,21 @@
 import { useState, useEffect } from "react";
-import { Plus, Edit, Trash2, History, AlertCircle } from "lucide-react";
+import { Plus, Edit, Trash2, History, AlertCircle, Banknote, CreditCard, FileCheck, Percent, Building2, ArrowRightLeft } from "lucide-react";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -30,7 +40,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "@/hooks/use-toast";
 import ParcelaEditModal from "./ParcelaEditModal";
-import LancamentoModal from "./LancamentoModal";
+import RecebimentoModal, { Lancamento } from "./RecebimentoModal";
 
 interface Parcela {
   id: number;
@@ -38,14 +48,6 @@ interface Parcela {
   dataVencimento: string;
   valor: number;
   situacao: "Aberto" | "Parcial" | "Quitado";
-}
-
-interface Lancamento {
-  id: number;
-  data: string;
-  formaRecebimento: string;
-  valor: number;
-  observacoes: string;
 }
 
 interface HistoricoAlteracao {
@@ -99,6 +101,8 @@ const ReceitaModal = ({ open, onOpenChange, receita }: ReceitaModalProps) => {
   const [lancamentos, setLancamentos] = useState<Lancamento[]>([]);
   const [lancamentoModalOpen, setLancamentoModalOpen] = useState(false);
   const [selectedLancamento, setSelectedLancamento] = useState<Lancamento | null>(null);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [lancamentoToDelete, setLancamentoToDelete] = useState<number | null>(null);
   
   // Historico
   const [historico] = useState<HistoricoAlteracao[]>([
@@ -229,11 +233,19 @@ const ReceitaModal = ({ open, onOpenChange, receita }: ReceitaModalProps) => {
   };
 
   const handleSaveLancamento = (lancamento: Lancamento) => {
+    let updatedLancamentos: Lancamento[];
     if (lancamento.id) {
-      setLancamentos(lancamentos.map(l => l.id === lancamento.id ? lancamento : l));
+      updatedLancamentos = lancamentos.map(l => l.id === lancamento.id ? lancamento : l);
     } else {
-      setLancamentos([...lancamentos, { ...lancamento, id: Date.now() }]);
+      updatedLancamentos = [...lancamentos, { ...lancamento, id: Date.now() }];
     }
+    setLancamentos(updatedLancamentos);
+    
+    // Recalcular valor devido
+    const totalRecebido = updatedLancamentos.reduce((acc, l) => acc + l.valor, 0);
+    const novoValorDevido = Math.max(0, (parseFloat(valor) || 0) - totalRecebido);
+    setValorDevido(novoValorDevido.toString());
+    
     setLancamentoModalOpen(false);
     toast({
       title: "Lançamento salvo",
@@ -241,12 +253,40 @@ const ReceitaModal = ({ open, onOpenChange, receita }: ReceitaModalProps) => {
     });
   };
 
-  const handleDeleteLancamento = (id: number) => {
-    setLancamentos(lancamentos.filter(l => l.id !== id));
+  const handleConfirmDelete = (id: number) => {
+    setLancamentoToDelete(id);
+    setDeleteConfirmOpen(true);
+  };
+
+  const handleDeleteLancamento = () => {
+    if (lancamentoToDelete === null) return;
+    
+    const updatedLancamentos = lancamentos.filter(l => l.id !== lancamentoToDelete);
+    setLancamentos(updatedLancamentos);
+    
+    // Recalcular valor devido
+    const totalRecebido = updatedLancamentos.reduce((acc, l) => acc + l.valor, 0);
+    const novoValorDevido = Math.max(0, (parseFloat(valor) || 0) - totalRecebido);
+    setValorDevido(novoValorDevido.toString());
+    
+    setDeleteConfirmOpen(false);
+    setLancamentoToDelete(null);
     toast({
       title: "Lançamento excluído",
       description: "O lançamento foi removido com sucesso.",
     });
+  };
+
+  const getFormaIcon = (forma: string) => {
+    switch (forma) {
+      case "Dinheiro": return <Banknote className="h-4 w-4 text-green-600" />;
+      case "Cheque": return <FileCheck className="h-4 w-4 text-blue-600" />;
+      case "Cartão": return <CreditCard className="h-4 w-4 text-purple-600" />;
+      case "Desconto": return <Percent className="h-4 w-4 text-red-600" />;
+      case "Depósito": return <Building2 className="h-4 w-4 text-teal-600" />;
+      case "Transferência": return <ArrowRightLeft className="h-4 w-4 text-indigo-600" />;
+      default: return null;
+    }
   };
 
   const formatCurrency = (value: number) => {
@@ -525,10 +565,35 @@ const ReceitaModal = ({ open, onOpenChange, receita }: ReceitaModalProps) => {
 
               {/* Tab 3 - Lançamentos Recebidos */}
               <TabsContent value="lancamentos" className="mt-0 space-y-4">
-                <div className="flex justify-end">
+                {/* Resumo Financeiro */}
+                <Card className="bg-muted/30 border-dashed">
+                  <CardContent className="py-3">
+                    <div className="grid grid-cols-3 gap-4 text-sm">
+                      <div>
+                        <span className="text-muted-foreground">Valor Original:</span>
+                        <p className="font-bold text-foreground">{formatCurrency(parseFloat(valor) || 0)}</p>
+                      </div>
+                      <div>
+                        <span className="text-muted-foreground">Total Recebido:</span>
+                        <p className="font-bold text-green-600">{formatCurrency(lancamentos.reduce((acc, l) => acc + l.valor, 0))}</p>
+                      </div>
+                      <div>
+                        <span className="text-muted-foreground">Valor Devido:</span>
+                        <p className={`font-bold ${(parseFloat(valorDevido) || 0) > 0 ? "text-orange-600" : "text-green-600"}`}>
+                          {formatCurrency(parseFloat(valorDevido) || 0)}
+                        </p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <div className="flex justify-between items-center">
+                  <p className="text-sm text-muted-foreground">
+                    {lancamentos.length} lançamento(s) registrado(s)
+                  </p>
                   <Button onClick={handleAddLancamento} className="gap-2">
                     <Plus className="h-4 w-4" />
-                    Incluir Lançamento
+                    Novo Recebimento
                   </Button>
                 </div>
 
@@ -550,7 +615,12 @@ const ReceitaModal = ({ open, onOpenChange, receita }: ReceitaModalProps) => {
                             <TableCell className="font-medium">
                               {formatDate(lancamento.data)}
                             </TableCell>
-                            <TableCell>{lancamento.formaRecebimento}</TableCell>
+                            <TableCell>
+                              <div className="flex items-center gap-2">
+                                {getFormaIcon(lancamento.formaRecebimento)}
+                                {lancamento.formaRecebimento}
+                              </div>
+                            </TableCell>
                             <TableCell className="text-right font-medium text-green-600">
                               {formatCurrency(lancamento.valor)}
                             </TableCell>
@@ -571,7 +641,7 @@ const ReceitaModal = ({ open, onOpenChange, receita }: ReceitaModalProps) => {
                                   variant="ghost"
                                   size="icon"
                                   className="h-8 w-8 text-destructive hover:text-destructive"
-                                  onClick={() => handleDeleteLancamento(lancamento.id)}
+                                  onClick={() => handleConfirmDelete(lancamento.id)}
                                 >
                                   <Trash2 className="h-4 w-4" />
                                 </Button>
@@ -622,12 +692,32 @@ const ReceitaModal = ({ open, onOpenChange, receita }: ReceitaModalProps) => {
         onSave={handleParcelaSave}
       />
 
-      <LancamentoModal
+      <RecebimentoModal
         open={lancamentoModalOpen}
         onOpenChange={setLancamentoModalOpen}
         lancamento={selectedLancamento}
         onSave={handleSaveLancamento}
+        valorDevido={parseFloat(valorDevido) || 0}
+        pessoaNome={pessoa}
+        pessoaCpf=""
       />
+
+      <AlertDialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmar Exclusão</AlertDialogTitle>
+            <AlertDialogDescription>
+              Deseja realmente excluir este lançamento? Esta ação não pode ser desfeita e o valor será recalculado automaticamente.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteLancamento} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 };
