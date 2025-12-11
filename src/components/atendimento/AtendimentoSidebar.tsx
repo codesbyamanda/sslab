@@ -20,7 +20,7 @@ const AtendimentoSidebar = () => {
 
   return (
     <aside className={cn(
-      "min-h-screen gradient-navy flex flex-col transition-all duration-200 relative flex-shrink-0",
+      "fixed top-0 left-0 h-screen gradient-navy flex flex-col transition-all duration-200 z-40 flex-shrink-0",
       collapsed ? "w-20" : "w-60"
     )}>
       {/* Module Title */}
