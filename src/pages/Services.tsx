@@ -63,6 +63,8 @@ const Services = () => {
       navigate("/atendimento");
     } else if (service === "Saúde Faturamento") {
       navigate("/faturamento");
+    } else if (service === "Saúde Financeiro") {
+      navigate("/financeiro");
     } else {
       // Outros módulos ainda não implementados
       navigate("/atendimento");
