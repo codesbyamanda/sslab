@@ -34,6 +34,9 @@ import Faturamento from "./pages/Faturamento";
 import SaudeFinanceiro from "./pages/SaudeFinanceiro";
 import ReceitasReceber from "./pages/financeiro/ReceitasReceber";
 import Cheques from "./pages/financeiro/Cheques";
+import TransacoesCartao from "./pages/financeiro/TransacoesCartao";
+import Depositos from "./pages/financeiro/Depositos";
+import RepasseCartao from "./pages/financeiro/RepasseCartao";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -76,9 +79,9 @@ const App = () => (
           <Route path="/financeiro" element={<SaudeFinanceiro />} />
           <Route path="/financeiro/receitas" element={<ReceitasReceber />} />
           <Route path="/financeiro/cheques" element={<Cheques />} />
-          <Route path="/financeiro/transacoes-cartao" element={<SaudeFinanceiro />} />
-          <Route path="/financeiro/depositos" element={<SaudeFinanceiro />} />
-          <Route path="/financeiro/repasse-cartao" element={<SaudeFinanceiro />} />
+          <Route path="/financeiro/transacoes-cartao" element={<TransacoesCartao />} />
+          <Route path="/financeiro/depositos" element={<Depositos />} />
+          <Route path="/financeiro/repasse-cartao" element={<RepasseCartao />} />
           <Route path="/financeiro/contas-pagar" element={<SaudeFinanceiro />} />
           <Route path="/financeiro/cheques-emitidos" element={<SaudeFinanceiro />} />
           <Route path="/financeiro/caixas" element={<SaudeFinanceiro />} />
