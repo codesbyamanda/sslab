@@ -1,13 +1,13 @@
-import { useState } from "react";
-import { History, Printer, RefreshCw, Eye, Globe, Download, FileText } from "lucide-react";
+import { useState, useEffect } from "react";
+import { History, Printer, RefreshCw, Eye, Globe, Download, FileText, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
+  DialogFooter,
 } from "@/components/ui/dialog";
 import {
   Table,
@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/table";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useToast } from "@/hooks/use-toast";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import type { Requisicao } from "@/pages/ImpressaoLaudos";
 
 interface Emissao {
@@ -80,6 +81,17 @@ const HistoricoEmissoesModal = ({ open, onClose, requisicao }: HistoricoEmissoes
   const { toast } = useToast();
   const [emissoes] = useState<Emissao[]>(mockEmissoes);
 
+  // Suporte para fechar com ESC
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && open) {
+        onClose();
+      }
+    };
+    document.addEventListener("keydown", handleEsc);
+    return () => document.removeEventListener("keydown", handleEsc);
+  }, [open, onClose]);
+
   const handleReimprimir = (emissao: Emissao) => {
     toast({
       title: "Reimprimindo laudo",
@@ -117,13 +129,29 @@ const HistoricoEmissoesModal = ({ open, onClose, requisicao }: HistoricoEmissoes
   const getSituacaoBadge = (situacao: string) => {
     switch (situacao) {
       case "Gerado":
-        return <Badge variant="secondary">Gerado</Badge>;
+        return (
+          <Badge variant="secondary" className="bg-muted text-muted-foreground">
+            Gerado
+          </Badge>
+        );
       case "Enviado":
-        return <Badge className="bg-verde-sucesso hover:bg-verde-sucesso/90">Enviado</Badge>;
+        return (
+          <Badge className="bg-verde-sucesso/15 text-verde-sucesso border border-verde-sucesso/30 hover:bg-verde-sucesso/20">
+            Enviado
+          </Badge>
+        );
       case "Erro":
-        return <Badge variant="destructive">Erro</Badge>;
+        return (
+          <Badge variant="destructive" className="bg-destructive/15 text-destructive border border-destructive/30">
+            Erro
+          </Badge>
+        );
       case "Cancelado":
-        return <Badge variant="outline" className="text-muted-foreground">Cancelado</Badge>;
+        return (
+          <Badge variant="outline" className="text-muted-foreground">
+            Cancelado
+          </Badge>
+        );
       default:
         return <Badge variant="outline">{situacao}</Badge>;
     }
@@ -131,135 +159,181 @@ const HistoricoEmissoesModal = ({ open, onClose, requisicao }: HistoricoEmissoes
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <History className="h-5 w-5 text-primary" />
-            Histórico de Emissões (F8)
-          </DialogTitle>
-          <DialogDescription>
-            Requisição: <span className="font-mono text-primary">{requisicao.numero}</span>
-            {" • "}Paciente: <span className="font-medium">{requisicao.paciente}</span>
-          </DialogDescription>
+      <DialogContent className="sm:max-w-[70vw] max-h-[85vh] p-0 gap-0 overflow-hidden">
+        {/* Cabeçalho */}
+        <DialogHeader className="px-6 py-4 border-b bg-muted/30">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-primary/10">
+                <History className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <DialogTitle className="text-lg font-semibold">
+                  Histórico de Emissões
+                </DialogTitle>
+                <p className="text-sm text-muted-foreground mt-0.5">
+                  Requisição: <span className="font-mono text-primary font-medium">{requisicao.numero}</span>
+                  {" • "}
+                  Paciente: <span className="font-medium text-foreground">{requisicao.paciente}</span>
+                </p>
+              </div>
+            </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 rounded-full hover:bg-destructive/10 hover:text-destructive"
+              onClick={onClose}
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
         </DialogHeader>
 
-        <div className="py-4">
-          <div className="rounded-lg border overflow-hidden">
-            <Table>
-              <TableHeader>
-                <TableRow className="bg-muted/30 hover:bg-muted/30">
-                  <TableHead className="font-semibold">Data/Hora</TableHead>
-                  <TableHead className="font-semibold">Tipo</TableHead>
-                  <TableHead className="font-semibold">Arquivo Gerado</TableHead>
-                  <TableHead className="font-semibold">Usuário</TableHead>
-                  <TableHead className="font-semibold">Convênio</TableHead>
-                  <TableHead className="font-semibold text-center">Situação</TableHead>
-                  <TableHead className="font-semibold text-center">Ações</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {emissoes.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={7} className="text-center py-12 text-muted-foreground">
-                      <History className="h-12 w-12 mx-auto mb-3 opacity-30" />
-                      <p>Nenhuma emissão registrada</p>
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  emissoes.map((emissao) => (
-                    <TableRow key={emissao.id} className={emissao.situacao === "Erro" ? "bg-vermelho-moderno/5" : ""}>
-                      <TableCell className="font-mono text-sm">
-                        {emissao.dataHora}
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          {getTipoIcon(emissao.tipo)}
-                          <span>{emissao.tipo}</span>
-                        </div>
-                      </TableCell>
-                      <TableCell className="font-mono text-xs text-primary">
-                        {emissao.arquivo}
-                      </TableCell>
-                      <TableCell>{emissao.usuario}</TableCell>
-                      <TableCell>{emissao.convenio}</TableCell>
-                      <TableCell className="text-center">
-                        {getSituacaoBadge(emissao.situacao)}
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center justify-center gap-1">
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Button
-                                size="icon"
-                                variant="ghost"
-                                className="h-8 w-8 hover:bg-primary/10 hover:text-primary"
-                                onClick={() => handleVisualizar(emissao)}
-                                disabled={emissao.situacao === "Erro"}
-                              >
-                                <Eye className="h-4 w-4" />
-                              </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>Visualizar PDF</TooltipContent>
-                          </Tooltip>
-
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Button
-                                size="icon"
-                                variant="ghost"
-                                className="h-8 w-8 hover:bg-verde-sucesso/10 hover:text-verde-sucesso"
-                                onClick={() => handleReimprimir(emissao)}
-                                disabled={emissao.situacao === "Erro"}
-                              >
-                                <Printer className="h-4 w-4" />
-                              </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>Reimprimir</TooltipContent>
-                          </Tooltip>
-
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Button
-                                size="icon"
-                                variant="ghost"
-                                className="h-8 w-8 hover:bg-amber-500/10 hover:text-amber-600"
-                                onClick={() => handleRegerar(emissao)}
-                              >
-                                <RefreshCw className="h-4 w-4" />
-                              </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>Regerar</TooltipContent>
-                          </Tooltip>
-                        </div>
-                      </TableCell>
+        {/* Corpo com tabela scrollável */}
+        <div className="flex-1 overflow-hidden">
+          <ScrollArea className="h-[50vh]">
+            <div className="px-6 py-4">
+              <div className="rounded-lg border overflow-hidden">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="bg-muted/50 hover:bg-muted/50">
+                      <TableHead className="font-semibold text-foreground">Data/Hora</TableHead>
+                      <TableHead className="font-semibold text-foreground">Tipo de Emissão</TableHead>
+                      <TableHead className="font-semibold text-foreground">Arquivo Gerado</TableHead>
+                      <TableHead className="font-semibold text-foreground">Usuário</TableHead>
+                      <TableHead className="font-semibold text-foreground">Convênio</TableHead>
+                      <TableHead className="font-semibold text-foreground text-center">Situação</TableHead>
+                      <TableHead className="font-semibold text-foreground text-center">Ações</TableHead>
                     </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </div>
+                  </TableHeader>
+                  <TableBody>
+                    {emissoes.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={7} className="text-center py-16 text-muted-foreground">
+                          <History className="h-12 w-12 mx-auto mb-3 opacity-30" />
+                          <p className="text-sm">Nenhuma emissão registrada para esta requisição</p>
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      emissoes.map((emissao) => (
+                        <TableRow 
+                          key={emissao.id} 
+                          className={
+                            emissao.situacao === "Erro" 
+                              ? "bg-destructive/5 hover:bg-destructive/10" 
+                              : "hover:bg-muted/30"
+                          }
+                        >
+                          <TableCell className="font-mono text-sm text-muted-foreground">
+                            {emissao.dataHora}
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-2">
+                              {getTipoIcon(emissao.tipo)}
+                              <span className="text-sm">{emissao.tipo}</span>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <code className="text-xs bg-muted px-2 py-1 rounded text-primary font-mono">
+                              {emissao.arquivo}
+                            </code>
+                          </TableCell>
+                          <TableCell className="text-sm">{emissao.usuario}</TableCell>
+                          <TableCell className="text-sm">{emissao.convenio}</TableCell>
+                          <TableCell className="text-center">
+                            {getSituacaoBadge(emissao.situacao)}
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex items-center justify-center gap-1">
+                              {/* Visualizar PDF - só aparece se houver arquivo e não for erro */}
+                              {emissao.situacao !== "Erro" && emissao.arquivo && (
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button
+                                      size="icon"
+                                      variant="ghost"
+                                      className="h-8 w-8 hover:bg-primary/10 hover:text-primary"
+                                      onClick={() => handleVisualizar(emissao)}
+                                    >
+                                      <Eye className="h-4 w-4" />
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent side="top">
+                                    <p>Visualizar PDF</p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              )}
 
-          <div className="mt-4 p-3 bg-muted/50 rounded-lg">
-            <p className="text-xs text-muted-foreground">
-              <strong>Legenda:</strong>{" "}
-              <span className="inline-flex items-center gap-1 mr-3">
-                <Globe className="h-3 w-3 text-verde-sucesso" /> Internet
-              </span>
-              <span className="inline-flex items-center gap-1 mr-3">
-                <Download className="h-3 w-3 text-amber-600" /> Arquivo
-              </span>
-              <span className="inline-flex items-center gap-1">
-                <Printer className="h-3 w-3 text-primary" /> Impressão
-              </span>
-            </p>
-          </div>
+                              {/* Reimprimir - desabilitado em caso de erro */}
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button
+                                    size="icon"
+                                    variant="ghost"
+                                    className="h-8 w-8 hover:bg-verde-sucesso/10 hover:text-verde-sucesso disabled:opacity-40"
+                                    onClick={() => handleReimprimir(emissao)}
+                                    disabled={emissao.situacao === "Erro"}
+                                  >
+                                    <Printer className="h-4 w-4" />
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent side="top">
+                                  <p>Imprimir novamente</p>
+                                </TooltipContent>
+                              </Tooltip>
+
+                              {/* Reprocessar/Gerar novamente - estilo neutro */}
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button
+                                    size="icon"
+                                    variant="ghost"
+                                    className="h-8 w-8 hover:bg-muted hover:text-foreground"
+                                    onClick={() => handleRegerar(emissao)}
+                                  >
+                                    <RefreshCw className="h-4 w-4" />
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent side="top">
+                                  <p>Reprocessar / Gerar novamente</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
+            </div>
+          </ScrollArea>
         </div>
 
-        <div className="flex justify-end">
-          <Button variant="outline" onClick={onClose}>
+        {/* Rodapé com legenda e botão */}
+        <DialogFooter className="px-6 py-4 border-t bg-muted/20 flex-row justify-between items-center">
+          {/* Legenda à esquerda */}
+          <div className="flex items-center gap-4 text-xs text-muted-foreground">
+            <span className="font-medium">Legenda:</span>
+            <span className="inline-flex items-center gap-1.5">
+              <Globe className="h-3.5 w-3.5 text-verde-sucesso" />
+              Internet
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <Download className="h-3.5 w-3.5 text-amber-600" />
+              Arquivo
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <Printer className="h-3.5 w-3.5 text-primary" />
+              Impressão
+            </span>
+          </div>
+
+          {/* Botão fechar à direita */}
+          <Button variant="outline" onClick={onClose} className="min-w-[100px]">
             Fechar
           </Button>
-        </div>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
