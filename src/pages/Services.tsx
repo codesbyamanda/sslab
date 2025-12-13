@@ -17,56 +17,59 @@ const services = [
     title: "Saúde Atendimento",
     description: "Gestão completa de atendimentos e consultas médicas",
     icon: Stethoscope,
+    enabled: true,
   },
   {
     title: "Saúde Cadastro",
     description: "Cadastro e gestão de pacientes e profissionais",
     icon: UserPlus,
+    enabled: false,
   },
   {
     title: "Saúde Faturamento",
     description: "Controle de faturamento e guias médicas",
     icon: Receipt,
+    enabled: false,
   },
   {
     title: "Saúde Financeiro",
     description: "Gestão financeira e controle de pagamentos",
     icon: DollarSign,
+    enabled: false,
   },
   {
     title: "Saúde Informática",
     description: "Suporte técnico e infraestrutura de TI",
     icon: Monitor,
+    enabled: false,
   },
   {
     title: "Saúde Laboratório",
     description: "Gestão de exames e resultados laboratoriais",
     icon: FlaskConical,
+    enabled: false,
   },
   {
     title: "Saúde Segurança",
     description: "Segurança da informação e compliance",
     icon: Shield,
+    enabled: false,
   },
   {
     title: "Saúde Transferência",
     description: "Transferência de pacientes e prontuários",
     icon: ArrowLeftRight,
+    enabled: false,
   },
 ];
 
 const Services = () => {
   const navigate = useNavigate();
 
-  const handleServiceClick = (service: string) => {
+  const handleServiceClick = (service: string, enabled: boolean) => {
+    if (!enabled) return;
+    
     if (service === "Saúde Atendimento") {
-      navigate("/atendimento");
-    } else if (service === "Saúde Faturamento") {
-      navigate("/faturamento");
-    } else if (service === "Saúde Financeiro") {
-      navigate("/financeiro");
-    } else {
-      // Outros módulos ainda não implementados
       navigate("/atendimento");
     }
   };
@@ -94,8 +97,9 @@ const Services = () => {
               title={service.title}
               description={service.description}
               icon={service.icon}
-              onClick={() => handleServiceClick(service.title)}
+              onClick={() => handleServiceClick(service.title, service.enabled)}
               delay={index * 60}
+              enabled={service.enabled}
             />
           ))}
         </div>
