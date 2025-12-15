@@ -1,4 +1,4 @@
-import { Edit, Eye, Printer, History, TestTube } from "lucide-react";
+import { Edit, Eye, Printer, History, TestTube, FileText, CreditCard, Tag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useNavigate } from "react-router-dom";
@@ -250,6 +250,64 @@ const AtendimentoListTable = ({ filters }: AtendimentoListTableProps) => {
                       </TooltipTrigger>
                       <TooltipContent>Recebimento de Material</TooltipContent>
                     </Tooltip>
+
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-muted-foreground hover:text-primary"
+                          onClick={() => navigate(`/atendimento/laudo-paciente/${atendimento.id}`)}
+                        >
+                          <FileText className="h-4 w-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>Imprimir Laudo</TooltipContent>
+                    </Tooltip>
+
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-muted-foreground hover:text-primary"
+                          onClick={() => navigate(`/atendimento/impressoes/${atendimento.id}`)}
+                        >
+                          <Tag className="h-4 w-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>Impressões do Atendimento</TooltipContent>
+                    </Tooltip>
+
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-muted-foreground hover:text-primary"
+                          onClick={() => navigate(`/atendimento/guias/${atendimento.id}`)}
+                        >
+                          <FileText className="h-4 w-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>Guias</TooltipContent>
+                    </Tooltip>
+
+                    {atendimento.convenio === "Particular" && (
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 text-muted-foreground hover:text-verde-clinico"
+                            onClick={() => navigate(`/atendimento/receita/${atendimento.id}`)}
+                          >
+                            <CreditCard className="h-4 w-4" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>Receita a Receber</TooltipContent>
+                      </Tooltip>
+                    )}
                   </div>
                 </td>
               </tr>
