@@ -154,11 +154,35 @@ const WorkspaceFinanceiro = () => {
                       border: "1px solid hsl(220, 10%, 88%)",
                       borderRadius: "8px"
                     }}
+                    formatter={(value: number) => [`${value}%`, '']}
                   />
                   <Legend />
                 </PieChart>
               </ResponsiveContainer>
             </div>
+          </div>
+        </div>
+
+        {/* Evolução Mensal */}
+        <div className="card-premium p-6">
+          <h3 className="text-base font-semibold text-foreground mb-1">
+            Evolução Mensal
+          </h3>
+          <p className="text-sm text-muted-foreground mb-4">
+            Resumo financeiro dos últimos meses
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
+            {receitaMensal.map((item) => (
+              <div key={item.mes} className="p-4 bg-muted/30 rounded-xl text-center">
+                <p className="text-sm font-medium text-muted-foreground mb-2">{item.mes}</p>
+                <p className="text-lg font-bold text-verde-clinico">R$ {(item.receita / 1000).toFixed(0)}k</p>
+                <p className="text-xs text-muted-foreground">Receita</p>
+                <div className="mt-2 pt-2 border-t border-border">
+                  <p className="text-sm font-semibold text-foreground">R$ {((item.receita - item.despesa) / 1000).toFixed(0)}k</p>
+                  <p className="text-xs text-muted-foreground">Lucro</p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>

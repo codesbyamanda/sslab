@@ -1,7 +1,7 @@
 import WorkspaceLayout from "@/components/workspace/WorkspaceLayout";
 import KPICard from "@/components/workspace/KPICard";
 import GlobalFilters from "@/components/workspace/GlobalFilters";
-import { Users, UserPlus, Clock, CheckCircle, TrendingUp, Calendar } from "lucide-react";
+import { Users, UserPlus, Clock, CheckCircle, TrendingUp, Calendar, Building2 } from "lucide-react";
 import {
   BarChart,
   Bar,
@@ -15,6 +15,14 @@ import {
   Pie,
   Cell,
 } from "recharts";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 const atendimentosPorDia = [
   { dia: "Seg", valor: 45 },
@@ -32,7 +40,24 @@ const tipoAtendimento = [
   { name: "Procedimento", value: 5 },
 ];
 
-const COLORS = ["hsl(200, 56%, 25%)", "hsl(161, 51%, 43%)", "hsl(38, 52%, 58%)", "hsl(215, 10%, 50%)"];
+const atendimentosPorConvenio = [
+  { name: "Unimed", value: 35 },
+  { name: "Particular", value: 25 },
+  { name: "Bradesco", value: 20 },
+  { name: "SulAmérica", value: 12 },
+  { name: "Outros", value: 8 },
+];
+
+const tabelaConvenios = [
+  { convenio: "Unimed", requisicoes: 428, exames: 1284, valor: 125430, participacao: 32.2 },
+  { convenio: "Particular", requisicoes: 312, exames: 936, valor: 98200, participacao: 25.2 },
+  { convenio: "Bradesco Saúde", requisicoes: 256, exames: 768, valor: 76890, participacao: 19.7 },
+  { convenio: "SulAmérica", requisicoes: 148, exames: 444, valor: 45320, participacao: 11.6 },
+  { convenio: "Amil", requisicoes: 98, exames: 294, valor: 28450, participacao: 7.3 },
+  { convenio: "Outros", requisicoes: 65, exames: 195, valor: 15130, participacao: 3.9 },
+];
+
+const COLORS = ["hsl(200, 56%, 25%)", "hsl(161, 51%, 43%)", "hsl(38, 52%, 58%)", "hsl(280, 50%, 50%)", "hsl(215, 10%, 50%)"];
 
 const WorkspaceAtendimento = () => {
   return (
@@ -79,7 +104,7 @@ const WorkspaceAtendimento = () => {
           />
         </div>
 
-        {/* Charts */}
+        {/* Charts Row 1 */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="card-premium p-6">
             <h3 className="text-base font-semibold text-foreground mb-1">
@@ -146,6 +171,112 @@ const WorkspaceAtendimento = () => {
                 </PieChart>
               </ResponsiveContainer>
             </div>
+          </div>
+        </div>
+
+        {/* Charts Row 2 */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="card-premium p-6">
+            <h3 className="text-base font-semibold text-foreground mb-1">
+              Atendimentos por Convênio
+            </h3>
+            <p className="text-sm text-muted-foreground mb-6">
+              Distribuição percentual por convênio
+            </p>
+            <div className="h-72 flex items-center justify-center">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={atendimentosPorConvenio}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={60}
+                    outerRadius={100}
+                    paddingAngle={2}
+                    dataKey="value"
+                  >
+                    {atendimentosPorConvenio.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip 
+                    contentStyle={{ 
+                      backgroundColor: "hsl(0, 0%, 100%)", 
+                      border: "1px solid hsl(220, 10%, 88%)",
+                      borderRadius: "8px"
+                    }}
+                    formatter={(value: number) => [`${value}%`, '']}
+                  />
+                  <Legend />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          <div className="card-premium p-6">
+            <div className="flex items-center gap-2 mb-1">
+              <Building2 className="h-4 w-4 text-muted-foreground" />
+              <h3 className="text-base font-semibold text-foreground">
+                Participação por Convênio
+              </h3>
+            </div>
+            <p className="text-sm text-muted-foreground mb-4">
+              Volume e valor por convênio
+            </p>
+            <div className="space-y-3">
+              {tabelaConvenios.slice(0, 4).map((item) => (
+                <div key={item.convenio} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
+                  <div>
+                    <p className="text-sm font-medium text-foreground">{item.convenio}</p>
+                    <p className="text-xs text-muted-foreground">{item.requisicoes} requisições • {item.exames} exames</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm font-semibold text-primary">R$ {item.valor.toLocaleString()}</p>
+                    <p className="text-xs text-muted-foreground">{item.participacao}%</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Tabela Analítica */}
+        <div className="card-premium p-6">
+          <h3 className="text-base font-semibold text-foreground mb-1">
+            Tabela Analítica por Convênio
+          </h3>
+          <p className="text-sm text-muted-foreground mb-4">
+            Detalhamento completo de requisições, exames e valores
+          </p>
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Convênio</TableHead>
+                  <TableHead className="text-right">Requisições</TableHead>
+                  <TableHead className="text-right">Exames</TableHead>
+                  <TableHead className="text-right">Valor Total</TableHead>
+                  <TableHead className="text-right">Participação %</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {tabelaConvenios.map((item) => (
+                  <TableRow key={item.convenio}>
+                    <TableCell className="font-medium">{item.convenio}</TableCell>
+                    <TableCell className="text-right">{item.requisicoes}</TableCell>
+                    <TableCell className="text-right">{item.exames}</TableCell>
+                    <TableCell className="text-right font-medium text-primary">
+                      R$ {item.valor.toLocaleString()}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary">
+                        {item.participacao}%
+                      </span>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           </div>
         </div>
       </div>

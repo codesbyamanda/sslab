@@ -162,36 +162,129 @@ const WorkspaceLaboratorio = () => {
           </div>
         </div>
 
-        {/* Pendências */}
+        {/* Pendências por Setor */}
         <div className="card-premium p-6">
           <h3 className="text-base font-semibold text-foreground mb-4">Exames Pendentes por Setor</h3>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="p-4 bg-muted/30 rounded-xl">
-              <p className="text-2xl font-bold text-foreground">42</p>
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-2xl font-bold text-foreground">42</p>
+                <span className="px-2 py-0.5 bg-ambar-suave/10 text-ambar-suave text-xs font-medium rounded-full">Atenção</span>
+              </div>
               <p className="text-sm text-muted-foreground">Bioquímica</p>
               <div className="mt-2 h-1.5 bg-muted rounded-full overflow-hidden">
-                <div className="h-full bg-primary w-[65%]" />
+                <div className="h-full bg-ambar-suave w-[65%]" />
               </div>
             </div>
             <div className="p-4 bg-muted/30 rounded-xl">
-              <p className="text-2xl font-bold text-foreground">28</p>
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-2xl font-bold text-foreground">28</p>
+                <span className="px-2 py-0.5 bg-verde-clinico/10 text-verde-clinico text-xs font-medium rounded-full">Normal</span>
+              </div>
               <p className="text-sm text-muted-foreground">Hematologia</p>
               <div className="mt-2 h-1.5 bg-muted rounded-full overflow-hidden">
                 <div className="h-full bg-verde-clinico w-[45%]" />
               </div>
             </div>
             <div className="p-4 bg-muted/30 rounded-xl">
-              <p className="text-2xl font-bold text-foreground">35</p>
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-2xl font-bold text-foreground">35</p>
+                <span className="px-2 py-0.5 bg-ambar-suave/10 text-ambar-suave text-xs font-medium rounded-full">Atenção</span>
+              </div>
               <p className="text-sm text-muted-foreground">Microbiologia</p>
               <div className="mt-2 h-1.5 bg-muted rounded-full overflow-hidden">
                 <div className="h-full bg-ambar-suave w-[55%]" />
               </div>
             </div>
             <div className="p-4 bg-muted/30 rounded-xl">
-              <p className="text-2xl font-bold text-foreground">22</p>
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-2xl font-bold text-foreground">22</p>
+                <span className="px-2 py-0.5 bg-verde-clinico/10 text-verde-clinico text-xs font-medium rounded-full">Normal</span>
+              </div>
               <p className="text-sm text-muted-foreground">Imunologia</p>
               <div className="mt-2 h-1.5 bg-muted rounded-full overflow-hidden">
-                <div className="h-full bg-primary w-[35%]" />
+                <div className="h-full bg-verde-clinico w-[35%]" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Riscos e Alertas */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="card-premium p-6">
+            <h3 className="text-base font-semibold text-foreground mb-4">Prazos Críticos</h3>
+            <div className="space-y-3">
+              <div className="flex items-center justify-between p-3 bg-vermelho-moderno/5 rounded-lg border border-vermelho-moderno/20">
+                <div className="flex items-center gap-3">
+                  <AlertTriangle className="h-4 w-4 text-vermelho-moderno" />
+                  <div>
+                    <p className="text-sm font-medium text-foreground">Cultura de Urina</p>
+                    <p className="text-xs text-muted-foreground">Req. #4521 • Prazo: 14:00</p>
+                  </div>
+                </div>
+                <span className="text-xs font-medium text-vermelho-moderno">Atrasado</span>
+              </div>
+              <div className="flex items-center justify-between p-3 bg-ambar-suave/5 rounded-lg border border-ambar-suave/20">
+                <div className="flex items-center gap-3">
+                  <Clock className="h-4 w-4 text-ambar-suave" />
+                  <div>
+                    <p className="text-sm font-medium text-foreground">Antibiograma</p>
+                    <p className="text-xs text-muted-foreground">Req. #4518 • Prazo: 16:00</p>
+                  </div>
+                </div>
+                <span className="text-xs font-medium text-ambar-suave">2h restantes</span>
+              </div>
+              <div className="flex items-center justify-between p-3 bg-ambar-suave/5 rounded-lg border border-ambar-suave/20">
+                <div className="flex items-center gap-3">
+                  <Clock className="h-4 w-4 text-ambar-suave" />
+                  <div>
+                    <p className="text-sm font-medium text-foreground">TSH Ultra-sensível</p>
+                    <p className="text-xs text-muted-foreground">Req. #4515 • Prazo: 17:30</p>
+                  </div>
+                </div>
+                <span className="text-xs font-medium text-ambar-suave">3h restantes</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="card-premium p-6">
+            <h3 className="text-base font-semibold text-foreground mb-4">Métricas de Qualidade</h3>
+            <div className="space-y-4">
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm text-foreground">Taxa de Recoleta</span>
+                  <span className="text-sm font-medium text-verde-clinico">1.2%</span>
+                </div>
+                <div className="h-2 bg-muted rounded-full overflow-hidden">
+                  <div className="h-full bg-verde-clinico w-[12%]" />
+                </div>
+              </div>
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm text-foreground">Amostras Rejeitadas</span>
+                  <span className="text-sm font-medium text-verde-clinico">0.8%</span>
+                </div>
+                <div className="h-2 bg-muted rounded-full overflow-hidden">
+                  <div className="h-full bg-verde-clinico w-[8%]" />
+                </div>
+              </div>
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm text-foreground">Tempo Médio de Liberação</span>
+                  <span className="text-sm font-medium text-foreground">4.2h</span>
+                </div>
+                <div className="h-2 bg-muted rounded-full overflow-hidden">
+                  <div className="h-full bg-primary w-[70%]" />
+                </div>
+              </div>
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm text-foreground">Satisfação do Cliente</span>
+                  <span className="text-sm font-medium text-verde-clinico">96%</span>
+                </div>
+                <div className="h-2 bg-muted rounded-full overflow-hidden">
+                  <div className="h-full bg-verde-clinico w-[96%]" />
+                </div>
               </div>
             </div>
           </div>
