@@ -1,7 +1,8 @@
 import WorkspaceLayout from "@/components/workspace/WorkspaceLayout";
-import KPICard from "@/components/workspace/KPICard";
+import KPICardWithTooltip from "@/components/workspace/KPICardWithTooltip";
 import GlobalFilters from "@/components/workspace/GlobalFilters";
-import { Users, DollarSign, TrendingUp, ArrowRightLeft, Target, BarChart3 } from "lucide-react";
+import LastUpdatedBadge from "@/components/workspace/LastUpdatedBadge";
+import { Users, DollarSign, TrendingUp, ArrowRightLeft, Target, BarChart3, Info } from "lucide-react";
 import {
   ComposedChart,
   Line,
@@ -42,44 +43,81 @@ const WorkspaceAtendimentoFinanceiro = () => {
   return (
     <WorkspaceLayout title="Atendimento x Financeiro">
       <div className="space-y-6">
-        <GlobalFilters />
+        <div className="flex items-center justify-between">
+          <GlobalFilters />
+          <LastUpdatedBadge relative="há 10 minutos" />
+        </div>
 
         {/* KPIs */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-          <KPICard
-            title="Total Atendimentos"
+          <KPICardWithTooltip
+            title="Total de Atendimentos"
             value="2.847"
+            subtitle="No período"
             icon={Users}
             trend={{ value: "12%", positive: true }}
+            tooltip={{
+              description: "Quantidade total de atendimentos realizados.",
+              calculation: "Soma de todos os atendimentos",
+              type: "Valor absoluto"
+            }}
           />
-          <KPICard
+          <KPICardWithTooltip
             title="Receita Gerada"
             value="R$ 389.420"
+            subtitle="Faturamento bruto"
             icon={DollarSign}
             trend={{ value: "8%", positive: true }}
+            tooltip={{
+              description: "Valor total faturado pelos atendimentos.",
+              calculation: "Soma dos valores de atendimento",
+              type: "Valor bruto (R$)"
+            }}
           />
-          <KPICard
+          <KPICardWithTooltip
             title="Ticket Médio"
             value="R$ 136,78"
+            subtitle="Por atendimento"
             icon={TrendingUp}
             trend={{ value: "3%", positive: true }}
+            tooltip={{
+              description: "Valor médio gerado por atendimento.",
+              calculation: "Receita total ÷ Número de atendimentos",
+              type: "Média (R$)"
+            }}
           />
-          <KPICard
+          <KPICardWithTooltip
             title="Conversão"
             value="94.2%"
-            subtitle="Atend. → Receita"
+            subtitle="Atend. para Receita"
             icon={ArrowRightLeft}
+            tooltip={{
+              description: "Percentual de atendimentos que geraram receita.",
+              calculation: "Atend. faturados ÷ Total atend. × 100",
+              type: "Percentual (%)"
+            }}
           />
-          <KPICard
+          <KPICardWithTooltip
             title="Meta Atingida"
             value="87%"
+            subtitle="Meta mensal: R$ 450k"
             icon={Target}
+            tooltip={{
+              description: "Percentual da meta mensal de receita atingido.",
+              calculation: "Receita atual ÷ Meta definida × 100",
+              type: "Percentual (%)"
+            }}
           />
-          <KPICard
+          <KPICardWithTooltip
             title="Eficiência"
             value="92%"
-            subtitle="Produtividade"
+            subtitle="Produtividade operacional"
             icon={BarChart3}
+            tooltip={{
+              description: "Índice de produtividade da operação.",
+              calculation: "Atend. realizados ÷ Capacidade × Qualidade",
+              type: "Índice (%)"
+            }}
           />
         </div>
 
@@ -181,7 +219,13 @@ const WorkspaceAtendimentoFinanceiro = () => {
 
         {/* Insights */}
         <div className="card-premium p-6">
-          <h3 className="text-base font-semibold text-foreground mb-4">Insights Analíticos</h3>
+          <div className="flex items-center gap-2 mb-4">
+            <h3 className="text-base font-semibold text-foreground">Insights Analíticos</h3>
+            <span className="text-xs text-muted-foreground px-2 py-0.5 bg-muted rounded-full flex items-center gap-1">
+              <Info className="h-3 w-3" />
+              Baseado em conversão e ticket médio
+            </span>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="p-4 bg-verde-clinico/5 rounded-xl border border-verde-clinico/20">
               <div className="w-8 h-8 rounded-lg bg-verde-clinico/10 flex items-center justify-center mb-3">

@@ -10,9 +10,10 @@ import {
 
 interface WorkspaceNavbarProps {
   title?: string;
+  showExport?: boolean;
 }
 
-const WorkspaceNavbar = ({ title = "Visão Geral" }: WorkspaceNavbarProps) => {
+const WorkspaceNavbar = ({ title = "Visão Geral", showExport = true }: WorkspaceNavbarProps) => {
   return (
     <header className="navbar-premium">
       <div className="flex items-center gap-4">
@@ -23,24 +24,26 @@ const WorkspaceNavbar = ({ title = "Visão Geral" }: WorkspaceNavbarProps) => {
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Buscar indicadores..."
-            className="pl-9 w-64 h-9 text-sm"
+            placeholder="Buscar painel, KPI ou indicador…"
+            className="pl-9 w-72 h-9 text-sm"
           />
         </div>
 
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button variant="outline" size="sm" className="gap-2 h-9">
-                <Download className="h-4 w-4" />
-                Exportar Relatório
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Exportar dados em PDF ou Excel</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        {showExport && (
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="outline" size="sm" className="gap-2 h-9">
+                  <Download className="h-4 w-4" />
+                  Exportar Relatório
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Exportar dados em PDF ou Excel</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        )}
 
         <Button variant="ghost" size="icon" className="h-9 w-9">
           <Bell className="h-4 w-4 text-muted-foreground" />
