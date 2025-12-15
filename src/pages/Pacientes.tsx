@@ -1,12 +1,11 @@
 import { useState } from "react";
 import { ArrowLeft, Plus, Users } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import AtendimentoSidebar from "@/components/atendimento/AtendimentoSidebar";
 import AtendimentoNavbar from "@/components/atendimento/AtendimentoNavbar";
 import PatientFilters from "@/components/pacientes/PatientFilters";
 import PatientTable from "@/components/pacientes/PatientTable";
-import PatientFormModal from "@/components/pacientes/PatientFormModal";
 import { toast } from "sonner";
 
 // Mock data
@@ -54,10 +53,9 @@ const mockPatients = [
 ];
 
 const Pacientes = () => {
+  const navigate = useNavigate();
   const [patients, setPatients] = useState(mockPatients);
   const [filteredPatients, setFilteredPatients] = useState(mockPatients);
-  const [isFormOpen, setIsFormOpen] = useState(false);
-  const [editingPatient, setEditingPatient] = useState<any>(null);
 
   const handleSearch = (filters: {
     search: string;
@@ -94,8 +92,7 @@ const Pacientes = () => {
   };
 
   const handleEdit = (patient: any) => {
-    setEditingPatient(patient);
-    setIsFormOpen(true);
+    navigate(`/atendimento/pacientes/${patient.id}`);
   };
 
   const handleView = (patient: any) => {
@@ -107,25 +104,6 @@ const Pacientes = () => {
     const updated = patients.filter((p) => p.id !== patient.id);
     setPatients(updated);
     setFilteredPatients(updated);
-  };
-
-  const handleSave = (patientData: any) => {
-    if (editingPatient) {
-      toast.success("Paciente atualizado com sucesso!");
-    } else {
-      toast.success("Paciente cadastrado com sucesso!");
-    }
-    setIsFormOpen(false);
-    setEditingPatient(null);
-  };
-
-  const handleSaveAndNew = (patientData: any) => {
-    toast.success("Paciente cadastrado! Formulário limpo para novo cadastro.");
-  };
-
-  const handleCloseForm = () => {
-    setIsFormOpen(false);
-    setEditingPatient(null);
   };
 
   return (
@@ -163,7 +141,7 @@ const Pacientes = () => {
               </div>
             </div>
             <Button
-              onClick={() => setIsFormOpen(true)}
+              onClick={() => navigate("/atendimento/pacientes/novo")}
               className="btn-primary-premium"
             >
               <Plus className="h-4 w-4" />
@@ -192,15 +170,6 @@ const Pacientes = () => {
           />
         </main>
       </div>
-
-      {/* Form Modal */}
-      <PatientFormModal
-        open={isFormOpen}
-        onClose={handleCloseForm}
-        onSave={handleSave}
-        onSaveAndNew={handleSaveAndNew}
-        patient={editingPatient}
-      />
     </div>
   );
 };

@@ -7,6 +7,7 @@ import Index from "./pages/Index";
 import Services from "./pages/Services";
 import SaudeAtendimento from "./pages/SaudeAtendimento";
 import Pacientes from "./pages/Pacientes";
+import PacienteCadastro from "./pages/PacienteCadastro";
 import Atendimentos from "./pages/Atendimentos";
 import AtendimentoCadastro from "./pages/AtendimentoCadastro";
 import RecebimentoMaterial from "./pages/RecebimentoMaterial";
@@ -58,6 +59,7 @@ const App = () => (
           <Route path="/services" element={<Services />} />
           <Route path="/atendimento" element={<SaudeAtendimento />} />
           <Route path="/atendimento/pacientes" element={<Pacientes />} />
+          <Route path="/atendimento/pacientes/:id" element={<PacienteCadastro />} />
           <Route path="/atendimento/atendimentos" element={<Atendimentos />} />
           <Route path="/atendimento/requisicao/:id" element={<AtendimentoCadastro />} />
           <Route path="/atendimento/recebimento" element={<RecebimentoMaterial />} />
