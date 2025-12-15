@@ -9,7 +9,8 @@ import {
   Monitor, 
   FlaskConical, 
   Shield, 
-  ArrowLeftRight 
+  ArrowLeftRight,
+  BarChart3
 } from "lucide-react";
 
 const services = [
@@ -61,6 +62,13 @@ const services = [
     icon: ArrowLeftRight,
     enabled: false,
   },
+  {
+    title: "Workspace de Dashboards",
+    description: "Indicadores, análises e visão geral do negócio",
+    icon: BarChart3,
+    enabled: true,
+    isStrategic: true,
+  },
 ];
 
 const Services = () => {
@@ -71,6 +79,8 @@ const Services = () => {
     
     if (service === "Saúde Atendimento") {
       navigate("/atendimento");
+    } else if (service === "Workspace de Dashboards") {
+      navigate("/workspace");
     }
   };
 
@@ -100,6 +110,7 @@ const Services = () => {
               onClick={() => handleServiceClick(service.title, service.enabled)}
               delay={index * 60}
               enabled={service.enabled}
+              isStrategic={(service as any).isStrategic}
             />
           ))}
         </div>

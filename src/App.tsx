@@ -37,6 +37,12 @@ import Cheques from "./pages/financeiro/Cheques";
 import TransacoesCartao from "./pages/financeiro/TransacoesCartao";
 import Depositos from "./pages/financeiro/Depositos";
 import RepasseCartao from "./pages/financeiro/RepasseCartao";
+import WorkspaceVisaoGeral from "./pages/workspace/WorkspaceVisaoGeral";
+import WorkspaceAtendimento from "./pages/workspace/WorkspaceAtendimento";
+import WorkspaceFinanceiro from "./pages/workspace/WorkspaceFinanceiro";
+import WorkspaceAtendimentoFinanceiro from "./pages/workspace/WorkspaceAtendimentoFinanceiro";
+import WorkspaceLaboratorio from "./pages/workspace/WorkspaceLaboratorio";
+import WorkspacePersonalizados from "./pages/workspace/WorkspacePersonalizados";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -89,8 +95,13 @@ const App = () => (
           <Route path="/financeiro/transferencias-caixas" element={<SaudeFinanceiro />} />
           <Route path="/financeiro/transferencias-bancarias" element={<SaudeFinanceiro />} />
           <Route path="/financeiro/configuracoes" element={<SaudeFinanceiro />} />
+          <Route path="/workspace" element={<WorkspaceVisaoGeral />} />
+          <Route path="/workspace/atendimento" element={<WorkspaceAtendimento />} />
+          <Route path="/workspace/financeiro" element={<WorkspaceFinanceiro />} />
+          <Route path="/workspace/atendimento-financeiro" element={<WorkspaceAtendimentoFinanceiro />} />
+          <Route path="/workspace/laboratorio" element={<WorkspaceLaboratorio />} />
+          <Route path="/workspace/personalizados" element={<WorkspacePersonalizados />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

@@ -13,9 +13,10 @@ interface ServiceCardProps {
   onClick?: () => void;
   delay?: number;
   enabled?: boolean;
+  isStrategic?: boolean;
 }
 
-const ServiceCard = ({ title, description, icon: Icon, onClick, delay = 0, enabled = true }: ServiceCardProps) => {
+const ServiceCard = ({ title, description, icon: Icon, onClick, delay = 0, enabled = true, isStrategic = false }: ServiceCardProps) => {
   const cardContent = (
     <button
       onClick={enabled ? onClick : undefined}
