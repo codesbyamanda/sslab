@@ -10,7 +10,6 @@ import {
   ChevronLeft,
   BarChart3
 } from "lucide-react";
-import SaudeLogo from "@/components/SaudeLogo";
 
 const menuItems = [
   {
@@ -57,7 +56,7 @@ const WorkspaceSidebar = () => {
   };
 
   return (
-    <aside className="w-64 min-h-screen gradient-navy flex flex-col">
+    <aside className="w-64 min-h-screen gradient-navy flex flex-col shrink-0">
       {/* Header */}
       <div className="p-6 border-b border-sidebar-border">
         <div className="flex items-center gap-3">
@@ -72,24 +71,28 @@ const WorkspaceSidebar = () => {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 py-4">
+      <nav className="flex-1 py-4 overflow-y-auto">
         <div className="px-3 mb-2">
           <span className="text-[10px] font-semibold uppercase tracking-wider text-sidebar-foreground/40 px-4">
             Painéis
           </span>
         </div>
         
-        <ul className="space-y-1">
+        <ul className="space-y-1 px-2">
           {menuItems.map((item) => (
             <li key={item.path}>
               <button
                 onClick={() => navigate(item.path)}
                 className={cn(
-                  "sidebar-item w-full text-left",
-                  isActive(item.path) && "sidebar-item-active"
+                  "flex items-center gap-3 w-full text-left px-4 py-2.5 rounded-lg transition-all duration-200",
+                  "text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/50",
+                  isActive(item.path) && "bg-sidebar-accent text-sidebar-foreground font-medium"
                 )}
               >
-                <item.icon className="h-5 w-5" />
+                <item.icon className={cn(
+                  "h-5 w-5 shrink-0",
+                  isActive(item.path) && "text-dourado-sutil"
+                )} />
                 <span className="text-sm">{item.title}</span>
               </button>
             </li>
@@ -101,7 +104,7 @@ const WorkspaceSidebar = () => {
       <div className="p-4 border-t border-sidebar-border">
         <button
           onClick={() => navigate("/services")}
-          className="flex items-center gap-2 text-sidebar-foreground/60 hover:text-sidebar-foreground transition-colors text-sm w-full px-4 py-2"
+          className="flex items-center gap-2 text-sidebar-foreground/60 hover:text-sidebar-foreground transition-colors text-sm w-full px-4 py-2.5 rounded-lg hover:bg-sidebar-accent/30"
         >
           <ChevronLeft className="h-4 w-4" />
           Voltar aos Módulos

@@ -209,6 +209,10 @@ const WorkspaceVisaoGeral = () => {
                 <span className="text-sm text-foreground">Bradesco Saúde</span>
                 <span className="text-sm font-medium text-primary">R$ 76.890</span>
               </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-foreground">SulAmérica</span>
+                <span className="text-sm font-medium text-primary">R$ 45.320</span>
+              </div>
             </div>
           </div>
 
@@ -227,23 +231,31 @@ const WorkspaceVisaoGeral = () => {
                 <span className="text-sm text-foreground">TSH</span>
                 <span className="text-sm font-medium">756</span>
               </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-foreground">Creatinina</span>
+                <span className="text-sm font-medium">654</span>
+              </div>
             </div>
           </div>
 
           <div className="card-premium p-5">
-            <h4 className="text-sm font-medium text-muted-foreground mb-3">Alertas Recentes</h4>
+            <h4 className="text-sm font-medium text-muted-foreground mb-3">Alertas Operacionais</h4>
             <div className="space-y-3">
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-ambar-suave" />
+              <div className="flex items-center gap-2 p-2 bg-ambar-suave/10 rounded-lg">
+                <div className="w-2 h-2 rounded-full bg-ambar-suave shrink-0" />
                 <span className="text-sm text-foreground">32 laudos aguardando liberação</span>
               </div>
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-vermelho-moderno" />
+              <div className="flex items-center gap-2 p-2 bg-vermelho-moderno/10 rounded-lg">
+                <div className="w-2 h-2 rounded-full bg-vermelho-moderno shrink-0" />
                 <span className="text-sm text-foreground">5 exames com prazo crítico</span>
               </div>
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-verde-clinico" />
+              <div className="flex items-center gap-2 p-2 bg-verde-clinico/10 rounded-lg">
+                <div className="w-2 h-2 rounded-full bg-verde-clinico shrink-0" />
                 <span className="text-sm text-foreground">Meta mensal: 85% atingida</span>
+              </div>
+              <div className="flex items-center gap-2 p-2 bg-primary/10 rounded-lg">
+                <div className="w-2 h-2 rounded-full bg-primary shrink-0" />
+                <span className="text-sm text-foreground">12 coletas pendentes hoje</span>
               </div>
             </div>
           </div>

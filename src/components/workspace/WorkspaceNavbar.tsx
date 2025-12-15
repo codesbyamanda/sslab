@@ -1,6 +1,12 @@
-import { Bell, Search, User } from "lucide-react";
+import { Bell, Search, User, Download } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface WorkspaceNavbarProps {
   title?: string;
@@ -21,6 +27,20 @@ const WorkspaceNavbar = ({ title = "Visão Geral" }: WorkspaceNavbarProps) => {
             className="pl-9 w-64 h-9 text-sm"
           />
         </div>
+
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="outline" size="sm" className="gap-2 h-9">
+                <Download className="h-4 w-4" />
+                Exportar Relatório
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Exportar dados em PDF ou Excel</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
 
         <Button variant="ghost" size="icon" className="h-9 w-9">
           <Bell className="h-4 w-4 text-muted-foreground" />
