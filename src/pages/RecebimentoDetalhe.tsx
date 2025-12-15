@@ -185,12 +185,12 @@ const RecebimentoDetalhe = () => {
   };
 
   const handleCancelar = () => {
-    navigate("/atendimento/recebimento");
+    navigate("/atendimento/atendimentos");
   };
 
   const handleClosePrintModal = () => {
     setShowPrintModal(false);
-    navigate("/atendimento/recebimento");
+    navigate("/atendimento/atendimentos");
   };
 
   const pendentesCount = servicosPendentes.filter(
@@ -210,11 +210,11 @@ const RecebimentoDetalhe = () => {
         <main className="flex-1 p-6 overflow-auto">
           {/* Breadcrumb */}
           <button
-            onClick={() => navigate("/atendimento/recebimento")}
+            onClick={() => navigate("/atendimento/atendimentos")}
             className="flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary/80 transition-colors mb-4 animate-fade-in"
           >
             <ArrowLeft className="h-4 w-4" />
-            <span>Voltar para Pesquisa</span>
+            <span>Voltar para Atendimentos</span>
           </button>
 
           {/* Header */}
