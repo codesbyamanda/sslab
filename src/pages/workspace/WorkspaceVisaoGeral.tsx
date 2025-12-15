@@ -1,17 +1,19 @@
 import WorkspaceLayout from "@/components/workspace/WorkspaceLayout";
-import KPICard from "@/components/workspace/KPICard";
+import KPICardWithTooltip from "@/components/workspace/KPICardWithTooltip";
 import GlobalFilters from "@/components/workspace/GlobalFilters";
+import LastUpdatedBadge from "@/components/workspace/LastUpdatedBadge";
 import { 
   Users, 
   DollarSign, 
   FlaskConical, 
   Clock, 
   TrendingUp,
-  Activity
+  Activity,
+  ExternalLink
 } from "lucide-react";
 import {
-  LineChart,
-  Line,
+  AreaChart,
+  Area,
   BarChart,
   Bar,
   XAxis,
@@ -20,9 +22,9 @@ import {
   Tooltip,
   ResponsiveContainer,
   Legend,
-  AreaChart,
-  Area,
 } from "recharts";
+import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 const atendimentoReceitaData = [
   { mes: "Jan", atendimentos: 320, receita: 45000 },
@@ -43,54 +45,89 @@ const producaoPrazoData = [
 ];
 
 const WorkspaceVisaoGeral = () => {
+  const navigate = useNavigate();
+
   return (
     <WorkspaceLayout title="Visão Geral">
       <div className="space-y-6">
-        {/* Filters */}
-        <GlobalFilters />
+        {/* Header with filters and update badge */}
+        <div className="flex items-center justify-between">
+          <GlobalFilters />
+          <LastUpdatedBadge relative="há 5 minutos" />
+        </div>
 
         {/* KPIs */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-          <KPICard
+          <KPICardWithTooltip
             title="Atendimentos"
             value="2.847"
-            subtitle="No período"
+            subtitle="No período selecionado"
             icon={Users}
             trend={{ value: "12%", positive: true }}
+            tooltip={{
+              description: "Total de atendimentos realizados no período.",
+              calculation: "Soma de todos os atendimentos registrados",
+              type: "Valor absoluto"
+            }}
           />
-          <KPICard
+          <KPICardWithTooltip
             title="Receita Total"
             value="R$ 389.420"
-            subtitle="No período"
+            subtitle="Faturamento bruto"
             icon={DollarSign}
             trend={{ value: "8.5%", positive: true }}
+            tooltip={{
+              description: "Valor total faturado no período.",
+              calculation: "Soma de todos os valores de atendimentos",
+              type: "Valor bruto (R$)"
+            }}
           />
-          <KPICard
+          <KPICardWithTooltip
             title="Exames Realizados"
             value="8.234"
-            subtitle="No período"
+            subtitle="No período selecionado"
             icon={FlaskConical}
             trend={{ value: "15%", positive: true }}
+            tooltip={{
+              description: "Quantidade de exames concluídos.",
+              calculation: "Total de exames com laudo liberado",
+              type: "Valor absoluto"
+            }}
           />
-          <KPICard
+          <KPICardWithTooltip
             title="Exames Pendentes"
             value="127"
-            subtitle="Aguardando"
+            subtitle="Aguardando processamento"
             icon={Clock}
             trend={{ value: "5%", positive: false }}
+            tooltip={{
+              description: "Exames aguardando realização ou liberação.",
+              calculation: "Exames coletados - Exames liberados",
+              type: "Valor absoluto"
+            }}
           />
-          <KPICard
+          <KPICardWithTooltip
             title="Ticket Médio"
             value="R$ 136,78"
             subtitle="Por atendimento"
             icon={TrendingUp}
             trend={{ value: "3.2%", positive: true }}
+            tooltip={{
+              description: "Valor médio por atendimento realizado.",
+              calculation: "Receita total ÷ Número de atendimentos",
+              type: "Média (R$)"
+            }}
           />
-          <KPICard
+          <KPICardWithTooltip
             title="Taxa de Ocupação"
             value="78%"
-            subtitle="Capacidade"
+            subtitle="Capacidade utilizada"
             icon={Activity}
+            tooltip={{
+              description: "Percentual de ocupação da capacidade operacional.",
+              calculation: "Atendimentos realizados ÷ Capacidade máxima × 100",
+              type: "Percentual (%)"
+            }}
           />
         </div>
 
@@ -195,7 +232,18 @@ const WorkspaceVisaoGeral = () => {
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="card-premium p-5">
-            <h4 className="text-sm font-medium text-muted-foreground mb-3">Top Convênios</h4>
+            <div className="flex items-center justify-between mb-3">
+              <h4 className="text-sm font-medium text-muted-foreground">Top Convênios</h4>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="h-7 text-xs gap-1"
+                onClick={() => navigate("/workspace/atendimento")}
+              >
+                Ver detalhes
+                <ExternalLink className="h-3 w-3" />
+              </Button>
+            </div>
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-sm text-foreground">Unimed</span>
@@ -217,7 +265,18 @@ const WorkspaceVisaoGeral = () => {
           </div>
 
           <div className="card-premium p-5">
-            <h4 className="text-sm font-medium text-muted-foreground mb-3">Exames Mais Solicitados</h4>
+            <div className="flex items-center justify-between mb-3">
+              <h4 className="text-sm font-medium text-muted-foreground">Exames Mais Solicitados</h4>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="h-7 text-xs gap-1"
+                onClick={() => navigate("/workspace/laboratorio")}
+              >
+                Ver detalhes
+                <ExternalLink className="h-3 w-3" />
+              </Button>
+            </div>
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-sm text-foreground">Hemograma Completo</span>
@@ -239,7 +298,18 @@ const WorkspaceVisaoGeral = () => {
           </div>
 
           <div className="card-premium p-5">
-            <h4 className="text-sm font-medium text-muted-foreground mb-3">Alertas Operacionais</h4>
+            <div className="flex items-center justify-between mb-3">
+              <h4 className="text-sm font-medium text-muted-foreground">Alertas Operacionais</h4>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="h-7 text-xs gap-1"
+                onClick={() => navigate("/workspace/laboratorio")}
+              >
+                Ver todos
+                <ExternalLink className="h-3 w-3" />
+              </Button>
+            </div>
             <div className="space-y-3">
               <div className="flex items-center gap-2 p-2 bg-ambar-suave/10 rounded-lg">
                 <div className="w-2 h-2 rounded-full bg-ambar-suave shrink-0" />
