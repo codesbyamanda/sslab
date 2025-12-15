@@ -62,12 +62,6 @@ const mainMenuItems = [
     tooltip: "Gerar requisições a partir de solicitações médicas"
   },
   { 
-    title: "Recebimento de Material", 
-    url: "/atendimento/recebimento", 
-    icon: Package,
-    tooltip: "Recebimento de amostras de exames pendentes"
-  },
-  { 
     title: "Orçamento", 
     url: "/atendimento/orcamento", 
     icon: Calculator,
