@@ -57,6 +57,8 @@ const Services = () => {
       navigate("/atendimento");
     } else if (service === "Workspace de Dashboards") {
       navigate("/workspace");
+    } else if (service === "Saúde Laboratório") {
+      navigate("/laboratorio");
     }
   };
   return <div className="min-h-screen bg-gradient-services">
