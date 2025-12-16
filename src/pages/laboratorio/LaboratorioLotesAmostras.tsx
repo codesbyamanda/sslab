@@ -113,7 +113,7 @@ const LaboratorioLotesAmostras = () => {
                     <SelectValue placeholder="Todas" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Todas</SelectItem>
+                    <SelectItem value="all">Todas</SelectItem>
                     <SelectItem value="central">Unidade Central</SelectItem>
                     <SelectItem value="norte">Unidade Norte</SelectItem>
                     <SelectItem value="sul">Unidade Sul</SelectItem>
@@ -127,7 +127,7 @@ const LaboratorioLotesAmostras = () => {
                     <SelectValue placeholder="Todos" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Todos</SelectItem>
+                    <SelectItem value="all">Todos</SelectItem>
                     <SelectItem value="bioquimica">Bioquímica</SelectItem>
                     <SelectItem value="hematologia">Hematologia</SelectItem>
                     <SelectItem value="microbiologia">Microbiologia</SelectItem>
@@ -141,7 +141,7 @@ const LaboratorioLotesAmostras = () => {
                     <SelectValue placeholder="Todos" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Todos</SelectItem>
+                    <SelectItem value="all">Todos</SelectItem>
                     <SelectItem value="aberto">Aberto</SelectItem>
                     <SelectItem value="processando">Processando</SelectItem>
                     <SelectItem value="concluido">Concluído</SelectItem>

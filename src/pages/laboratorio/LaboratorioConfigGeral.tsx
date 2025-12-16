@@ -100,7 +100,7 @@ const LaboratorioConfigGeral = () => {
                     <SelectValue placeholder="Selecione o filtro" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Nenhum</SelectItem>
+                    <SelectItem value="none">Nenhum</SelectItem>
                     <SelectItem value="1">Bioquímica Geral</SelectItem>
                     <SelectItem value="2">Hematologia</SelectItem>
                     <SelectItem value="3">Microbiologia</SelectItem>
@@ -115,7 +115,7 @@ const LaboratorioConfigGeral = () => {
                     <SelectValue placeholder="Selecione o modelo" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Nenhum</SelectItem>
+                    <SelectItem value="none">Nenhum</SelectItem>
                     <SelectItem value="1">Modelo Padrão</SelectItem>
                     <SelectItem value="2">Modelo Resumido</SelectItem>
                     <SelectItem value="3">Modelo Detalhado</SelectItem>

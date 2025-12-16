@@ -158,7 +158,7 @@ const LaboratorioImpressaoLaudo = () => {
                     <SelectValue placeholder="Todos" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Todos</SelectItem>
+                    <SelectItem value="all">Todos</SelectItem>
                     <SelectItem value="dr-carlos">Dr. Carlos Silva</SelectItem>
                     <SelectItem value="dra-ana">Dra. Ana Souza</SelectItem>
                     <SelectItem value="dr-pedro">Dr. Pedro Lima</SelectItem>
@@ -172,7 +172,7 @@ const LaboratorioImpressaoLaudo = () => {
                     <SelectValue placeholder="Todos" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Todos</SelectItem>
+                    <SelectItem value="all">Todos</SelectItem>
                     <SelectItem value="pendente">Laudo Pendente</SelectItem>
                     <SelectItem value="pronto">Pronto</SelectItem>
                     <SelectItem value="impresso">Impresso</SelectItem>
