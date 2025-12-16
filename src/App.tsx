@@ -49,6 +49,21 @@ import WorkspaceFinanceiro from "./pages/workspace/WorkspaceFinanceiro";
 import WorkspaceAtendimentoFinanceiro from "./pages/workspace/WorkspaceAtendimentoFinanceiro";
 import WorkspaceLaboratorio from "./pages/workspace/WorkspaceLaboratorio";
 import WorkspacePersonalizados from "./pages/workspace/WorkspacePersonalizados";
+import LaboratorioHome from "./pages/laboratorio/LaboratorioHome";
+import LaboratorioFiltroMapa from "./pages/laboratorio/LaboratorioFiltroMapa";
+import LaboratorioFiltroMapaCadastro from "./pages/laboratorio/LaboratorioFiltroMapaCadastro";
+import LaboratorioMapaTrabalho from "./pages/laboratorio/LaboratorioMapaTrabalho";
+import LaboratorioLotesAmostras from "./pages/laboratorio/LaboratorioLotesAmostras";
+import LaboratorioAmostras from "./pages/laboratorio/LaboratorioAmostras";
+import LaboratorioDigitacaoPaciente from "./pages/laboratorio/LaboratorioDigitacaoPaciente";
+import LaboratorioDigitacaoRequisicao from "./pages/laboratorio/LaboratorioDigitacaoRequisicao";
+import LaboratorioDigitacaoMapa from "./pages/laboratorio/LaboratorioDigitacaoMapa";
+import LaboratorioImpressaoLaudo from "./pages/laboratorio/LaboratorioImpressaoLaudo";
+import LaboratorioGerarLaudosLote from "./pages/laboratorio/LaboratorioGerarLaudosLote";
+import LaboratorioConfigGeral from "./pages/laboratorio/LaboratorioConfigGeral";
+import LaboratorioConfigImpressao from "./pages/laboratorio/LaboratorioConfigImpressao";
+import LaboratorioConfigLaudoInternet from "./pages/laboratorio/LaboratorioConfigLaudoInternet";
+import LaboratorioRelatorios from "./pages/laboratorio/LaboratorioRelatorios";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -114,6 +129,25 @@ const App = () => (
           <Route path="/workspace/atendimento-financeiro" element={<WorkspaceAtendimentoFinanceiro />} />
           <Route path="/workspace/laboratorio" element={<WorkspaceLaboratorio />} />
           <Route path="/workspace/personalizados" element={<WorkspacePersonalizados />} />
+          {/* Laboratório */}
+          <Route path="/laboratorio" element={<LaboratorioHome />} />
+          <Route path="/laboratorio/filtro-mapa" element={<LaboratorioFiltroMapa />} />
+          <Route path="/laboratorio/filtro-mapa/novo" element={<LaboratorioFiltroMapaCadastro />} />
+          <Route path="/laboratorio/filtro-mapa/:id" element={<LaboratorioFiltroMapaCadastro />} />
+          <Route path="/laboratorio/filtro-mapa/:id/editar" element={<LaboratorioFiltroMapaCadastro />} />
+          <Route path="/laboratorio/mapa-trabalho" element={<LaboratorioMapaTrabalho />} />
+          <Route path="/laboratorio/lotes-amostras" element={<LaboratorioLotesAmostras />} />
+          <Route path="/laboratorio/amostras" element={<LaboratorioAmostras />} />
+          <Route path="/laboratorio/digitacao-paciente" element={<LaboratorioDigitacaoPaciente />} />
+          <Route path="/laboratorio/digitacao-paciente/:id" element={<LaboratorioDigitacaoRequisicao />} />
+          <Route path="/laboratorio/digitacao-mapa" element={<LaboratorioDigitacaoMapa />} />
+          <Route path="/laboratorio/digitacao-mapa/:id" element={<LaboratorioDigitacaoRequisicao />} />
+          <Route path="/laboratorio/impressao-laudo" element={<LaboratorioImpressaoLaudo />} />
+          <Route path="/laboratorio/gerar-laudos-lote" element={<LaboratorioGerarLaudosLote />} />
+          <Route path="/laboratorio/config-geral" element={<LaboratorioConfigGeral />} />
+          <Route path="/laboratorio/config-impressao" element={<LaboratorioConfigImpressao />} />
+          <Route path="/laboratorio/config-laudo-internet" element={<LaboratorioConfigLaudoInternet />} />
+          <Route path="/laboratorio/relatorios" element={<LaboratorioRelatorios />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
