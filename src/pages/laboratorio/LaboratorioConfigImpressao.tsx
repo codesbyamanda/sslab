@@ -53,7 +53,7 @@ const LaboratorioConfigImpressao = () => {
                     <SelectValue placeholder="Selecione a impressora" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Nenhuma</SelectItem>
+                    <SelectItem value="none">Nenhuma</SelectItem>
                     <SelectItem value="hp-laserjet-p1102">HP LaserJet P1102</SelectItem>
                     <SelectItem value="epson-l3150">Epson L3150</SelectItem>
                     <SelectItem value="brother-hl-l2320d">Brother HL-L2320D</SelectItem>
@@ -69,7 +69,7 @@ const LaboratorioConfigImpressao = () => {
                     <SelectValue placeholder="Selecione a impressora" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Nenhuma</SelectItem>
+                    <SelectItem value="none">Nenhuma</SelectItem>
                     <SelectItem value="hp-laserjet-p1102">HP LaserJet P1102</SelectItem>
                     <SelectItem value="epson-l3150">Epson L3150</SelectItem>
                     <SelectItem value="brother-hl-l2320d">Brother HL-L2320D</SelectItem>
@@ -85,7 +85,7 @@ const LaboratorioConfigImpressao = () => {
                     <SelectValue placeholder="Selecione a impressora" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Nenhuma</SelectItem>
+                    <SelectItem value="none">Nenhuma</SelectItem>
                     <SelectItem value="hp-laserjet-p1102">HP LaserJet P1102</SelectItem>
                     <SelectItem value="epson-l3150">Epson L3150</SelectItem>
                     <SelectItem value="brother-hl-l2320d">Brother HL-L2320D</SelectItem>

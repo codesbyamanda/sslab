@@ -107,7 +107,7 @@ const LaboratorioGerarLaudosLote = () => {
                     <SelectValue placeholder="Todas" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Todas</SelectItem>
+                    <SelectItem value="all">Todas</SelectItem>
                     <SelectItem value="central">Unidade Central</SelectItem>
                     <SelectItem value="norte">Unidade Norte</SelectItem>
                     <SelectItem value="sul">Unidade Sul</SelectItem>
@@ -121,7 +121,7 @@ const LaboratorioGerarLaudosLote = () => {
                     <SelectValue placeholder="Todos" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Todos</SelectItem>
+                    <SelectItem value="all">Todos</SelectItem>
                     <SelectItem value="unimed">Unimed</SelectItem>
                     <SelectItem value="sulamerica">SulAmérica</SelectItem>
                     <SelectItem value="bradesco">Bradesco Saúde</SelectItem>
@@ -136,7 +136,7 @@ const LaboratorioGerarLaudosLote = () => {
                     <SelectValue placeholder="Todos" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Todos</SelectItem>
+                    <SelectItem value="all">Todos</SelectItem>
                     <SelectItem value="basico">Básico</SelectItem>
                     <SelectItem value="intermediario">Intermediário</SelectItem>
                     <SelectItem value="completo">Completo</SelectItem>
@@ -150,7 +150,7 @@ const LaboratorioGerarLaudosLote = () => {
                     <SelectValue placeholder="Todos" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Todos</SelectItem>
+                    <SelectItem value="all">Todos</SelectItem>
                     <SelectItem value="dr-carlos">Dr. Carlos Silva</SelectItem>
                     <SelectItem value="dra-ana">Dra. Ana Souza</SelectItem>
                     <SelectItem value="dr-pedro">Dr. Pedro Lima</SelectItem>
