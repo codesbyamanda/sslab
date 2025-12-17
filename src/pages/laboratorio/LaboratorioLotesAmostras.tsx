@@ -195,7 +195,13 @@ const LaboratorioLotesAmostras = () => {
                     </TableCell>
                     <TableCell>{getStatusBadge(lote.status)}</TableCell>
                     <TableCell className="text-right">
-                      <Button variant="ghost" size="icon" className="h-8 w-8">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8"
+                        onClick={() => navigate(`/laboratorio/lotes-amostras/${lote.id}`)}
+                        title="Visualizar lote"
+                      >
                         <Eye className="h-4 w-4" />
                       </Button>
                     </TableCell>
