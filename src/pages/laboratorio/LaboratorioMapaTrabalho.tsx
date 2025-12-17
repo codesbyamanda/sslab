@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import LaboratorioLayout from "@/components/laboratorio/LaboratorioLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -25,9 +26,10 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Map, Printer, FileDown, X, Info, AlertTriangle } from "lucide-react";
+import { Map, Printer, FileDown, X, Info, AlertTriangle, FileText, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 
+// Mock data - em produção viria do backend
 const mockFiltros = [
   { id: "1", nome: "Bioquímica Geral" },
   { id: "2", nome: "Hematologia" },
@@ -35,9 +37,9 @@ const mockFiltros = [
 ];
 
 const mockModelos = [
-  { id: "1", nome: "Modelo Padrão" },
-  { id: "2", nome: "Modelo Resumido" },
-  { id: "3", nome: "Modelo Detalhado" },
+  { id: "padrao", nome: "Modelo Padrão" },
+  { id: "resumido", nome: "Modelo Resumido" },
+  { id: "detalhado", nome: "Modelo Detalhado" },
 ];
 
 const mockEmpresas = [
@@ -53,6 +55,7 @@ const mockUnidades = [
 ];
 
 const LaboratorioMapaTrabalho = () => {
+  const navigate = useNavigate();
   const [dataInicial, setDataInicial] = useState("");
   const [dataFinal, setDataFinal] = useState("");
   const [filtro, setFiltro] = useState("");
@@ -62,11 +65,35 @@ const LaboratorioMapaTrabalho = () => {
   const [somenteUrgentes, setSomenteUrgentes] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
 
-  const handleGerar = () => {
-    if (!dataInicial || !dataFinal || !filtro || !modelo || !empresa) {
-      toast.error("Preencha todos os campos obrigatórios");
-      return;
+  // Validação de datas
+  const dateError = useMemo(() => {
+    if (dataInicial && dataFinal) {
+      const inicio = new Date(dataInicial);
+      const fim = new Date(dataFinal);
+      if (fim < inicio) {
+        return "Data Final não pode ser menor que Data Inicial";
+      }
     }
+    return null;
+  }, [dataInicial, dataFinal]);
+
+  // Verificar se todos os campos obrigatórios estão preenchidos
+  const isFormValid = useMemo(() => {
+    return (
+      dataInicial !== "" &&
+      dataFinal !== "" &&
+      filtro !== "" &&
+      modelo !== "" &&
+      empresa !== "" &&
+      !dateError
+    );
+  }, [dataInicial, dataFinal, filtro, modelo, empresa, dateError]);
+
+  // Verificar se existem filtros cadastrados
+  const hasFiltros = mockFiltros.length > 0;
+
+  const handleGerar = () => {
+    if (!isFormValid) return;
     setPreviewOpen(true);
     toast.success("Mapa de trabalho gerado com sucesso!");
   };
@@ -77,6 +104,10 @@ const LaboratorioMapaTrabalho = () => {
 
   const handleSavePDF = () => {
     toast.success("PDF gerado com sucesso!");
+  };
+
+  const handleGoToFiltros = () => {
+    navigate("/laboratorio/filtro-mapa");
   };
 
   return (
@@ -90,7 +121,7 @@ const LaboratorioMapaTrabalho = () => {
           </p>
         </div>
 
-        {/* Filtros */}
+        {/* Parâmetros de Geração */}
         <Card className="card-premium">
           <CardHeader className="pb-4">
             <div className="flex items-center gap-2">
@@ -100,45 +131,82 @@ const LaboratorioMapaTrabalho = () => {
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <div>
-                <Label htmlFor="dataInicial">Data Inicial *</Label>
+              {/* Data Inicial */}
+              <div className="space-y-1.5">
+                <Label htmlFor="dataInicial">
+                  Data Inicial<span className="text-destructive ml-0.5">*</span>
+                </Label>
                 <Input
                   id="dataInicial"
                   type="date"
                   value={dataInicial}
                   onChange={(e) => setDataInicial(e.target.value)}
-                  className="mt-1.5"
+                  className={!dataInicial ? "border-muted-foreground/30" : ""}
                 />
               </div>
-              <div>
-                <Label htmlFor="dataFinal">Data Final *</Label>
+
+              {/* Data Final */}
+              <div className="space-y-1.5">
+                <Label htmlFor="dataFinal">
+                  Data Final<span className="text-destructive ml-0.5">*</span>
+                </Label>
                 <Input
                   id="dataFinal"
                   type="date"
                   value={dataFinal}
                   onChange={(e) => setDataFinal(e.target.value)}
-                  className="mt-1.5"
+                  className={dateError ? "border-destructive focus-visible:ring-destructive" : ""}
                 />
+                {dateError && (
+                  <p className="text-sm text-destructive flex items-center gap-1">
+                    <AlertCircle className="h-3.5 w-3.5" />
+                    {dateError}
+                  </p>
+                )}
               </div>
-              <div>
-                <Label htmlFor="filtro">Filtro *</Label>
-                <Select value={filtro} onValueChange={setFiltro}>
-                  <SelectTrigger className="mt-1.5">
-                    <SelectValue placeholder="Selecione o filtro" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {mockFiltros.map((f) => (
-                      <SelectItem key={f.id} value={f.id}>
-                        {f.nome}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+
+              {/* Filtro */}
+              <div className="space-y-1.5">
+                <Label htmlFor="filtro">
+                  Filtro<span className="text-destructive ml-0.5">*</span>
+                </Label>
+                {hasFiltros ? (
+                  <Select value={filtro} onValueChange={setFiltro}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione o filtro" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {mockFiltros.map((f) => (
+                        <SelectItem key={f.id} value={f.id}>
+                          {f.nome}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <div className="flex flex-col gap-2">
+                    <div className="h-10 px-3 py-2 rounded-md border border-dashed border-muted-foreground/30 bg-muted/30 flex items-center text-sm text-muted-foreground">
+                      Nenhum filtro cadastrado
+                    </div>
+                    <Button
+                      variant="link"
+                      size="sm"
+                      className="h-auto p-0 justify-start text-primary"
+                      onClick={handleGoToFiltros}
+                    >
+                      Cadastrar filtro em "Filtro do Mapa" →
+                    </Button>
+                  </div>
+                )}
               </div>
-              <div>
-                <Label htmlFor="modelo">Modelo *</Label>
+
+              {/* Modelo */}
+              <div className="space-y-1.5">
+                <Label htmlFor="modelo">
+                  Modelo<span className="text-destructive ml-0.5">*</span>
+                </Label>
                 <Select value={modelo} onValueChange={setModelo}>
-                  <SelectTrigger className="mt-1.5">
+                  <SelectTrigger>
                     <SelectValue placeholder="Selecione o modelo" />
                   </SelectTrigger>
                   <SelectContent>
@@ -150,10 +218,14 @@ const LaboratorioMapaTrabalho = () => {
                   </SelectContent>
                 </Select>
               </div>
-              <div>
-                <Label htmlFor="empresa">Empresa *</Label>
+
+              {/* Empresa */}
+              <div className="space-y-1.5">
+                <Label htmlFor="empresa">
+                  Empresa<span className="text-destructive ml-0.5">*</span>
+                </Label>
                 <Select value={empresa} onValueChange={setEmpresa}>
-                  <SelectTrigger className="mt-1.5">
+                  <SelectTrigger>
                     <SelectValue placeholder="Selecione a empresa" />
                   </SelectTrigger>
                   <SelectContent>
@@ -165,22 +237,24 @@ const LaboratorioMapaTrabalho = () => {
                   </SelectContent>
                 </Select>
               </div>
-              <div>
-                <Label htmlFor="unidade">
+
+              {/* Unidade de Coleta */}
+              <div className="space-y-1.5">
+                <Label htmlFor="unidade" className="flex items-center gap-1">
                   Unidade de Coleta
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <Info className="h-3.5 w-3.5 inline ml-1 text-muted-foreground" />
+                        <Info className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
                       </TooltipTrigger>
                       <TooltipContent>
-                        <p>Se vazio, imprime todas as unidades</p>
+                        <p>Campo opcional. Se vazio, considera todas as unidades.</p>
                       </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
                 </Label>
                 <Select value={unidade} onValueChange={setUnidade}>
-                  <SelectTrigger className="mt-1.5">
+                  <SelectTrigger>
                     <SelectValue placeholder="Todas as unidades" />
                   </SelectTrigger>
                   <SelectContent>
@@ -194,6 +268,7 @@ const LaboratorioMapaTrabalho = () => {
               </div>
             </div>
 
+            {/* Checkbox Somente Urgentes */}
             <div className="flex items-center space-x-2">
               <Checkbox
                 id="urgentes"
@@ -211,16 +286,21 @@ const LaboratorioMapaTrabalho = () => {
                 <Info className="h-4 w-4 text-primary" />
                 Informações sobre o Mapa
               </h4>
-              <ul className="space-y-1 text-muted-foreground">
+              <ul className="space-y-1.5 text-muted-foreground">
                 <li>• O mapa é separado por setor/bancada/paciente/amostra/exames</li>
                 <li>• Quebra de folha por Unidade e Bancada</li>
-                <li>• Só gera para exames com status "colhido"</li>
+                <li>• Só gera para exames/amostras com status elegível (ex.: "Colhido")</li>
                 <li>• Ao gerar, serão criados lotes de mapas com numeração sequencial</li>
               </ul>
             </div>
 
+            {/* Botão Gerar */}
             <div className="flex justify-end">
-              <Button onClick={handleGerar} className="btn-primary-premium">
+              <Button
+                onClick={handleGerar}
+                disabled={!isFormValid}
+                className="btn-primary-premium"
+              >
                 <Map className="h-4 w-4 mr-2" />
                 Gerar Mapa
               </Button>
@@ -232,31 +312,39 @@ const LaboratorioMapaTrabalho = () => {
         <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
           <DialogContent className="max-w-4xl max-h-[90vh]">
             <DialogHeader>
-              <DialogTitle>Preview do Mapa de Trabalho</DialogTitle>
-              <DialogDescription>
+              <DialogTitle className="text-lg">Preview do Mapa de Trabalho</DialogTitle>
+              <DialogDescription className="text-sm">
                 Mapa #1234 • 3 folhas • Gerado em 16/12/2024 às 10:30
               </DialogDescription>
             </DialogHeader>
 
-            {/* Mock Preview */}
-            <div className="border rounded-lg bg-muted/30 p-8 min-h-[400px] flex items-center justify-center">
-              <div className="text-center">
-                <Map className="h-16 w-16 text-muted-foreground/50 mx-auto mb-4" />
-                <p className="text-muted-foreground">Preview do mapa de trabalho</p>
-                <p className="text-sm text-muted-foreground/70 mt-1">
-                  Bioquímica Geral • Unidade Central • Bancada 01-02
-                </p>
+            {/* PDF Preview Placeholder */}
+            <div className="border rounded-lg bg-muted/30 min-h-[400px] flex items-center justify-center">
+              <div className="text-center space-y-3">
+                <div className="h-20 w-20 rounded-full bg-muted/50 flex items-center justify-center mx-auto">
+                  <FileText className="h-10 w-10 text-muted-foreground/60" />
+                </div>
+                <div>
+                  <p className="text-muted-foreground font-medium">Preview do mapa de trabalho</p>
+                  <p className="text-sm text-muted-foreground/70 mt-1">
+                    {mockFiltros.find(f => f.id === filtro)?.nome || "Filtro"} • {mockEmpresas.find(e => e.id === empresa)?.nome || "Empresa"}
+                  </p>
+                </div>
               </div>
             </div>
 
+            {/* Footer */}
             <div className="flex items-center justify-between pt-4 border-t">
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <AlertTriangle className="h-4 w-4 text-warning" />
-                <span>5 itens urgentes incluídos</span>
+                {somenteUrgentes ? (
+                  <span>Somente itens urgentes incluídos</span>
+                ) : (
+                  <span>5 itens urgentes incluídos</span>
+                )}
               </div>
               <div className="flex gap-2">
                 <Button variant="outline" onClick={() => setPreviewOpen(false)}>
-                  <X className="h-4 w-4 mr-2" />
                   Fechar
                 </Button>
                 <Button variant="outline" onClick={handleSavePDF}>
