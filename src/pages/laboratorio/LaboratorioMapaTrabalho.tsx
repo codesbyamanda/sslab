@@ -46,7 +46,7 @@ const mockEmpresas = [
 ];
 
 const mockUnidades = [
-  { id: "", nome: "Todas as unidades" },
+  { id: "all", nome: "Todas as unidades" },
   { id: "1", nome: "Unidade Central" },
   { id: "2", nome: "Unidade Norte" },
   { id: "3", nome: "Unidade Sul" },
@@ -185,7 +185,7 @@ const LaboratorioMapaTrabalho = () => {
                   </SelectTrigger>
                   <SelectContent>
                     {mockUnidades.map((u) => (
-                      <SelectItem key={u.id || "all"} value={u.id}>
+                      <SelectItem key={u.id} value={u.id}>
                         {u.nome}
                       </SelectItem>
                     ))}
