@@ -56,6 +56,7 @@ import LaboratorioMapaTrabalho from "./pages/laboratorio/LaboratorioMapaTrabalho
 import LaboratorioLotesAmostras from "./pages/laboratorio/LaboratorioLotesAmostras";
 import LaboratorioLoteDetalhe from "./pages/laboratorio/LaboratorioLoteDetalhe";
 import LaboratorioAmostras from "./pages/laboratorio/LaboratorioAmostras";
+import LaboratorioAmostraDetalhe from "./pages/laboratorio/LaboratorioAmostraDetalhe";
 import LaboratorioDigitacaoPaciente from "./pages/laboratorio/LaboratorioDigitacaoPaciente";
 import LaboratorioDigitacaoRequisicao from "./pages/laboratorio/LaboratorioDigitacaoRequisicao";
 import LaboratorioDigitacaoMapa from "./pages/laboratorio/LaboratorioDigitacaoMapa";
@@ -140,6 +141,7 @@ const App = () => (
           <Route path="/laboratorio/lotes-amostras" element={<LaboratorioLotesAmostras />} />
           <Route path="/laboratorio/lotes-amostras/:id" element={<LaboratorioLoteDetalhe />} />
           <Route path="/laboratorio/amostras" element={<LaboratorioAmostras />} />
+          <Route path="/laboratorio/amostras/:id" element={<LaboratorioAmostraDetalhe />} />
           <Route path="/laboratorio/digitacao-paciente" element={<LaboratorioDigitacaoPaciente />} />
           <Route path="/laboratorio/digitacao-paciente/:id" element={<LaboratorioDigitacaoRequisicao />} />
           <Route path="/laboratorio/digitacao-mapa" element={<LaboratorioDigitacaoMapa />} />
