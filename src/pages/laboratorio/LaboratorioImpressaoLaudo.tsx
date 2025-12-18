@@ -20,7 +20,20 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Printer, Search, Filter, FileDown, Eye, AlertCircle } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { Printer, Search, Filter, FileDown, Eye, AlertCircle, FileText, Building2, Calendar, User } from "lucide-react";
 import { toast } from "sonner";
 
 interface ServicoLaudo {
@@ -46,6 +59,35 @@ const situacaoConfig = {
   impresso: { label: "Impresso", class: "badge-neutral" },
 };
 
+// Mock data for the report preview
+const mockRequisicao = {
+  numero: "REQ-2024-045678",
+  paciente: "Maria Silva Santos",
+  dataNascimento: "15/03/1985",
+  sexo: "Feminino",
+  unidade: "Laboratório Central",
+  dataAtendimento: "16/12/2024",
+  requisitante: "Dr. Carlos Silva",
+  crm: "CRM-SP 123456",
+};
+
+// Mock results for report preview
+const mockResultados: Record<string, { parametro: string; resultado: string; unidade: string; referencia: string }[]> = {
+  "1": [
+    { parametro: "Glicose", resultado: "92", unidade: "mg/dL", referencia: "70 - 99" },
+  ],
+  "2": [
+    { parametro: "Colesterol Total", resultado: "185", unidade: "mg/dL", referencia: "< 200 (desejável)" },
+  ],
+  "4": [
+    { parametro: "Hemácias", resultado: "4.8", unidade: "milhões/mm³", referencia: "4.5 - 5.5" },
+    { parametro: "Hemoglobina", resultado: "14.2", unidade: "g/dL", referencia: "12.0 - 16.0" },
+    { parametro: "Hematócrito", resultado: "42", unidade: "%", referencia: "36 - 46" },
+    { parametro: "Leucócitos", resultado: "7.500", unidade: "/mm³", referencia: "4.000 - 11.000" },
+    { parametro: "Plaquetas", resultado: "250.000", unidade: "/mm³", referencia: "150.000 - 400.000" },
+  ],
+};
+
 const LaboratorioImpressaoLaudo = () => {
   const [numeroRequisicao, setNumeroRequisicao] = useState("");
   const [paciente, setPaciente] = useState("");
@@ -55,6 +97,7 @@ const LaboratorioImpressaoLaudo = () => {
   const [status, setStatus] = useState("");
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
   const [showResults, setShowResults] = useState(true);
+  const [viewingLaudo, setViewingLaudo] = useState<ServicoLaudo | null>(null);
 
   const handleSelectAll = () => {
     if (selectedServices.length === mockServicos.length) {
@@ -86,6 +129,23 @@ const LaboratorioImpressaoLaudo = () => {
       return;
     }
     toast.success("PDF gerado com sucesso!");
+  };
+
+  const handleViewLaudo = (servico: ServicoLaudo) => {
+    setViewingLaudo(servico);
+  };
+
+  const handlePrintLaudo = () => {
+    toast.success("Enviando laudo para impressão...");
+    setViewingLaudo(null);
+  };
+
+  const handleSaveLaudoPDF = () => {
+    toast.success("PDF do laudo gerado com sucesso!");
+  };
+
+  const canViewLaudo = (situacao: ServicoLaudo["situacao"]) => {
+    return situacao === "pronto" || situacao === "impresso";
   };
 
   const hasPendingLaudos = mockServicos.some((s) => s.situacao === "pendente");
@@ -255,6 +315,7 @@ const LaboratorioImpressaoLaudo = () => {
                       <TableHead>Data Coleta</TableHead>
                       <TableHead>Data Entrega</TableHead>
                       <TableHead>Situação</TableHead>
+                      <TableHead className="w-20 text-center">Ações</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -277,6 +338,28 @@ const LaboratorioImpressaoLaudo = () => {
                             {situacaoConfig[servico.situacao].label}
                           </span>
                         </TableCell>
+                        <TableCell className="text-center">
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-8 w-8"
+                                  disabled={!canViewLaudo(servico.situacao)}
+                                  onClick={() => handleViewLaudo(servico)}
+                                >
+                                  <Eye className={`h-4 w-4 ${!canViewLaudo(servico.situacao) ? "text-muted-foreground/50" : "text-muted-foreground"}`} />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                {canViewLaudo(servico.situacao) 
+                                  ? "Visualizar Laudo" 
+                                  : "Laudo pendente de liberação"}
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
@@ -298,6 +381,149 @@ const LaboratorioImpressaoLaudo = () => {
           </>
         )}
       </div>
+
+      {/* Modal Visualizar Laudo */}
+      <Dialog open={!!viewingLaudo} onOpenChange={(open) => !open && setViewingLaudo(null)}>
+        <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col">
+          <DialogHeader className="border-b pb-4">
+            <DialogTitle className="text-lg font-semibold flex items-center gap-2">
+              <FileText className="h-5 w-5" />
+              Visualizar Laudo - {viewingLaudo?.descricao}
+            </DialogTitle>
+            
+            {/* Metadados do cabeçalho */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4 pt-4">
+              <div className="flex items-start gap-2">
+                <User className="h-4 w-4 text-muted-foreground mt-0.5" />
+                <div>
+                  <p className="text-xs text-muted-foreground">Paciente</p>
+                  <p className="text-sm font-medium">{mockRequisicao.paciente}</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-2">
+                <FileText className="h-4 w-4 text-muted-foreground mt-0.5" />
+                <div>
+                  <p className="text-xs text-muted-foreground">Nº Requisição</p>
+                  <p className="text-sm font-medium">{mockRequisicao.numero}</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-2">
+                <Building2 className="h-4 w-4 text-muted-foreground mt-0.5" />
+                <div>
+                  <p className="text-xs text-muted-foreground">Unidade</p>
+                  <p className="text-sm font-medium">{mockRequisicao.unidade}</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-2">
+                <Calendar className="h-4 w-4 text-muted-foreground mt-0.5" />
+                <div>
+                  <p className="text-xs text-muted-foreground">Data</p>
+                  <p className="text-sm font-medium">{mockRequisicao.dataAtendimento}</p>
+                </div>
+              </div>
+            </div>
+          </DialogHeader>
+
+          {/* Preview do Laudo */}
+          <div className="flex-1 overflow-auto py-4">
+            <div className="bg-white border rounded-lg shadow-sm p-6 min-h-[400px]">
+              {/* Cabeçalho do Laudo */}
+              <div className="border-b pb-4 mb-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-lg font-bold text-gray-900">LABORATÓRIO CENTRAL</h3>
+                    <p className="text-xs text-gray-600">Av. Brasil, 1500 - Centro • Tel: (11) 3000-0000</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-xs text-gray-600">Requisição: {mockRequisicao.numero}</p>
+                    <p className="text-xs text-gray-600">Data: {mockRequisicao.dataAtendimento}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Dados do Paciente */}
+              <div className="bg-gray-50 rounded p-3 mb-4">
+                <div className="grid grid-cols-2 gap-2 text-sm">
+                  <div>
+                    <span className="text-gray-600">Paciente:</span>
+                    <span className="font-medium text-gray-900 ml-1">{mockRequisicao.paciente}</span>
+                  </div>
+                  <div>
+                    <span className="text-gray-600">Data Nasc.:</span>
+                    <span className="font-medium text-gray-900 ml-1">{mockRequisicao.dataNascimento}</span>
+                  </div>
+                  <div>
+                    <span className="text-gray-600">Sexo:</span>
+                    <span className="font-medium text-gray-900 ml-1">{mockRequisicao.sexo}</span>
+                  </div>
+                  <div>
+                    <span className="text-gray-600">Requisitante:</span>
+                    <span className="font-medium text-gray-900 ml-1">{mockRequisicao.requisitante}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Exame */}
+              <div className="mb-4">
+                <div className="bg-primary/10 text-primary font-semibold px-3 py-2 rounded-t text-sm">
+                  {viewingLaudo?.servico} - {viewingLaudo?.descricao}
+                </div>
+                <div className="border border-t-0 rounded-b">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b bg-gray-50">
+                        <th className="text-left p-2 font-medium text-gray-700">Parâmetro</th>
+                        <th className="text-center p-2 font-medium text-gray-700">Resultado</th>
+                        <th className="text-center p-2 font-medium text-gray-700">Unidade</th>
+                        <th className="text-left p-2 font-medium text-gray-700">Valor de Referência</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {viewingLaudo && mockResultados[viewingLaudo.id]?.map((resultado, idx) => (
+                        <tr key={idx} className="border-b last:border-b-0">
+                          <td className="p-2 text-gray-900">{resultado.parametro}</td>
+                          <td className="p-2 text-center font-semibold text-gray-900">{resultado.resultado}</td>
+                          <td className="p-2 text-center text-gray-600">{resultado.unidade}</td>
+                          <td className="p-2 text-gray-600">{resultado.referencia}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* Rodapé do Laudo */}
+              <div className="border-t pt-4 mt-6">
+                <div className="flex justify-between items-end">
+                  <div className="text-xs text-gray-600">
+                    <p>Material: {viewingLaudo?.material}</p>
+                    <p>Data/Hora da Coleta: {viewingLaudo?.dataColeta}</p>
+                  </div>
+                  <div className="text-center">
+                    <div className="border-t border-gray-400 w-48 mb-1"></div>
+                    <p className="text-sm font-medium text-gray-900">{mockRequisicao.requisitante}</p>
+                    <p className="text-xs text-gray-600">{mockRequisicao.crm}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter className="border-t pt-4 gap-2">
+            <Button variant="outline" onClick={() => setViewingLaudo(null)}>
+              Fechar
+            </Button>
+            <Button variant="outline" onClick={handleSaveLaudoPDF}>
+              <FileDown className="h-4 w-4 mr-2" />
+              Salvar PDF
+            </Button>
+            <Button onClick={handlePrintLaudo} className="btn-primary-premium">
+              <Printer className="h-4 w-4 mr-2" />
+              Imprimir
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </LaboratorioLayout>
   );
 };
