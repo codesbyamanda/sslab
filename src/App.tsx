@@ -37,6 +37,7 @@ import Configuracoes from "./pages/Configuracoes";
 import SaudeFaturamento from "./pages/SaudeFaturamento";
 import PreFaturamento from "./pages/PreFaturamento";
 import Faturamento from "./pages/Faturamento";
+import GuiasFaturamento from "./pages/faturamento/Guias";
 import SaudeFinanceiro from "./pages/SaudeFinanceiro";
 import ReceitasReceber from "./pages/financeiro/ReceitasReceber";
 import Cheques from "./pages/financeiro/Cheques";
@@ -112,6 +113,7 @@ const App = () => (
           <Route path="/faturamento" element={<SaudeFaturamento />} />
           <Route path="/faturamento/pre-faturamento" element={<PreFaturamento />} />
           <Route path="/faturamento/faturamento" element={<Faturamento />} />
+          <Route path="/faturamento/guias" element={<GuiasFaturamento />} />
           <Route path="/financeiro" element={<SaudeFinanceiro />} />
           <Route path="/financeiro/receitas" element={<ReceitasReceber />} />
           <Route path="/financeiro/cheques" element={<Cheques />} />
