@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import LaboratorioLayout from "@/components/laboratorio/LaboratorioLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -49,6 +50,7 @@ interface LaudoProcessado {
 }
 
 const LaboratorioGerarLaudosLote = () => {
+  const navigate = useNavigate();
   const [dataInicialEntrega, setDataInicialEntrega] = useState("");
   const [dataFinalEntrega, setDataFinalEntrega] = useState("");
   const [unidade, setUnidade] = useState("");
@@ -163,7 +165,21 @@ const LaboratorioGerarLaudosLote = () => {
     setIsModalOpen(false);
   };
 
-  const handleImprimir = () => {
+  const handleImprimirLaudos = () => {
+    // Navegar para tela de impressão com filtros aplicados
+    const params = new URLSearchParams();
+    params.set("status", "gerado");
+    params.set("dataInicial", dataInicialEntrega);
+    params.set("dataFinal", dataFinalEntrega);
+    if (unidade && unidade !== "all") {
+      params.set("unidade", unidade);
+    }
+    
+    setIsModalOpen(false);
+    navigate(`/laboratorio/impressao-laudo?${params.toString()}`);
+  };
+
+  const handleImprimirDireto = () => {
     const gerados = laudosProcessados.filter(l => l.status === "gerado").length;
     toast.success(`Enviando ${gerados} laudos para impressão...`);
   };
@@ -551,15 +567,21 @@ const LaboratorioGerarLaudosLote = () => {
               Fechar
             </Button>
             {isCompleted && imprimir && laudosGeradosCount > 0 && (
-              <Button variant="outline" onClick={handleImprimir}>
+              <Button variant="outline" onClick={handleImprimirDireto}>
                 <Printer className="h-4 w-4 mr-2" />
-                Imprimir Laudos ({laudosGeradosCount})
+                Imprimir Direto ({laudosGeradosCount})
               </Button>
             )}
             {isCompleted && enviarDataCenter && laudosGeradosCount > 0 && (
-              <Button onClick={handleEnviarDataCenter} className="btn-primary-premium">
+              <Button variant="outline" onClick={handleEnviarDataCenter}>
                 <Cloud className="h-4 w-4 mr-2" />
                 Enviar ao Data Center ({laudosGeradosCount})
+              </Button>
+            )}
+            {isCompleted && laudosGeradosCount > 0 && (
+              <Button onClick={handleImprimirLaudos} className="btn-primary-premium">
+                <Printer className="h-4 w-4 mr-2" />
+                Imprimir Laudos
               </Button>
             )}
           </DialogFooter>
