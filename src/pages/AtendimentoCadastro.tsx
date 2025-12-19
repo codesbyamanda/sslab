@@ -15,6 +15,7 @@ import ConveniosTab from "@/components/atendimentos/ConveniosTab";
 import GeralTab from "@/components/atendimentos/GeralTab";
 import MedicosTab from "@/components/atendimentos/MedicosTab";
 import ServicosTab from "@/components/atendimentos/ServicosTab";
+import AmostrasTab, { Amostra } from "@/components/atendimentos/AmostrasTab";
 import PaymentsModal from "@/components/atendimentos/PaymentsModal";
 import PrintingModal from "@/components/atendimentos/PrintingModal";
 
@@ -121,6 +122,9 @@ const AtendimentoCadastro = () => {
   const [servicos, setServicos] = useState<Servico[]>([]);
   const [nextServicoId, setNextServicoId] = useState(1);
 
+  const [amostras, setAmostras] = useState<Amostra[]>([]);
+  const [nextAmostraId, setNextAmostraId] = useState(1);
+
   // Payment flow states
   const [showPaymentsModal, setShowPaymentsModal] = useState(false);
   const [showPrintingModal, setShowPrintingModal] = useState(false);
@@ -213,6 +217,19 @@ const AtendimentoCadastro = () => {
     );
   };
 
+  const handleAddAmostra = (amostra: Omit<Amostra, "id">) => {
+    setAmostras([...amostras, { ...amostra, id: nextAmostraId }]);
+    setNextAmostraId((prev) => prev + 1);
+  };
+
+  const handleEditAmostra = (amostra: Amostra) => {
+    setAmostras(amostras.map((a) => (a.id === amostra.id ? amostra : a)));
+  };
+
+  const handleDeleteAmostra = (id: number) => {
+    setAmostras(amostras.filter((a) => a.id !== id));
+  };
+
   const handleSave = () => {
     // Check if requires payment
     if (requiresPayment() && calcularValorTotal() > 0) {
@@ -243,6 +260,7 @@ const AtendimentoCadastro = () => {
     setConvenios([]);
     setMedicos([]);
     setServicos([]);
+    setAmostras([]);
     setGeralData({
       cid: "",
       tipoDoenca: "",
@@ -423,11 +441,12 @@ const AtendimentoCadastro = () => {
           {/* Tabs */}
           <Card className="p-6">
             <Tabs defaultValue="convenios" className="w-full">
-              <TabsList className="grid w-full grid-cols-4 mb-6">
+              <TabsList className="grid w-full grid-cols-5 mb-6">
                 <TabsTrigger value="convenios">Convênios</TabsTrigger>
                 <TabsTrigger value="geral">Geral</TabsTrigger>
                 <TabsTrigger value="medicos">Médicos Solicitantes</TabsTrigger>
                 <TabsTrigger value="servicos">Serviços</TabsTrigger>
+                <TabsTrigger value="amostras">Amostras</TabsTrigger>
               </TabsList>
 
               <TabsContent value="convenios">
@@ -454,6 +473,16 @@ const AtendimentoCadastro = () => {
                   onEditServico={handleEditServico}
                   onCancelServico={handleCancelServico}
                   urgenciaGlobal={geralData.urgencia}
+                />
+              </TabsContent>
+
+              <TabsContent value="amostras">
+                <AmostrasTab
+                  amostras={amostras}
+                  servicos={servicos}
+                  onAddAmostra={handleAddAmostra}
+                  onEditAmostra={handleEditAmostra}
+                  onDeleteAmostra={handleDeleteAmostra}
                 />
               </TabsContent>
             </Tabs>
