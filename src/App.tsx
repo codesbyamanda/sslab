@@ -54,7 +54,8 @@ import WorkspacePersonalizados from "./pages/workspace/WorkspacePersonalizados";
 import LaboratorioHome from "./pages/laboratorio/LaboratorioHome";
 import LaboratorioFiltroMapa from "./pages/laboratorio/LaboratorioFiltroMapa";
 import LaboratorioFiltroMapaCadastro from "./pages/laboratorio/LaboratorioFiltroMapaCadastro";
-import LaboratorioMapaTrabalho from "./pages/laboratorio/LaboratorioMapaTrabalho";
+import LaboratorioMapasLista from "./pages/laboratorio/LaboratorioMapasLista";
+import LaboratorioMapaTrabalhoNovo from "./pages/laboratorio/LaboratorioMapaTrabalhoNovo";
 import LaboratorioLotesAmostras from "./pages/laboratorio/LaboratorioLotesAmostras";
 import LaboratorioLoteDetalhe from "./pages/laboratorio/LaboratorioLoteDetalhe";
 import LaboratorioAmostras from "./pages/laboratorio/LaboratorioAmostras";
@@ -141,7 +142,8 @@ const App = () => (
           <Route path="/laboratorio/filtro-mapa/novo" element={<LaboratorioFiltroMapaCadastro />} />
           <Route path="/laboratorio/filtro-mapa/:id" element={<LaboratorioFiltroMapaCadastro />} />
           <Route path="/laboratorio/filtro-mapa/:id/editar" element={<LaboratorioFiltroMapaCadastro />} />
-          <Route path="/laboratorio/mapa-trabalho" element={<LaboratorioMapaTrabalho />} />
+          <Route path="/laboratorio/mapa-trabalho" element={<LaboratorioMapasLista />} />
+          <Route path="/laboratorio/mapa-trabalho/novo" element={<LaboratorioMapaTrabalhoNovo />} />
           <Route path="/laboratorio/lotes-amostras" element={<LaboratorioLotesAmostras />} />
           <Route path="/laboratorio/lotes-amostras/:id" element={<LaboratorioLoteDetalhe />} />
           <Route path="/laboratorio/amostras" element={<LaboratorioAmostras />} />
