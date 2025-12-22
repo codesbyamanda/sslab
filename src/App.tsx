@@ -63,6 +63,7 @@ import LaboratorioAmostraDetalhe from "./pages/laboratorio/LaboratorioAmostraDet
 import LaboratorioDigitacaoPaciente from "./pages/laboratorio/LaboratorioDigitacaoPaciente";
 import LaboratorioDigitacaoRequisicao from "./pages/laboratorio/LaboratorioDigitacaoRequisicao";
 import LaboratorioDigitacaoMapa from "./pages/laboratorio/LaboratorioDigitacaoMapa";
+import LaboratorioDigitacaoMapaDetalhe from "./pages/laboratorio/LaboratorioDigitacaoMapaDetalhe";
 import LaboratorioImpressaoLaudo from "./pages/laboratorio/LaboratorioImpressaoLaudo";
 import LaboratorioGerarLaudosLote from "./pages/laboratorio/LaboratorioGerarLaudosLote";
 import LaboratorioConfigGeral from "./pages/laboratorio/LaboratorioConfigGeral";
@@ -151,7 +152,7 @@ const App = () => (
           <Route path="/laboratorio/digitacao-paciente" element={<LaboratorioDigitacaoPaciente />} />
           <Route path="/laboratorio/digitacao-paciente/:id" element={<LaboratorioDigitacaoRequisicao />} />
           <Route path="/laboratorio/digitacao-mapa" element={<LaboratorioDigitacaoMapa />} />
-          <Route path="/laboratorio/digitacao-mapa/:id" element={<LaboratorioDigitacaoRequisicao />} />
+          <Route path="/laboratorio/digitacao-mapa/:id" element={<LaboratorioDigitacaoMapaDetalhe />} />
           <Route path="/laboratorio/impressao-laudo" element={<LaboratorioImpressaoLaudo />} />
           <Route path="/laboratorio/gerar-laudos-lote" element={<LaboratorioGerarLaudosLote />} />
           <Route path="/laboratorio/config-geral" element={<LaboratorioConfigGeral />} />
