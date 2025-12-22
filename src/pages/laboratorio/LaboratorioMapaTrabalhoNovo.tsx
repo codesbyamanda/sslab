@@ -14,19 +14,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Map, Printer, FileDown, X, Info, AlertTriangle, FileText, AlertCircle } from "lucide-react";
+import { Map, Info, AlertCircle, Loader2, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 
 // Mock data - em produção viria do backend
@@ -54,7 +47,7 @@ const mockUnidades = [
   { id: "3", nome: "Unidade Sul" },
 ];
 
-const LaboratorioMapaTrabalho = () => {
+const LaboratorioMapaTrabalhoNovo = () => {
   const navigate = useNavigate();
   const [dataInicial, setDataInicial] = useState("");
   const [dataFinal, setDataFinal] = useState("");
@@ -63,7 +56,7 @@ const LaboratorioMapaTrabalho = () => {
   const [empresa, setEmpresa] = useState("");
   const [unidade, setUnidade] = useState("");
   const [somenteUrgentes, setSomenteUrgentes] = useState(false);
-  const [previewOpen, setPreviewOpen] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
 
   // Validação de datas
   const dateError = useMemo(() => {
@@ -92,33 +85,57 @@ const LaboratorioMapaTrabalho = () => {
   // Verificar se existem filtros cadastrados
   const hasFiltros = mockFiltros.length > 0;
 
-  const handleGerar = () => {
+  const handleGerar = async () => {
     if (!isFormValid) return;
-    setPreviewOpen(true);
-    toast.success("Mapa de trabalho gerado com sucesso!");
-  };
 
-  const handlePrint = () => {
-    toast.success("Enviando para impressão...");
-  };
-
-  const handleSavePDF = () => {
-    toast.success("PDF gerado com sucesso!");
+    setIsGenerating(true);
+    
+    try {
+      // Simular processamento demorado
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      
+      toast.success("Mapa de trabalho gerado com sucesso!", {
+        description: "O mapa foi salvo e está disponível na listagem.",
+      });
+      
+      // Redirecionar para a listagem de mapas
+      navigate("/laboratorio/mapa-trabalho");
+    } catch {
+      toast.error("Erro ao gerar mapa de trabalho", {
+        description: "Não foi possível gerar o mapa. Tente novamente.",
+      });
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   const handleGoToFiltros = () => {
     navigate("/laboratorio/filtro-mapa");
   };
 
+  const handleVoltar = () => {
+    navigate("/laboratorio/mapa-trabalho");
+  };
+
   return (
-    <LaboratorioLayout title="Mapa de Trabalho">
+    <LaboratorioLayout title="Gerar Mapa de Trabalho">
       <div className="space-y-6 animate-fade-in">
         {/* Header */}
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">Mapa de Trabalho</h1>
-          <p className="text-muted-foreground mt-1">
-            Gere mapas de trabalho por filtros pré-definidos para organização das bancadas.
-          </p>
+        <div className="flex items-start gap-4">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={handleVoltar}
+            className="shrink-0 mt-1"
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+          <div>
+            <h1 className="text-2xl font-bold text-foreground">Gerar Mapa de Trabalho</h1>
+            <p className="text-muted-foreground mt-1">
+              Informe os parâmetros para gerar um novo mapa de trabalho.
+            </p>
+          </div>
         </div>
 
         {/* Parâmetros de Geração */}
@@ -142,6 +159,7 @@ const LaboratorioMapaTrabalho = () => {
                   value={dataInicial}
                   onChange={(e) => setDataInicial(e.target.value)}
                   className={!dataInicial ? "border-muted-foreground/30" : ""}
+                  disabled={isGenerating}
                 />
               </div>
 
@@ -156,6 +174,7 @@ const LaboratorioMapaTrabalho = () => {
                   value={dataFinal}
                   onChange={(e) => setDataFinal(e.target.value)}
                   className={dateError ? "border-destructive focus-visible:ring-destructive" : ""}
+                  disabled={isGenerating}
                 />
                 {dateError && (
                   <p className="text-sm text-destructive flex items-center gap-1">
@@ -171,7 +190,7 @@ const LaboratorioMapaTrabalho = () => {
                   Filtro<span className="text-destructive ml-0.5">*</span>
                 </Label>
                 {hasFiltros ? (
-                  <Select value={filtro} onValueChange={setFiltro}>
+                  <Select value={filtro} onValueChange={setFiltro} disabled={isGenerating}>
                     <SelectTrigger>
                       <SelectValue placeholder="Selecione o filtro" />
                     </SelectTrigger>
@@ -205,7 +224,7 @@ const LaboratorioMapaTrabalho = () => {
                 <Label htmlFor="modelo">
                   Modelo<span className="text-destructive ml-0.5">*</span>
                 </Label>
-                <Select value={modelo} onValueChange={setModelo}>
+                <Select value={modelo} onValueChange={setModelo} disabled={isGenerating}>
                   <SelectTrigger>
                     <SelectValue placeholder="Selecione o modelo" />
                   </SelectTrigger>
@@ -224,7 +243,7 @@ const LaboratorioMapaTrabalho = () => {
                 <Label htmlFor="empresa">
                   Empresa<span className="text-destructive ml-0.5">*</span>
                 </Label>
-                <Select value={empresa} onValueChange={setEmpresa}>
+                <Select value={empresa} onValueChange={setEmpresa} disabled={isGenerating}>
                   <SelectTrigger>
                     <SelectValue placeholder="Selecione a empresa" />
                   </SelectTrigger>
@@ -253,7 +272,7 @@ const LaboratorioMapaTrabalho = () => {
                     </Tooltip>
                   </TooltipProvider>
                 </Label>
-                <Select value={unidade} onValueChange={setUnidade}>
+                <Select value={unidade} onValueChange={setUnidade} disabled={isGenerating}>
                   <SelectTrigger>
                     <SelectValue placeholder="Todas as unidades" />
                   </SelectTrigger>
@@ -274,6 +293,7 @@ const LaboratorioMapaTrabalho = () => {
                 id="urgentes"
                 checked={somenteUrgentes}
                 onCheckedChange={(checked) => setSomenteUrgentes(checked as boolean)}
+                disabled={isGenerating}
               />
               <Label htmlFor="urgentes" className="text-sm font-normal cursor-pointer">
                 Somente Itens Urgentes
@@ -290,78 +310,43 @@ const LaboratorioMapaTrabalho = () => {
                 <li>• O mapa é separado por setor/bancada/paciente/amostra/exames</li>
                 <li>• Quebra de folha por Unidade e Bancada</li>
                 <li>• Só gera para exames/amostras com status elegível (ex.: "Colhido")</li>
-                <li>• Ao gerar, serão criados lotes de mapas com numeração sequencial</li>
+                <li>• Bancadas com mais de 6 exames geram complemento automático</li>
+                <li>• Ao gerar, o mapa será salvo e disponível na listagem</li>
               </ul>
             </div>
 
-            {/* Botão Gerar */}
-            <div className="flex justify-end">
+            {/* Botões de Ação */}
+            <div className="flex justify-end gap-3 pt-2">
+              <Button
+                variant="outline"
+                onClick={handleVoltar}
+                disabled={isGenerating}
+              >
+                Cancelar
+              </Button>
               <Button
                 onClick={handleGerar}
-                disabled={!isFormValid}
-                className="btn-primary-premium"
+                disabled={!isFormValid || isGenerating}
+                className="btn-primary-premium min-w-[180px]"
               >
-                <Map className="h-4 w-4 mr-2" />
-                Gerar Mapa
+                {isGenerating ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Gerando Mapa...
+                  </>
+                ) : (
+                  <>
+                    <Map className="h-4 w-4 mr-2" />
+                    Gerar Mapa
+                  </>
+                )}
               </Button>
             </div>
           </CardContent>
         </Card>
-
-        {/* Preview Dialog */}
-        <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
-          <DialogContent className="max-w-4xl max-h-[90vh]">
-            <DialogHeader>
-              <DialogTitle className="text-lg">Preview do Mapa de Trabalho</DialogTitle>
-              <DialogDescription className="text-sm">
-                Mapa #1234 • 3 folhas • Gerado em 16/12/2024 às 10:30
-              </DialogDescription>
-            </DialogHeader>
-
-            {/* PDF Preview Placeholder */}
-            <div className="border rounded-lg bg-muted/30 min-h-[400px] flex items-center justify-center">
-              <div className="text-center space-y-3">
-                <div className="h-20 w-20 rounded-full bg-muted/50 flex items-center justify-center mx-auto">
-                  <FileText className="h-10 w-10 text-muted-foreground/60" />
-                </div>
-                <div>
-                  <p className="text-muted-foreground font-medium">Preview do mapa de trabalho</p>
-                  <p className="text-sm text-muted-foreground/70 mt-1">
-                    {mockFiltros.find(f => f.id === filtro)?.nome || "Filtro"} • {mockEmpresas.find(e => e.id === empresa)?.nome || "Empresa"}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Footer */}
-            <div className="flex items-center justify-between pt-4 border-t">
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <AlertTriangle className="h-4 w-4 text-warning" />
-                {somenteUrgentes ? (
-                  <span>Somente itens urgentes incluídos</span>
-                ) : (
-                  <span>5 itens urgentes incluídos</span>
-                )}
-              </div>
-              <div className="flex gap-2">
-                <Button variant="outline" onClick={() => setPreviewOpen(false)}>
-                  Fechar
-                </Button>
-                <Button variant="outline" onClick={handleSavePDF}>
-                  <FileDown className="h-4 w-4 mr-2" />
-                  Salvar PDF
-                </Button>
-                <Button onClick={handlePrint} className="btn-primary-premium">
-                  <Printer className="h-4 w-4 mr-2" />
-                  Imprimir
-                </Button>
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
       </div>
     </LaboratorioLayout>
   );
 };
 
-export default LaboratorioMapaTrabalho;
+export default LaboratorioMapaTrabalhoNovo;

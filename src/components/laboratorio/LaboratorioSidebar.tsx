@@ -46,7 +46,7 @@ const menuGroups: MenuGroup[] = [
       { title: "Lotes de Amostras", icon: Package, path: "/laboratorio/lotes-amostras" },
       { title: "Amostras", icon: TestTube2, path: "/laboratorio/amostras" },
       { title: "Filtro do Mapa", icon: Filter, path: "/laboratorio/filtro-mapa" },
-      { title: "Mapa de Trabalho", icon: Map, path: "/laboratorio/mapa-trabalho" },
+      { title: "Mapas de Trabalho", icon: Map, path: "/laboratorio/mapa-trabalho" },
     ],
   },
   {
