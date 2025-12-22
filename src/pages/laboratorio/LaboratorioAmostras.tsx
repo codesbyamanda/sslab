@@ -20,7 +20,19 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { TestTube2, Search, Filter, Eye, AlertTriangle } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { TestTube2, Search, Filter, Eye, AlertTriangle, FileText, Loader2 } from "lucide-react";
+import { toast } from "@/hooks/use-toast";
 
 interface Amostra {
   id: string;
@@ -30,14 +42,15 @@ interface Amostra {
   setorBancada: string;
   status: "colhida" | "em_analise" | "concluida" | "repetir";
   urgente: boolean;
+  servicos: string[];
 }
 
 const mockAmostras: Amostra[] = [
-  { id: "1", numeroAmostra: "A-2024-089234", paciente: "Maria Silva Santos", dataColeta: "16/12/2024 08:15", setorBancada: "Bioquímica / Bancada 01", status: "em_analise", urgente: true },
-  { id: "2", numeroAmostra: "A-2024-089233", paciente: "João Pedro Oliveira", dataColeta: "16/12/2024 08:00", setorBancada: "Hematologia / Bancada 01", status: "concluida", urgente: false },
-  { id: "3", numeroAmostra: "A-2024-089232", paciente: "Ana Carolina Lima", dataColeta: "16/12/2024 07:45", setorBancada: "Bioquímica / Bancada 02", status: "colhida", urgente: false },
-  { id: "4", numeroAmostra: "A-2024-089231", paciente: "Carlos Eduardo Souza", dataColeta: "16/12/2024 07:30", setorBancada: "Microbiologia / Bancada 01", status: "em_analise", urgente: false },
-  { id: "5", numeroAmostra: "A-2024-089230", paciente: "Fernanda Costa", dataColeta: "15/12/2024 17:00", setorBancada: "Urinálise / Bancada 01", status: "repetir", urgente: true },
+  { id: "1", numeroAmostra: "A-2024-089234", paciente: "Maria Silva Santos", dataColeta: "16/12/2024 08:15", setorBancada: "Bioquímica / Bancada 01", status: "em_analise", urgente: true, servicos: ["HMG", "GLI", "HB1AC", "CREA", "UREIA"] },
+  { id: "2", numeroAmostra: "A-2024-089233", paciente: "João Pedro Oliveira", dataColeta: "16/12/2024 08:00", setorBancada: "Hematologia / Bancada 01", status: "concluida", urgente: false, servicos: ["HMG", "COL", "TRI"] },
+  { id: "3", numeroAmostra: "A-2024-089232", paciente: "Ana Carolina Lima", dataColeta: "16/12/2024 07:45", setorBancada: "Bioquímica / Bancada 02", status: "colhida", urgente: false, servicos: ["GLI", "TGO"] },
+  { id: "4", numeroAmostra: "A-2024-089231", paciente: "Carlos Eduardo Souza", dataColeta: "16/12/2024 07:30", setorBancada: "Microbiologia / Bancada 01", status: "em_analise", urgente: false, servicos: ["URO"] },
+  { id: "5", numeroAmostra: "A-2024-089230", paciente: "Fernanda Costa", dataColeta: "15/12/2024 17:00", setorBancada: "Urinálise / Bancada 01", status: "repetir", urgente: true, servicos: ["EAS", "URO", "CRE", "GLI", "HMG", "COL"] },
 ];
 
 const statusConfig = {
@@ -45,6 +58,59 @@ const statusConfig = {
   em_analise: { label: "Em Análise", class: "badge-warning" },
   concluida: { label: "Concluída", class: "badge-success" },
   repetir: { label: "Repetir", class: "badge-error" },
+};
+
+const ServicosCell = ({ servicos }: { servicos: string[] }) => {
+  const maxVisible = 3;
+  const visibleServicos = servicos.slice(0, maxVisible);
+  const hiddenServicos = servicos.slice(maxVisible);
+  const hasMore = hiddenServicos.length > 0;
+
+  return (
+    <div className="flex flex-wrap items-center gap-1">
+      {visibleServicos.map((servico) => (
+        <span
+          key={servico}
+          className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-primary/10 text-primary border border-primary/20"
+        >
+          {servico}
+        </span>
+      ))}
+      {hasMore && (
+        <TooltipProvider>
+          <Tooltip>
+            <Popover>
+              <PopoverTrigger asChild>
+                <TooltipTrigger asChild>
+                  <button className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-muted text-muted-foreground border border-border hover:bg-muted/80 cursor-pointer transition-colors">
+                    +{hiddenServicos.length}
+                  </button>
+                </TooltipTrigger>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-3" align="start">
+                <p className="text-xs text-muted-foreground mb-2 font-medium">
+                  Todos os serviços ({servicos.length})
+                </p>
+                <div className="flex flex-wrap gap-1 max-w-xs">
+                  {servicos.map((servico) => (
+                    <span
+                      key={servico}
+                      className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-primary/10 text-primary border border-primary/20"
+                    >
+                      {servico}
+                    </span>
+                  ))}
+                </div>
+              </PopoverContent>
+            </Popover>
+            <TooltipContent side="top">
+              <p>{hiddenServicos.join(", ")}</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      )}
+    </div>
+  );
 };
 
 const LaboratorioAmostras = () => {
@@ -55,6 +121,37 @@ const LaboratorioAmostras = () => {
   const [setor, setSetor] = useState("");
   const [status, setStatus] = useState("");
   const [urgencia, setUrgencia] = useState("");
+  const [isExporting, setIsExporting] = useState(false);
+
+  const handleExportPDF = async () => {
+    if (mockAmostras.length === 0) {
+      toast({
+        title: "Não há amostras para exportar",
+        description: "Não há amostras para exportar com os filtros atuais.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsExporting(true);
+    
+    // Simular geração do PDF
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+      toast({
+        title: "PDF gerado com sucesso",
+        description: `Lista de ${mockAmostras.length} amostras exportada.`,
+      });
+    } catch {
+      toast({
+        title: "Erro ao gerar PDF",
+        description: "Não foi possível gerar o PDF. Tente novamente.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   return (
     <LaboratorioLayout title="Amostras">
@@ -169,7 +266,28 @@ const LaboratorioAmostras = () => {
                 <TestTube2 className="h-4 w-4" />
                 Amostras Encontradas
               </CardTitle>
-              <span className="text-sm text-muted-foreground">{mockAmostras.length} amostras</span>
+              <div className="flex items-center gap-3">
+                <span className="text-sm text-muted-foreground">{mockAmostras.length} amostras</span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleExportPDF}
+                  disabled={isExporting || mockAmostras.length === 0}
+                  className="gap-2"
+                >
+                  {isExporting ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Gerando...
+                    </>
+                  ) : (
+                    <>
+                      <FileText className="h-4 w-4" />
+                      Salvar como PDF
+                    </>
+                  )}
+                </Button>
+              </div>
             </div>
           </CardHeader>
           <CardContent className="p-0">
@@ -180,43 +298,65 @@ const LaboratorioAmostras = () => {
                   <TableHead>Paciente</TableHead>
                   <TableHead>Data Coleta</TableHead>
                   <TableHead>Setor / Bancada</TableHead>
+                  <TableHead>Serviços</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead className="text-center">Urgência</TableHead>
                   <TableHead className="text-right">Ações</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {mockAmostras.map((amostra) => (
-                  <TableRow key={amostra.id}>
-                    <TableCell className="font-medium font-mono">{amostra.numeroAmostra}</TableCell>
-                    <TableCell>{amostra.paciente}</TableCell>
-                    <TableCell>{amostra.dataColeta}</TableCell>
-                    <TableCell>{amostra.setorBancada}</TableCell>
-                    <TableCell>
-                      <span className={statusConfig[amostra.status].class}>
-                        {statusConfig[amostra.status].label}
-                      </span>
-                    </TableCell>
-                    <TableCell className="text-center">
-                      {amostra.urgente && (
-                        <span className="badge-error flex items-center gap-1 justify-center">
-                          <AlertTriangle className="h-3 w-3" />
-                          Urgente
-                        </span>
-                      )}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8"
-                        onClick={() => navigate(`/laboratorio/amostras/${amostra.id}`)}
-                      >
-                        <Eye className="h-4 w-4" />
-                      </Button>
+                {mockAmostras.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={8} className="h-32 text-center">
+                      <div className="flex flex-col items-center justify-center text-muted-foreground">
+                        <TestTube2 className="h-10 w-10 mb-2 opacity-50" />
+                        <p>Nenhuma amostra encontrada com os filtros aplicados.</p>
+                      </div>
                     </TableCell>
                   </TableRow>
-                ))}
+                ) : (
+                  mockAmostras.map((amostra) => (
+                    <TableRow key={amostra.id}>
+                      <TableCell className="font-medium font-mono">{amostra.numeroAmostra}</TableCell>
+                      <TableCell>{amostra.paciente}</TableCell>
+                      <TableCell>{amostra.dataColeta}</TableCell>
+                      <TableCell>{amostra.setorBancada}</TableCell>
+                      <TableCell>
+                        <ServicosCell servicos={amostra.servicos} />
+                      </TableCell>
+                      <TableCell>
+                        <span className={statusConfig[amostra.status].class}>
+                          {statusConfig[amostra.status].label}
+                        </span>
+                      </TableCell>
+                      <TableCell className="text-center">
+                        {amostra.urgente && (
+                          <span className="badge-error flex items-center gap-1 justify-center">
+                            <AlertTriangle className="h-3 w-3" />
+                            Urgente
+                          </span>
+                        )}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8"
+                                onClick={() => navigate(`/laboratorio/amostras/${amostra.id}`)}
+                              >
+                                <Eye className="h-4 w-4" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>Visualizar detalhes</TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
               </TableBody>
             </Table>
           </CardContent>

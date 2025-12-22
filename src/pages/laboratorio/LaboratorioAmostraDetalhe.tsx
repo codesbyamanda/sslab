@@ -20,6 +20,13 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import {
   ArrowLeft,
   TestTube2,
@@ -28,6 +35,20 @@ import {
   AlertTriangle,
   FileText,
   AlertCircle,
+  Syringe,
+  Check,
+  Truck,
+  Package,
+  ClipboardCheck,
+  Play,
+  Pause,
+  RotateCcw,
+  Ban,
+  AlertOctagon,
+  CheckCircle2,
+  Settings,
+  User,
+  Thermometer,
 } from "lucide-react";
 
 interface AmostraDetalhe {
@@ -51,12 +72,37 @@ interface ExameVinculado {
   dataHoraProcessamento: string | null;
 }
 
+type EventoTipo = 
+  | "coleta"
+  | "conferencia"
+  | "acondicionamento"
+  | "transito"
+  | "recebimento"
+  | "protocolo"
+  | "distribuicao"
+  | "analise_inicio"
+  | "analise_pausa"
+  | "analise_retomada"
+  | "repetir"
+  | "recolhida"
+  | "concluida"
+  | "liberada"
+  | "exame_concluido"
+  | "exame_analise"
+  | "rejeitada"
+  | "extraviada"
+  | "sistema";
+
 interface EventoHistorico {
   id: string;
+  tipo: EventoTipo;
   evento: string;
   dataHora: string;
-  usuario: string;
+  responsavel: string;
+  setor?: string;
   observacao?: string;
+  isCritical?: boolean;
+  isAutomatic?: boolean;
 }
 
 const mockAmostra: AmostraDetalhe = {
@@ -80,10 +126,111 @@ const mockExames: ExameVinculado[] = [
 ];
 
 const mockHistorico: EventoHistorico[] = [
-  { id: "1", evento: "Amostra Coletada", dataHora: "16/12/2024 08:15", usuario: "Ana Paula (Coleta)", observacao: "Coleta venosa, braço esquerdo" },
-  { id: "2", evento: "Amostra Recebida no Setor", dataHora: "16/12/2024 08:45", usuario: "Carlos (Triagem)" },
-  { id: "3", evento: "Início da Análise", dataHora: "16/12/2024 09:30", usuario: "Sistema (Automação)" },
-  { id: "4", evento: "Exame GLI Concluído", dataHora: "16/12/2024 09:45", usuario: "Sistema (Automação)", observacao: "Resultado: 98 mg/dL" },
+  { 
+    id: "1", 
+    tipo: "coleta",
+    evento: "Amostra Coletada", 
+    dataHora: "16/12/2024 08:15", 
+    responsavel: "Ana Paula",
+    setor: "Coleta",
+    observacao: "Coleta venosa, braço esquerdo. Paciente em jejum de 12h." 
+  },
+  { 
+    id: "2", 
+    tipo: "conferencia",
+    evento: "Conferência na Coleta", 
+    dataHora: "16/12/2024 08:18", 
+    responsavel: "Ana Paula",
+    setor: "Coleta",
+    observacao: "Volume adequado, identificação conferida"
+  },
+  { 
+    id: "3", 
+    tipo: "acondicionamento",
+    evento: "Acondicionamento", 
+    dataHora: "16/12/2024 08:20", 
+    responsavel: "Ana Paula",
+    setor: "Coleta",
+    observacao: "Temperatura ambiente, caixa de transporte #12"
+  },
+  { 
+    id: "4", 
+    tipo: "transito",
+    evento: "Em Trânsito para Triagem", 
+    dataHora: "16/12/2024 08:25", 
+    responsavel: "Sistema",
+    isAutomatic: true,
+    observacao: "Rota: Coleta → Triagem Central"
+  },
+  { 
+    id: "5", 
+    tipo: "recebimento",
+    evento: "Recebida na Triagem", 
+    dataHora: "16/12/2024 08:40", 
+    responsavel: "Carlos Eduardo",
+    setor: "Triagem"
+  },
+  { 
+    id: "6", 
+    tipo: "protocolo",
+    evento: "Protocolada", 
+    dataHora: "16/12/2024 08:42", 
+    responsavel: "Carlos Eduardo",
+    setor: "Triagem",
+    observacao: "Protocolo #TR-2024-089234"
+  },
+  { 
+    id: "7", 
+    tipo: "transito",
+    evento: "Em Trânsito para Setor", 
+    dataHora: "16/12/2024 08:50", 
+    responsavel: "Sistema",
+    isAutomatic: true,
+    observacao: "Rota: Triagem → Bioquímica"
+  },
+  { 
+    id: "8", 
+    tipo: "distribuicao",
+    evento: "Distribuída para Setor", 
+    dataHora: "16/12/2024 09:00", 
+    responsavel: "Carlos Eduardo",
+    setor: "Triagem",
+    observacao: "Entregue à Bioquímica / Bancada 01"
+  },
+  { 
+    id: "9", 
+    tipo: "recebimento",
+    evento: "Amostra Entregue no Setor", 
+    dataHora: "16/12/2024 09:05", 
+    responsavel: "Marcos Silva",
+    setor: "Bioquímica"
+  },
+  { 
+    id: "10", 
+    tipo: "analise_inicio",
+    evento: "Início da Análise", 
+    dataHora: "16/12/2024 09:30", 
+    responsavel: "Sistema (Automação)",
+    isAutomatic: true,
+    observacao: "Equipamento: Analisador BQ-5000"
+  },
+  { 
+    id: "11", 
+    tipo: "exame_concluido",
+    evento: "Exame GLI Concluído", 
+    dataHora: "16/12/2024 09:45", 
+    responsavel: "Sistema (Automação)",
+    isAutomatic: true,
+    observacao: "Resultado: 98 mg/dL - Dentro dos valores de referência"
+  },
+  { 
+    id: "12", 
+    tipo: "exame_analise",
+    evento: "Exame HMG em Análise", 
+    dataHora: "16/12/2024 10:00", 
+    responsavel: "Sistema (Automação)",
+    isAutomatic: true
+  },
 ];
 
 const statusConfig = {
@@ -98,6 +245,98 @@ const situacaoExameConfig = {
   em_analise: { label: "Em Análise", className: "badge-warning" },
   concluido: { label: "Concluído", className: "badge-success" },
   repetir: { label: "Repetir", className: "badge-error" },
+};
+
+const getEventoIcon = (tipo: EventoTipo) => {
+  const iconClass = "h-4 w-4";
+  switch (tipo) {
+    case "coleta":
+      return <Syringe className={iconClass} />;
+    case "conferencia":
+      return <ClipboardCheck className={iconClass} />;
+    case "acondicionamento":
+      return <Thermometer className={iconClass} />;
+    case "transito":
+      return <Truck className={iconClass} />;
+    case "recebimento":
+      return <Package className={iconClass} />;
+    case "protocolo":
+      return <FileText className={iconClass} />;
+    case "distribuicao":
+      return <Package className={iconClass} />;
+    case "analise_inicio":
+      return <Play className={iconClass} />;
+    case "analise_pausa":
+      return <Pause className={iconClass} />;
+    case "analise_retomada":
+      return <Play className={iconClass} />;
+    case "repetir":
+      return <RotateCcw className={iconClass} />;
+    case "recolhida":
+      return <RotateCcw className={iconClass} />;
+    case "concluida":
+      return <Check className={iconClass} />;
+    case "liberada":
+      return <CheckCircle2 className={iconClass} />;
+    case "exame_concluido":
+      return <FlaskConical className={iconClass} />;
+    case "exame_analise":
+      return <FlaskConical className={iconClass} />;
+    case "rejeitada":
+      return <Ban className={iconClass} />;
+    case "extraviada":
+      return <AlertOctagon className={iconClass} />;
+    case "sistema":
+      return <Settings className={iconClass} />;
+    default:
+      return <Clock className={iconClass} />;
+  }
+};
+
+const getEventoStyle = (tipo: EventoTipo, isCritical?: boolean) => {
+  if (isCritical || tipo === "rejeitada" || tipo === "extraviada") {
+    return {
+      iconBg: "bg-destructive",
+      iconText: "text-destructive-foreground",
+      cardBg: "bg-destructive/10 border-destructive/30",
+    };
+  }
+  
+  switch (tipo) {
+    case "coleta":
+      return {
+        iconBg: "bg-primary",
+        iconText: "text-primary-foreground",
+        cardBg: "bg-muted/30",
+      };
+    case "concluida":
+    case "liberada":
+    case "exame_concluido":
+      return {
+        iconBg: "bg-green-600",
+        iconText: "text-white",
+        cardBg: "bg-green-50 dark:bg-green-950/30",
+      };
+    case "transito":
+      return {
+        iconBg: "bg-blue-600",
+        iconText: "text-white",
+        cardBg: "bg-blue-50 dark:bg-blue-950/30",
+      };
+    case "repetir":
+    case "recolhida":
+      return {
+        iconBg: "bg-orange-600",
+        iconText: "text-white",
+        cardBg: "bg-orange-50 dark:bg-orange-950/30",
+      };
+    default:
+      return {
+        iconBg: "bg-muted",
+        iconText: "text-muted-foreground",
+        cardBg: "bg-muted/30",
+      };
+  }
 };
 
 const LaboratorioAmostraDetalhe = () => {
@@ -355,10 +594,13 @@ const LaboratorioAmostraDetalhe = () => {
         {/* Seção Histórico / Linha do tempo */}
         <Card className="card-premium">
           <CardHeader className="pb-4">
-            <CardTitle className="text-base flex items-center gap-2">
-              <Clock className="h-4 w-4 text-primary" />
-              Histórico / Linha do Tempo
-            </CardTitle>
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-base flex items-center gap-2">
+                <Clock className="h-4 w-4 text-primary" />
+                Histórico / Linha do Tempo
+              </CardTitle>
+              <span className="text-sm text-muted-foreground">{historico.length} eventos</span>
+            </div>
           </CardHeader>
           <CardContent>
             {historico.length === 0 ? (
@@ -369,36 +611,87 @@ const LaboratorioAmostraDetalhe = () => {
                 </p>
               </div>
             ) : (
-              <div className="relative">
-                <div className="absolute left-3 top-2 bottom-2 w-px bg-border" />
-                <div className="space-y-4">
-                  {historico.map((evento, index) => (
-                    <div key={evento.id} className="relative pl-8">
-                      <div
-                        className={`absolute left-0 top-1.5 h-6 w-6 rounded-full border-2 flex items-center justify-center ${
-                          index === 0
-                            ? "bg-primary border-primary text-primary-foreground"
-                            : "bg-background border-border"
-                        }`}
-                      >
-                        <div className={`h-2 w-2 rounded-full ${index === 0 ? "bg-primary-foreground" : "bg-muted-foreground"}`} />
-                      </div>
-                      <div className="bg-muted/30 rounded-lg p-3">
-                        <div className="flex items-center justify-between mb-1">
-                          <p className="font-medium text-foreground text-sm">{evento.evento}</p>
-                          <span className="text-xs text-muted-foreground">{evento.dataHora}</span>
+              <ScrollArea className="h-[500px] pr-4">
+                <div className="relative">
+                  <div className="absolute left-4 top-2 bottom-2 w-px bg-border" />
+                  <div className="space-y-4">
+                    {historico.map((evento, index) => {
+                      const style = getEventoStyle(evento.tipo, evento.isCritical);
+                      const isFirst = index === 0;
+                      const isCritical = evento.isCritical || evento.tipo === "rejeitada" || evento.tipo === "extraviada";
+                      
+                      return (
+                        <div key={evento.id} className="relative pl-12">
+                          {/* Icon Circle */}
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <div
+                                  className={`absolute left-0 top-2 h-8 w-8 rounded-full border-2 flex items-center justify-center cursor-help transition-transform hover:scale-110 ${
+                                    isFirst
+                                      ? "bg-primary border-primary text-primary-foreground"
+                                      : `${style.iconBg} ${style.iconText} border-transparent`
+                                  }`}
+                                >
+                                  {getEventoIcon(evento.tipo)}
+                                </div>
+                              </TooltipTrigger>
+                              <TooltipContent side="left">
+                                <p>{evento.evento}</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                          
+                          {/* Event Card */}
+                          <div className={`rounded-lg p-4 border ${style.cardBg} ${isCritical ? 'border-destructive/50' : 'border-transparent'}`}>
+                            <div className="flex items-start justify-between gap-4 mb-2">
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2 flex-wrap">
+                                  <p className={`font-medium text-sm ${isCritical ? 'text-destructive' : 'text-foreground'}`}>
+                                    {evento.evento}
+                                  </p>
+                                  {evento.isAutomatic && (
+                                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-muted text-muted-foreground">
+                                      <Settings className="h-2.5 w-2.5" />
+                                      Automático
+                                    </span>
+                                  )}
+                                  {isCritical && (
+                                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-destructive text-destructive-foreground">
+                                      <AlertOctagon className="h-2.5 w-2.5" />
+                                      Crítico
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                              <span className="text-xs text-muted-foreground whitespace-nowrap font-mono">
+                                {evento.dataHora}
+                              </span>
+                            </div>
+                            
+                            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                              <User className="h-3 w-3" />
+                              <span>{evento.responsavel}</span>
+                              {evento.setor && (
+                                <>
+                                  <span className="text-border">•</span>
+                                  <span>{evento.setor}</span>
+                                </>
+                              )}
+                            </div>
+                            
+                            {evento.observacao && (
+                              <p className="text-xs text-muted-foreground mt-2 pl-5 border-l-2 border-border/50 italic">
+                                {evento.observacao}
+                              </p>
+                            )}
+                          </div>
                         </div>
-                        <p className="text-xs text-muted-foreground">{evento.usuario}</p>
-                        {evento.observacao && (
-                          <p className="text-xs text-muted-foreground mt-1 italic">
-                            {evento.observacao}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  ))}
+                      );
+                    })}
+                  </div>
                 </div>
-              </div>
+              </ScrollArea>
             )}
           </CardContent>
         </Card>
