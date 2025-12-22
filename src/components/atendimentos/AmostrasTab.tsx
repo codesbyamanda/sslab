@@ -1,17 +1,19 @@
-import { useState } from "react";
-import { Plus, Edit, Eye, XCircle, TestTubes, FlaskConical } from "lucide-react";
+import { useMemo, useState } from "react";
+import { Eye, FlaskConical, TestTubes, Info, Beaker } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { useToast } from "@/hooks/use-toast";
-import AmostraModal from "./AmostraModal";
-
-export interface Amostra {
-  id: number;
-  nome: string;
-  descricao: string;
-  servicosVinculados: number[];
-  status: "ativa" | "inativa";
-}
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface Servico {
   id: number;
@@ -28,54 +30,113 @@ interface Servico {
   valor: number;
 }
 
-interface AmostrasTabProps {
-  amostras: Amostra[];
+export interface AmostraGerada {
+  id: number;
+  nome: string;
+  material: string;
   servicos: Servico[];
-  onAddAmostra: (amostra: Omit<Amostra, "id">) => void;
-  onEditAmostra: (amostra: Amostra) => void;
-  onDeleteAmostra: (id: number) => void;
+  origem: string;
+  status: "aguardando_coleta" | "coletada" | "em_analise" | "finalizada";
 }
 
-const AmostrasTab = ({
-  amostras,
-  servicos,
-  onAddAmostra,
-  onEditAmostra,
-  onDeleteAmostra,
-}: AmostrasTabProps) => {
-  const { toast } = useToast();
-  const [showModal, setShowModal] = useState(false);
-  const [editingAmostra, setEditingAmostra] = useState<Amostra | null>(null);
-  const [viewingAmostra, setViewingAmostra] = useState<Amostra | null>(null);
+interface AmostrasTabProps {
+  servicos: Servico[];
+}
 
-  const handleSave = (amostra: Omit<Amostra, "id"> | Amostra) => {
-    if ("id" in amostra) {
-      onEditAmostra(amostra as Amostra);
-    } else {
-      onAddAmostra(amostra);
-    }
-    setShowModal(false);
-    setEditingAmostra(null);
-    toast({
-      title: "Amostra salva com sucesso.",
-      description: `A amostra "${amostra.nome}" foi salva.`,
+// Mapeamento de mnemônicos para materiais (simulando lógica de negócio)
+const MATERIAL_MAP: Record<string, { material: string; grupo: string }> = {
+  "COL": { material: "Sangue Total", grupo: "bioquimica" },
+  "TRI": { material: "Sangue Total", grupo: "bioquimica" },
+  "HDL": { material: "Sangue Total", grupo: "bioquimica" },
+  "GLI": { material: "Sangue Total", grupo: "bioquimica" },
+  "HEMO": { material: "Sangue Total", grupo: "hematologia" },
+  "HEM": { material: "Sangue Total", grupo: "hematologia" },
+  "URIN": { material: "Urina", grupo: "urina" },
+  "EAS": { material: "Urina", grupo: "urina" },
+  "URO": { material: "Urina", grupo: "urina" },
+  "SWAB": { material: "Swab Nasal", grupo: "swab" },
+  "PCR": { material: "Swab Nasal", grupo: "swab" },
+  "COVID": { material: "Swab Nasal", grupo: "swab" },
+  "FEZES": { material: "Fezes", grupo: "fezes" },
+  "EPF": { material: "Fezes", grupo: "fezes" },
+};
+
+const getStatusStyle = (status: AmostraGerada["status"]) => {
+  switch (status) {
+    case "aguardando_coleta":
+      return "bg-ambar-suave/20 text-ambar-suave border border-ambar-suave/30";
+    case "coletada":
+      return "bg-petroleo/20 text-petroleo border border-petroleo/30";
+    case "em_analise":
+      return "bg-primary/20 text-primary border border-primary/30";
+    case "finalizada":
+      return "bg-verde-clinico/20 text-verde-clinico border border-verde-clinico/30";
+    default:
+      return "bg-muted text-muted-foreground";
+  }
+};
+
+const getStatusLabel = (status: AmostraGerada["status"]) => {
+  const labels: Record<string, string> = {
+    aguardando_coleta: "Aguardando Coleta",
+    coletada: "Coletada",
+    em_analise: "Em Análise",
+    finalizada: "Finalizada",
+  };
+  return labels[status] || status;
+};
+
+const AmostrasTab = ({ servicos }: AmostrasTabProps) => {
+  const [viewingAmostra, setViewingAmostra] = useState<AmostraGerada | null>(null);
+
+  // Gera amostras automaticamente baseado nos serviços
+  const amostrasGeradas = useMemo(() => {
+    // Filtrar serviços não cancelados
+    const servicosAtivos = servicos.filter((s) => s.situacao !== "cancelado");
+
+    if (servicosAtivos.length === 0) return [];
+
+    // Agrupar serviços por material e grupo
+    const grupos: Record<string, Servico[]> = {};
+
+    servicosAtivos.forEach((servico) => {
+      const mnemonico = servico.mnemonico.toUpperCase();
+      const config = MATERIAL_MAP[mnemonico] || { material: "Sangue Total", grupo: "outros" };
+      const key = `${config.material}_${config.grupo}`;
+
+      if (!grupos[key]) {
+        grupos[key] = [];
+      }
+      grupos[key].push(servico);
     });
-  };
 
-  const handleToggleStatus = (amostra: Amostra) => {
-    const newStatus = amostra.status === "ativa" ? "inativa" : "ativa";
-    onEditAmostra({ ...amostra, status: newStatus });
-    toast({
-      title: `Amostra ${newStatus === "ativa" ? "ativada" : "inativada"}`,
-      description: `A amostra "${amostra.nome}" foi ${newStatus === "ativa" ? "ativada" : "inativada"}.`,
+    // Criar amostras a partir dos grupos
+    const amostras: AmostraGerada[] = [];
+    let id = 1;
+
+    Object.entries(grupos).forEach(([key, servicosGrupo]) => {
+      const [material, grupo] = key.split("_");
+      
+      // Determinar nome da amostra baseado no grupo
+      let nomeAmostra = material;
+      if (grupo === "hematologia") {
+        nomeAmostra = "HMO";
+      } else if (grupo === "bioquimica") {
+        nomeAmostra = material;
+      }
+
+      amostras.push({
+        id: id++,
+        nome: nomeAmostra,
+        material: material,
+        servicos: servicosGrupo,
+        origem: "Triagem",
+        status: "aguardando_coleta",
+      });
     });
-  };
 
-  const getServicosNomes = (servicosIds: number[]) => {
-    return servicosIds
-      .map((id) => servicos.find((s) => s.id === id)?.descricao)
-      .filter(Boolean);
-  };
+    return amostras;
+  }, [servicos]);
 
   return (
     <div className="space-y-4">
@@ -84,13 +145,17 @@ const AmostrasTab = ({
         <div>
           <h3 className="text-lg font-semibold text-foreground">Amostras</h3>
           <p className="text-sm text-muted-foreground">
-            Gerencie amostras que agrupam serviços relacionados à mesma coleta.
+            Visualização das amostras geradas automaticamente.
           </p>
         </div>
-        <Button onClick={() => setShowModal(true)} className="btn-primary-premium">
-          <Plus className="h-4 w-4" />
-          Adicionar Amostra
-        </Button>
+      </div>
+
+      {/* Info Banner */}
+      <div className="flex items-center gap-3 p-4 bg-primary/5 border border-primary/20 rounded-lg">
+        <Info className="h-5 w-5 text-primary flex-shrink-0" />
+        <p className="text-sm text-foreground">
+          As amostras são geradas automaticamente com base nos serviços adicionados.
+        </p>
       </div>
 
       {/* Table */}
@@ -100,13 +165,15 @@ const AmostrasTab = ({
             <thead>
               <tr>
                 <th>Nome da Amostra</th>
+                <th>Tipo de Material</th>
                 <th>Serviços Vinculados</th>
+                <th>Origem</th>
                 <th>Status</th>
                 <th className="text-center">Ações</th>
               </tr>
             </thead>
             <tbody>
-              {amostras.map((amostra) => (
+              {amostrasGeradas.map((amostra) => (
                 <tr key={amostra.id} className="hover:bg-muted/30">
                   <td>
                     <div className="flex items-center gap-2">
@@ -115,31 +182,58 @@ const AmostrasTab = ({
                     </div>
                   </td>
                   <td>
+                    <div className="flex items-center gap-2">
+                      <Beaker className="h-4 w-4 text-muted-foreground" />
+                      <span>{amostra.material}</span>
+                    </div>
+                  </td>
+                  <td>
                     <div className="flex flex-wrap gap-1">
-                      {amostra.servicosVinculados.length > 0 ? (
-                        <>
-                          <Badge variant="secondary" className="text-xs">
-                            {amostra.servicosVinculados.length} serviço(s)
-                          </Badge>
-                        </>
-                      ) : (
-                        <span className="text-muted-foreground text-sm">Nenhum serviço</span>
+                      {amostra.servicos.slice(0, 3).map((servico) => (
+                        <Badge
+                          key={servico.id}
+                          variant="secondary"
+                          className="text-xs font-mono"
+                        >
+                          {servico.mnemonico}
+                        </Badge>
+                      ))}
+                      {amostra.servicos.length > 3 && (
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Badge variant="outline" className="text-xs">
+                                +{amostra.servicos.length - 3}
+                              </Badge>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <div className="space-y-1">
+                                {amostra.servicos.slice(3).map((servico) => (
+                                  <div key={servico.id} className="text-xs">
+                                    {servico.mnemonico} - {servico.descricao}
+                                  </div>
+                                ))}
+                              </div>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
                       )}
                     </div>
                   </td>
                   <td>
+                    <span className="text-sm">{amostra.origem}</span>
+                  </td>
+                  <td>
                     <span
-                      className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold ${
-                        amostra.status === "ativa"
-                          ? "bg-verde-clinico/20 text-verde-clinico border border-verde-clinico/30"
-                          : "bg-muted text-muted-foreground border border-border"
-                      }`}
+                      className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold ${getStatusStyle(
+                        amostra.status
+                      )}`}
                     >
-                      {amostra.status === "ativa" ? "Ativa" : "Inativa"}
+                      {getStatusLabel(amostra.status)}
                     </span>
                   </td>
                   <td>
-                    <div className="flex items-center justify-center gap-1">
+                    <div className="flex items-center justify-center">
                       <Button
                         variant="ghost"
                         size="icon"
@@ -148,27 +242,6 @@ const AmostrasTab = ({
                         title="Visualizar"
                       >
                         <Eye className="h-3.5 w-3.5" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-7 w-7 text-muted-foreground hover:text-primary"
-                        onClick={() => {
-                          setEditingAmostra(amostra);
-                          setShowModal(true);
-                        }}
-                        title="Editar"
-                      >
-                        <Edit className="h-3.5 w-3.5" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-7 w-7 text-muted-foreground hover:text-destructive"
-                        onClick={() => handleToggleStatus(amostra)}
-                        title={amostra.status === "ativa" ? "Inativar" : "Ativar"}
-                      >
-                        <XCircle className="h-3.5 w-3.5" />
                       </Button>
                     </div>
                   </td>
@@ -179,30 +252,18 @@ const AmostrasTab = ({
         </div>
 
         {/* Empty State */}
-        {amostras.length === 0 && (
+        {amostrasGeradas.length === 0 && (
           <div className="p-12 text-center">
             <TestTubes className="h-12 w-12 mx-auto text-muted-foreground/50 mb-4" />
             <h4 className="text-lg font-medium text-foreground mb-2">
-              Nenhuma amostra cadastrada ainda
+              Nenhuma amostra gerada
             </h4>
             <p className="text-sm text-muted-foreground max-w-md mx-auto">
-              Cadastre amostras para agrupar serviços relacionados à mesma coleta.
+              Adicione serviços para que as amostras sejam geradas automaticamente.
             </p>
           </div>
         )}
       </div>
-
-      {/* Add/Edit Modal */}
-      <AmostraModal
-        open={showModal}
-        onClose={() => {
-          setShowModal(false);
-          setEditingAmostra(null);
-        }}
-        onSave={handleSave}
-        editingAmostra={editingAmostra}
-        servicos={servicos}
-      />
 
       {/* View Modal */}
       {viewingAmostra && (
@@ -210,7 +271,6 @@ const AmostrasTab = ({
           open={!!viewingAmostra}
           onClose={() => setViewingAmostra(null)}
           amostra={viewingAmostra}
-          servicos={servicos}
         />
       )}
     </div>
@@ -218,25 +278,13 @@ const AmostrasTab = ({
 };
 
 // View Modal Component
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-
 interface AmostraViewModalProps {
   open: boolean;
   onClose: () => void;
-  amostra: Amostra;
-  servicos: Servico[];
+  amostra: AmostraGerada;
 }
 
-const AmostraViewModal = ({ open, onClose, amostra, servicos }: AmostraViewModalProps) => {
-  const servicosVinculados = amostra.servicosVinculados
-    .map((id) => servicos.find((s) => s.id === id))
-    .filter(Boolean);
-
+const AmostraViewModal = ({ open, onClose, amostra }: AmostraViewModalProps) => {
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-lg">
@@ -248,45 +296,58 @@ const AmostraViewModal = ({ open, onClose, amostra, servicos }: AmostraViewModal
         </DialogHeader>
 
         <div className="space-y-4">
-          {amostra.descricao && (
+          <div className="grid grid-cols-2 gap-4">
             <div>
-              <h4 className="text-sm font-medium text-muted-foreground mb-1">Descrição</h4>
-              <p className="text-sm">{amostra.descricao}</p>
+              <h4 className="text-sm font-medium text-muted-foreground mb-1">
+                Tipo de Material
+              </h4>
+              <p className="text-sm font-medium">{amostra.material}</p>
             </div>
-          )}
+            <div>
+              <h4 className="text-sm font-medium text-muted-foreground mb-1">
+                Origem
+              </h4>
+              <p className="text-sm font-medium">{amostra.origem}</p>
+            </div>
+          </div>
 
           <div>
-            <h4 className="text-sm font-medium text-muted-foreground mb-1">Status</h4>
+            <h4 className="text-sm font-medium text-muted-foreground mb-1">
+              Status
+            </h4>
             <span
-              className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold ${
-                amostra.status === "ativa"
-                  ? "bg-verde-clinico/20 text-verde-clinico border border-verde-clinico/30"
-                  : "bg-muted text-muted-foreground border border-border"
-              }`}
+              className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold ${getStatusStyle(
+                amostra.status
+              )}`}
             >
-              {amostra.status === "ativa" ? "Ativa" : "Inativa"}
+              {getStatusLabel(amostra.status)}
             </span>
           </div>
 
           <div>
             <h4 className="text-sm font-medium text-muted-foreground mb-2">
-              Serviços Vinculados ({servicosVinculados.length})
+              Serviços Vinculados ({amostra.servicos.length})
             </h4>
-            {servicosVinculados.length > 0 ? (
-              <div className="space-y-2">
-                {servicosVinculados.map((servico) => (
-                  <div
-                    key={servico!.id}
-                    className="flex items-center gap-2 p-2 bg-muted/30 rounded-md"
-                  >
-                    <span className="font-mono text-xs text-primary">{servico!.mnemonico}</span>
-                    <span className="text-sm">{servico!.descricao}</span>
+            <div className="space-y-2 max-h-48 overflow-y-auto">
+              {amostra.servicos.map((servico) => (
+                <div
+                  key={servico.id}
+                  className="flex items-center justify-between p-2 bg-muted/30 rounded-md"
+                >
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono text-xs text-primary font-medium">
+                      {servico.mnemonico}
+                    </span>
+                    <span className="text-sm">{servico.descricao}</span>
                   </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-sm text-muted-foreground">Nenhum serviço vinculado.</p>
-            )}
+                  {servico.urgencia && (
+                    <Badge variant="destructive" className="text-xs">
+                      Urgente
+                    </Badge>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 
