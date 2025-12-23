@@ -12,7 +12,9 @@ import {
   Download,
   Lock,
   FileArchive,
-  Info
+  Info,
+  Send,
+  History
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import FaturamentoSidebar from "@/components/faturamento/FaturamentoSidebar";
@@ -50,8 +52,23 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import { FaturaBadge, type FaturaStatus } from "@/components/faturamento/StatusBadge";
+import { FaturamentoTimeline, type TimelineEvent, createTimelineEvent } from "@/components/faturamento/FaturamentoTimeline";
 
 // Mock data for pre-faturas fechadas
 const mockPreFaturas = [
@@ -64,143 +81,18 @@ const mockPreFaturas = [
 
 const convenios = ["Unimed", "Bradesco Saúde", "SulAmérica", "Amil", "Porto Seguro", "Hapvida", "NotreDame"];
 
-type FaturaStatus = "aberta" | "fechada";
-
 interface Fatura {
   codigo: string;
   convenio: string;
   dataCriacao: string;
   dataFechamento: string | null;
+  dataEnvio: string | null;
   qtdPreLotes: number;
   qtdGuias: number;
   total: number;
   status: FaturaStatus;
+  timeline: TimelineEvent[];
 }
-
-const Faturamento = () => {
-  const navigate = useNavigate();
-  const { toast } = useToast();
-  
-  // State
-  const [isInfoExpanded, setIsInfoExpanded] = useState(false);
-  const [filterConvenio, setFilterConvenio] = useState("");
-  const [filterDataInicio, setFilterDataInicio] = useState("");
-  const [filterDataFim, setFilterDataFim] = useState("");
-  const [preFaturas, setPreFaturas] = useState(mockPreFaturas);
-  const [hasFiltered, setHasFiltered] = useState(false);
-  
-  // Fatura state
-  const [faturaGerada, setFaturaGerada] = useState<Fatura | null>(null);
-  const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const [showCloseConfirmModal, setShowCloseConfirmModal] = useState(false);
-
-  const handleFilter = () => {
-    setHasFiltered(true);
-    // In real implementation, would filter based on criteria
-    toast({
-      title: "Filtro aplicado",
-      description: "Pré-faturas fechadas localizadas com sucesso.",
-    });
-  };
-
-  const clearFilters = () => {
-    setFilterConvenio("");
-    setFilterDataInicio("");
-    setFilterDataFim("");
-    setHasFiltered(false);
-  };
-
-  const handlePreFaturaSelect = (id: number, checked: boolean) => {
-    setPreFaturas(preFaturas.map(pf => pf.id === id ? { ...pf, selected: checked } : pf));
-  };
-
-  const handleSelectAll = (checked: boolean) => {
-    setPreFaturas(preFaturas.map(pf => ({ ...pf, selected: checked })));
-  };
-
-  const selectedPreFaturas = preFaturas.filter(pf => pf.selected);
-  const totalGuias = selectedPreFaturas.reduce((sum, pf) => sum + pf.qtdGuias, 0);
-  const totalValor = selectedPreFaturas.reduce((sum, pf) => sum + pf.total, 0);
-
-  const handleGerarFatura = () => {
-    if (selectedPreFaturas.length === 0) {
-      toast({
-        title: "Nenhum pré-lote selecionado",
-        description: "Selecione ao menos um pré-lote para gerar a fatura.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    // Generate new fatura
-    const novaFatura: Fatura = {
-      codigo: `FAT-2024-${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}`,
-      convenio: selectedPreFaturas[0].convenio,
-      dataCriacao: new Date().toISOString().split('T')[0],
-      dataFechamento: null,
-      qtdPreLotes: selectedPreFaturas.length,
-      qtdGuias: totalGuias,
-      total: totalValor,
-      status: "aberta"
-    };
-
-    setFaturaGerada(novaFatura);
-    setShowSuccessModal(true);
-  };
-
-  const handleFecharFatura = () => {
-    if (!faturaGerada) return;
-    setShowCloseConfirmModal(true);
-  };
-
-  const confirmFecharFatura = () => {
-    if (!faturaGerada) return;
-    
-    setFaturaGerada({
-      ...faturaGerada,
-      status: "fechada",
-      dataFechamento: new Date().toISOString().split('T')[0]
-    });
-    setShowCloseConfirmModal(false);
-    
-    toast({
-      title: "Fatura fechada com sucesso",
-      description: `Fatura ${faturaGerada.codigo} está pronta para geração de arquivo magnético.`,
-    });
-  };
-
-  const handleGerarArquivoMagnetico = () => {
-    if (!faturaGerada) return;
-    
-    if (faturaGerada.status !== "fechada") {
-      toast({
-        title: "Fatura não fechada",
-        description: "Feche a fatura antes de gerar o arquivo magnético.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    toast({
-      title: "Arquivo magnético gerado",
-      description: `Arquivo para a fatura ${faturaGerada.codigo} foi gerado com sucesso.`,
-    });
-  };
-
-  const handleNovaFatura = () => {
-    setFaturaGerada(null);
-    setHasFiltered(false);
-    clearFilters();
-  };
-
-  const getStatusBadge = (status: FaturaStatus) => {
-    switch (status) {
-      case "aberta":
-        return <Badge className="bg-amarelo-alerta/20 text-amarelo-alerta border-amarelo-alerta/30">Aberta</Badge>;
-      case "fechada":
-        return <Badge className="bg-verde-ativo/20 text-verde-ativo border-verde-ativo/30">Fechada</Badge>;
-    }
-  };
 
   return (
     <div className="flex min-h-screen w-full bg-gradient-services">

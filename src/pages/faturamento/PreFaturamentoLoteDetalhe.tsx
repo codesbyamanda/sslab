@@ -15,7 +15,11 @@ import {
   Eye,
   Download,
   Info,
-  Calculator
+  Calculator,
+  History,
+  Gavel,
+  RefreshCw,
+  DollarSign
 } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import FaturamentoSidebar from "@/components/faturamento/FaturamentoSidebar";
@@ -48,12 +52,28 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
-
-type LoteStatus = "transicao" | "fechado" | "faturado";
-type GuiaStatus = "aberta" | "pendente" | "cancelada";
-type ItemStatus = "ok" | "pendente";
+import { 
+  LotePreFaturamentoBadge, 
+  GuiaBadge, 
+  ItemGuiaBadge,
+  type LotePreFaturamentoStatus,
+  type GuiaStatus,
+  type ItemGuiaStatus
+} from "@/components/faturamento/StatusBadge";
+import { 
+  FaturamentoTimeline, 
+  type TimelineEvent,
+  createTimelineEvent 
+} from "@/components/faturamento/FaturamentoTimeline";
 
 interface Item {
   id: number;
@@ -62,7 +82,7 @@ interface Item {
   quantidade: number;
   valorUnitario: number;
   valorTotal: number;
-  situacao: ItemStatus;
+  situacao: ItemGuiaStatus;
   motivoPendencia: string | null;
 }
 
@@ -78,6 +98,7 @@ interface Guia {
   motivoPendencia: string | null;
   selected: boolean;
   itens: Item[];
+  timeline: TimelineEvent[];
 }
 
 interface Lote {
@@ -86,8 +107,9 @@ interface Lote {
   convenio: string;
   periodoInicio: string;
   periodoFim: string;
-  status: LoteStatus;
+  status: LotePreFaturamentoStatus;
   guias: Guia[];
+  timeline: TimelineEvent[];
 }
 
 // Mock data
@@ -98,6 +120,11 @@ const mockLote: Lote = {
   periodoInicio: "2024-01-01",
   periodoFim: "2024-01-15",
   status: "transicao",
+  timeline: [
+    { id: "1", type: "lote_aberto", title: "Lote criado", timestamp: "15/01 09:00", user: "Maria Silva", origem: "usuario" },
+    { id: "2", type: "item_incluido", title: "6 guias incluídas", timestamp: "15/01 09:15", user: "Maria Silva", origem: "usuario" },
+    { id: "3", type: "guia_pendente", title: "2 guias com pendência identificadas", timestamp: "15/01 09:15", origem: "sistema" },
+  ],
   guias: [
     {
       id: 1,
@@ -110,12 +137,16 @@ const mockLote: Lote = {
       status: "aberta",
       motivoPendencia: null,
       selected: false,
+      timeline: [
+        { id: "g1-1", type: "guia_criada", title: "Guia criada", timestamp: "15/01 08:00", user: "Sistema", origem: "sistema" },
+        { id: "g1-2", type: "item_incluido", title: "Incluída no lote PF-2024-001", timestamp: "15/01 09:15", user: "Maria Silva", origem: "usuario" },
+      ],
       itens: [
-        { id: 1, codigo: "40304361", descricao: "Hemograma Completo", quantidade: 1, valorUnitario: 35.00, valorTotal: 35.00, situacao: "ok", motivoPendencia: null },
-        { id: 2, codigo: "40302504", descricao: "Glicemia de Jejum", quantidade: 1, valorUnitario: 25.00, valorTotal: 25.00, situacao: "ok", motivoPendencia: null },
-        { id: 3, codigo: "40301630", descricao: "Colesterol Total e Frações", quantidade: 1, valorUnitario: 120.00, valorTotal: 120.00, situacao: "ok", motivoPendencia: null },
-        { id: 4, codigo: "40316521", descricao: "TSH", quantidade: 1, valorUnitario: 85.00, valorTotal: 85.00, situacao: "ok", motivoPendencia: null },
-        { id: 5, codigo: "40316530", descricao: "T4 Livre", quantidade: 1, valorUnitario: 85.00, valorTotal: 85.00, situacao: "ok", motivoPendencia: null },
+        { id: 1, codigo: "40304361", descricao: "Hemograma Completo", quantidade: 1, valorUnitario: 35.00, valorTotal: 35.00, situacao: "aberto", motivoPendencia: null },
+        { id: 2, codigo: "40302504", descricao: "Glicemia de Jejum", quantidade: 1, valorUnitario: 25.00, valorTotal: 25.00, situacao: "aberto", motivoPendencia: null },
+        { id: 3, codigo: "40301630", descricao: "Colesterol Total e Frações", quantidade: 1, valorUnitario: 120.00, valorTotal: 120.00, situacao: "aberto", motivoPendencia: null },
+        { id: 4, codigo: "40316521", descricao: "TSH", quantidade: 1, valorUnitario: 85.00, valorTotal: 85.00, situacao: "aberto", motivoPendencia: null },
+        { id: 5, codigo: "40316530", descricao: "T4 Livre", quantidade: 1, valorUnitario: 85.00, valorTotal: 85.00, situacao: "aberto", motivoPendencia: null },
       ]
     },
     {
@@ -129,10 +160,14 @@ const mockLote: Lote = {
       status: "pendente",
       motivoPendencia: "Código do CID não preenchido",
       selected: false,
+      timeline: [
+        { id: "g2-1", type: "guia_criada", title: "Guia criada", timestamp: "15/01 08:30", user: "Sistema", origem: "sistema" },
+        { id: "g2-2", type: "guia_pendente", title: "Pendência identificada: CID não preenchido", timestamp: "15/01 09:15", origem: "sistema" },
+      ],
       itens: [
         { id: 6, codigo: "40301630", descricao: "Colesterol Total e Frações", quantidade: 1, valorUnitario: 120.00, valorTotal: 120.00, situacao: "pendente", motivoPendencia: "Código do CID não preenchido" },
-        { id: 7, codigo: "40302504", descricao: "Glicemia de Jejum", quantidade: 1, valorUnitario: 25.00, valorTotal: 25.00, situacao: "ok", motivoPendencia: null },
-        { id: 8, codigo: "40304361", descricao: "Hemograma Completo", quantidade: 1, valorUnitario: 35.00, valorTotal: 35.00, situacao: "ok", motivoPendencia: null },
+        { id: 7, codigo: "40302504", descricao: "Glicemia de Jejum", quantidade: 1, valorUnitario: 25.00, valorTotal: 25.00, situacao: "aberto", motivoPendencia: null },
+        { id: 8, codigo: "40304361", descricao: "Hemograma Completo", quantidade: 1, valorUnitario: 35.00, valorTotal: 35.00, situacao: "aberto", motivoPendencia: null },
       ]
     },
     {
@@ -146,11 +181,14 @@ const mockLote: Lote = {
       status: "aberta",
       motivoPendencia: null,
       selected: false,
+      timeline: [
+        { id: "g3-1", type: "guia_criada", title: "Guia criada", timestamp: "14/01 10:00", user: "Sistema", origem: "sistema" },
+      ],
       itens: [
-        { id: 9, codigo: "40316521", descricao: "TSH", quantidade: 1, valorUnitario: 85.00, valorTotal: 85.00, situacao: "ok", motivoPendencia: null },
-        { id: 10, codigo: "40316530", descricao: "T4 Livre", quantidade: 1, valorUnitario: 85.00, valorTotal: 85.00, situacao: "ok", motivoPendencia: null },
-        { id: 11, codigo: "40302229", descricao: "Ácido Úrico", quantidade: 1, valorUnitario: 30.00, valorTotal: 30.00, situacao: "ok", motivoPendencia: null },
-        { id: 12, codigo: "40302318", descricao: "Creatinina", quantidade: 1, valorUnitario: 28.00, valorTotal: 28.00, situacao: "ok", motivoPendencia: null },
+        { id: 9, codigo: "40316521", descricao: "TSH", quantidade: 1, valorUnitario: 85.00, valorTotal: 85.00, situacao: "aberto", motivoPendencia: null },
+        { id: 10, codigo: "40316530", descricao: "T4 Livre", quantidade: 1, valorUnitario: 85.00, valorTotal: 85.00, situacao: "aberto", motivoPendencia: null },
+        { id: 11, codigo: "40302229", descricao: "Ácido Úrico", quantidade: 1, valorUnitario: 30.00, valorTotal: 30.00, situacao: "aberto", motivoPendencia: null },
+        { id: 12, codigo: "40302318", descricao: "Creatinina", quantidade: 1, valorUnitario: 28.00, valorTotal: 28.00, situacao: "aberto", motivoPendencia: null },
       ]
     },
     {
@@ -164,10 +202,14 @@ const mockLote: Lote = {
       status: "pendente",
       motivoPendencia: "Data da solicitação não informada; Número da carteira inválido",
       selected: false,
+      timeline: [
+        { id: "g4-1", type: "guia_criada", title: "Guia criada", timestamp: "14/01 11:00", user: "Sistema", origem: "sistema" },
+        { id: "g4-2", type: "guia_pendente", title: "Múltiplas pendências identificadas", timestamp: "15/01 09:15", origem: "sistema" },
+      ],
       itens: [
         { id: 13, codigo: "40304361", descricao: "Hemograma Completo", quantidade: 1, valorUnitario: 35.00, valorTotal: 35.00, situacao: "pendente", motivoPendencia: "Data da solicitação não informada" },
         { id: 14, codigo: "40302504", descricao: "Glicemia de Jejum", quantidade: 2, valorUnitario: 25.00, valorTotal: 50.00, situacao: "pendente", motivoPendencia: "Número da carteira inválido" },
-        { id: 15, codigo: "40301630", descricao: "Colesterol Total e Frações", quantidade: 1, valorUnitario: 120.00, valorTotal: 120.00, situacao: "ok", motivoPendencia: null },
+        { id: 15, codigo: "40301630", descricao: "Colesterol Total e Frações", quantidade: 1, valorUnitario: 120.00, valorTotal: 120.00, situacao: "aberto", motivoPendencia: null },
       ]
     },
     {
@@ -181,9 +223,13 @@ const mockLote: Lote = {
       status: "cancelada",
       motivoPendencia: null,
       selected: false,
+      timeline: [
+        { id: "g5-1", type: "guia_criada", title: "Guia criada", timestamp: "13/01 14:00", user: "Sistema", origem: "sistema" },
+        { id: "g5-2", type: "item_removido", title: "Guia cancelada pelo usuário", timestamp: "14/01 08:00", user: "João Santos", origem: "usuario" },
+      ],
       itens: [
-        { id: 16, codigo: "40302504", descricao: "Glicemia de Jejum", quantidade: 1, valorUnitario: 25.00, valorTotal: 25.00, situacao: "ok", motivoPendencia: null },
-        { id: 17, codigo: "40304361", descricao: "Hemograma Completo", quantidade: 1, valorUnitario: 35.00, valorTotal: 35.00, situacao: "ok", motivoPendencia: null },
+        { id: 16, codigo: "40302504", descricao: "Glicemia de Jejum", quantidade: 1, valorUnitario: 25.00, valorTotal: 25.00, situacao: "cancelado", motivoPendencia: null },
+        { id: 17, codigo: "40304361", descricao: "Hemograma Completo", quantidade: 1, valorUnitario: 35.00, valorTotal: 35.00, situacao: "cancelado", motivoPendencia: null },
       ]
     },
     {
@@ -197,10 +243,37 @@ const mockLote: Lote = {
       status: "aberta",
       motivoPendencia: null,
       selected: false,
+      timeline: [
+        { id: "g6-1", type: "guia_criada", title: "Guia criada", timestamp: "13/01 15:00", user: "Sistema", origem: "sistema" },
+      ],
       itens: [
-        { id: 18, codigo: "40316521", descricao: "TSH", quantidade: 1, valorUnitario: 85.00, valorTotal: 85.00, situacao: "ok", motivoPendencia: null },
-        { id: 19, codigo: "40316530", descricao: "T4 Livre", quantidade: 1, valorUnitario: 85.00, valorTotal: 85.00, situacao: "ok", motivoPendencia: null },
-        { id: 20, codigo: "40302504", descricao: "Glicemia de Jejum", quantidade: 1, valorUnitario: 25.00, valorTotal: 25.00, situacao: "ok", motivoPendencia: null },
+        { id: 18, codigo: "40316521", descricao: "TSH", quantidade: 1, valorUnitario: 85.00, valorTotal: 85.00, situacao: "aberto", motivoPendencia: null },
+        { id: 19, codigo: "40316530", descricao: "T4 Livre", quantidade: 1, valorUnitario: 85.00, valorTotal: 85.00, situacao: "aberto", motivoPendencia: null },
+        { id: 20, codigo: "40302504", descricao: "Glicemia de Jejum", quantidade: 1, valorUnitario: 25.00, valorTotal: 25.00, situacao: "aberto", motivoPendencia: null },
+      ]
+    },
+    // Adicionar guia com itens glosados para demonstrar fluxo completo
+    {
+      id: 7,
+      codigo: "REQ-2024-0007",
+      paciente: "Paulo Mendes",
+      convenio: "Unimed",
+      plano: "Empresarial",
+      dataAtendimento: "2024-01-12",
+      valorTotal: 245.00,
+      status: "aberta",
+      motivoPendencia: null,
+      selected: false,
+      timeline: [
+        { id: "g7-1", type: "guia_criada", title: "Guia criada", timestamp: "12/01 09:00", user: "Sistema", origem: "sistema" },
+        { id: "g7-2", type: "glosa_identificada", title: "Glosa identificada no retorno", timestamp: "20/01 14:00", origem: "sistema" },
+        { id: "g7-3", type: "glosa_tratada", title: "Recurso de glosa enviado", timestamp: "21/01 10:00", user: "Ana Costa", origem: "usuario" },
+      ],
+      itens: [
+        { id: 21, codigo: "40304361", descricao: "Hemograma Completo", quantidade: 1, valorUnitario: 35.00, valorTotal: 35.00, situacao: "recebido", motivoPendencia: null },
+        { id: 22, codigo: "40302504", descricao: "Glicemia de Jejum", quantidade: 1, valorUnitario: 25.00, valorTotal: 25.00, situacao: "glosado", motivoPendencia: "Procedimento não autorizado na guia" },
+        { id: 23, codigo: "40301630", descricao: "Colesterol Total e Frações", quantidade: 1, valorUnitario: 120.00, valorTotal: 120.00, situacao: "reapresentado", motivoPendencia: null },
+        { id: 24, codigo: "40316521", descricao: "TSH", quantidade: 1, valorUnitario: 85.00, valorTotal: 85.00, situacao: "glosa_acatada", motivoPendencia: "Glosa aceita - sem cobertura" },
       ]
     },
   ]
@@ -217,13 +290,29 @@ const PreFaturamentoLoteDetalhe = () => {
   const [showRemoveAlert, setShowRemoveAlert] = useState(false);
   const [showCloseAlert, setShowCloseAlert] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
+  const [selectedGuiaForTimeline, setSelectedGuiaForTimeline] = useState<Guia | null>(null);
 
   // Computed values
   const selectedGuias = useMemo(() => lote.guias.filter(g => g.selected), [lote.guias]);
   const pendentesCount = useMemo(() => lote.guias.filter(g => g.status === "pendente").length, [lote.guias]);
   const canceladasCount = useMemo(() => lote.guias.filter(g => g.status === "cancelada").length, [lote.guias]);
-  const totalLote = useMemo(() => lote.guias.reduce((sum, g) => sum + g.valorTotal, 0), [lote.guias]);
+  const totalLote = useMemo(() => lote.guias.filter(g => g.status !== "cancelada").reduce((sum, g) => sum + g.valorTotal, 0), [lote.guias]);
   const hasPendencias = pendentesCount > 0;
+  
+  // Contagem de itens por status
+  const itemStatusCounts = useMemo(() => {
+    const counts: Record<ItemGuiaStatus, number> = {
+      aberto: 0, pendente: 0, pre_faturado: 0, em_faturamento: 0,
+      recebido: 0, glosado: 0, glosa_acatada: 0, reapresentado: 0,
+      em_refaturamento: 0, cancelado: 0
+    };
+    lote.guias.forEach(g => {
+      g.itens.forEach(item => {
+        counts[item.situacao]++;
+      });
+    });
+    return counts;
+  }, [lote.guias]);
 
   // Toggle expand
   const toggleExpand = (guiaId: number) => {
@@ -303,8 +392,14 @@ const PreFaturamentoLoteDetalhe = () => {
         if (g.id !== guiaId) return g;
         const updatedItens = g.itens.filter(item => item.id !== itemId);
         const newTotal = updatedItens.reduce((sum, item) => sum + item.valorTotal, 0);
-        return { ...g, itens: updatedItens, valorTotal: newTotal };
-      })
+        return { 
+          ...g, 
+          itens: updatedItens, 
+          valorTotal: newTotal,
+          timeline: [...g.timeline, createTimelineEvent("item_removido", "Item removido da guia", { user: "Usuário Atual" })]
+        };
+      }),
+      timeline: [...prev.timeline, createTimelineEvent("item_removido", `Item removido da guia`, { user: "Usuário Atual" })]
     }));
     setHasChanges(true);
     toast({
@@ -320,16 +415,18 @@ const PreFaturamentoLoteDetalhe = () => {
         if (g.id !== guiaId) return g;
         const updatedItens = g.itens.map(item => {
           if (item.id !== itemId) return item;
-          return { ...item, situacao: "ok" as ItemStatus, motivoPendencia: null };
+          return { ...item, situacao: "aberto" as ItemGuiaStatus, motivoPendencia: null };
         });
         const hasPending = updatedItens.some(item => item.situacao === "pendente");
         return { 
           ...g, 
           itens: updatedItens,
           status: hasPending ? "pendente" : "aberta" as GuiaStatus,
-          motivoPendencia: hasPending ? g.motivoPendencia : null
+          motivoPendencia: hasPending ? g.motivoPendencia : null,
+          timeline: [...g.timeline, createTimelineEvent("item_corrigido", "Pendência do item corrigida", { user: "Usuário Atual" })]
         };
-      })
+      }),
+      timeline: [...prev.timeline, createTimelineEvent("item_corrigido", "Pendência corrigida", { user: "Usuário Atual" })]
     }));
     setHasChanges(true);
     toast({
@@ -338,9 +435,44 @@ const PreFaturamentoLoteDetalhe = () => {
     });
   };
 
+  const handleTratarGlosa = (guiaId: number, itemId: number) => {
+    toast({
+      title: "Tratar Glosa",
+      description: "Abrindo tela de tratamento de glosa...",
+    });
+  };
+
+  const handleReapresentar = (guiaId: number, itemId: number) => {
+    setLote(prev => ({
+      ...prev,
+      guias: prev.guias.map(g => {
+        if (g.id !== guiaId) return g;
+        const updatedItens = g.itens.map(item => {
+          if (item.id !== itemId) return item;
+          return { ...item, situacao: "reapresentado" as ItemGuiaStatus, motivoPendencia: null };
+        });
+        return { 
+          ...g, 
+          itens: updatedItens,
+          timeline: [...g.timeline, createTimelineEvent("item_reapresentado", "Item reapresentado ao convênio", { user: "Usuário Atual" })]
+        };
+      }),
+      timeline: [...prev.timeline, createTimelineEvent("item_reapresentado", "Item reapresentado", { user: "Usuário Atual" })]
+    }));
+    setHasChanges(true);
+    toast({
+      title: "Item reapresentado",
+      description: "O item foi marcado para reapresentação.",
+    });
+  };
+
   // Actions
   const handleSave = () => {
     setHasChanges(false);
+    setLote(prev => ({
+      ...prev,
+      timeline: [...prev.timeline, createTimelineEvent("alteracao", "Alterações salvas no lote", { user: "Usuário Atual" })]
+    }));
     toast({
       title: "Alterações salvas",
       description: "As alterações do lote foram salvas com sucesso.",
@@ -360,20 +492,25 @@ const PreFaturamentoLoteDetalhe = () => {
   };
 
   const confirmRemoveSelected = () => {
+    const count = selectedGuias.length;
     setLote(prev => ({
       ...prev,
-      guias: prev.guias.filter(g => !g.selected)
+      guias: prev.guias.filter(g => !g.selected),
+      timeline: [...prev.timeline, createTimelineEvent("item_removido", `${count} guia(s) removida(s) do lote`, { user: "Usuário Atual" })]
     }));
     setShowRemoveAlert(false);
     setHasChanges(true);
     toast({
       title: "Guias removidas",
-      description: `${selectedGuias.length} guia(s) removida(s) do lote.`,
+      description: `${count} guia(s) removida(s) do lote.`,
     });
   };
 
   const handleCancelUnexecuted = () => {
-    // Mock: would cancel unexecuted items
+    setLote(prev => ({
+      ...prev,
+      timeline: [...prev.timeline, createTimelineEvent("item_removido", "Itens não executados cancelados", { user: "Usuário Atual" })]
+    }));
     toast({
       title: "Itens cancelados",
       description: "Os itens não executados foram cancelados.",
@@ -397,7 +534,11 @@ const PreFaturamentoLoteDetalhe = () => {
   };
 
   const confirmCloseLote = () => {
-    setLote(prev => ({ ...prev, status: "fechado" }));
+    setLote(prev => ({ 
+      ...prev, 
+      status: "fechado",
+      timeline: [...prev.timeline, createTimelineEvent("lote_fechado", "Lote fechado para faturamento", { user: "Usuário Atual" })]
+    }));
     setShowCloseAlert(false);
     toast({
       title: "Lote fechado",
@@ -405,46 +546,78 @@ const PreFaturamentoLoteDetalhe = () => {
     });
   };
 
-  // Status badges
-  const getStatusBadge = (status: LoteStatus) => {
-    switch (status) {
-      case "transicao":
-        return <Badge className="bg-warning/20 text-warning border-warning/30">Em Transição</Badge>;
-      case "fechado":
-        return <Badge className="bg-primary/20 text-primary border-primary/30">Fechado</Badge>;
-      case "faturado":
-        return <Badge className="bg-success/20 text-success border-success/30">Faturado</Badge>;
+  // Get action buttons for item based on status
+  const getItemActions = (guia: Guia, item: Item) => {
+    const actions: React.ReactNode[] = [];
+    
+    if (item.situacao === "pendente" && lote.status === "transicao") {
+      actions.push(
+        <Tooltip key="corrigir">
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7 text-success hover:text-success hover:bg-success/10"
+              onClick={() => handleCorrectItem(guia.id, item.id)}
+            >
+              <CheckCircle2 className="h-4 w-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>Corrigir pendência</TooltipContent>
+        </Tooltip>
+      );
     }
-  };
-
-  const getGuiaStatusBadge = (status: GuiaStatus) => {
-    switch (status) {
-      case "aberta":
-        return <Badge className="bg-primary/20 text-primary border-primary/30">Aberta</Badge>;
-      case "pendente":
-        return <Badge className="bg-destructive/20 text-destructive border-destructive/30">Pendente</Badge>;
-      case "cancelada":
-        return <Badge className="bg-muted text-muted-foreground border-border">Cancelada</Badge>;
+    
+    if (item.situacao === "glosado") {
+      actions.push(
+        <Tooltip key="tratar">
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7 text-warning hover:text-warning hover:bg-warning/10"
+              onClick={() => handleTratarGlosa(guia.id, item.id)}
+            >
+              <Gavel className="h-4 w-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>Tratar Glosa</TooltipContent>
+        </Tooltip>,
+        <Tooltip key="reapresentar">
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7 text-primary hover:text-primary hover:bg-primary/10"
+              onClick={() => handleReapresentar(guia.id, item.id)}
+            >
+              <RefreshCw className="h-4 w-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>Reapresentar</TooltipContent>
+        </Tooltip>
+      );
     }
-  };
-
-  const getItemStatusBadge = (situacao: ItemStatus) => {
-    switch (situacao) {
-      case "ok":
-        return (
-          <span className="inline-flex items-center gap-1 text-xs font-medium text-success">
-            <CheckCircle2 className="h-3.5 w-3.5" />
-            Ok
-          </span>
-        );
-      case "pendente":
-        return (
-          <span className="inline-flex items-center gap-1 text-xs font-medium text-destructive">
-            <AlertCircle className="h-3.5 w-3.5" />
-            Pendente
-          </span>
-        );
+    
+    if (lote.status === "transicao" && !["recebido", "glosa_acatada", "cancelado"].includes(item.situacao)) {
+      actions.push(
+        <Tooltip key="remover">
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7 text-destructive hover:text-destructive hover:bg-destructive/10"
+              onClick={() => handleRemoveItem(guia.id, item.id)}
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>Excluir item</TooltipContent>
+        </Tooltip>
+      );
     }
+    
+    return actions;
   };
 
   return (
@@ -475,7 +648,7 @@ const PreFaturamentoLoteDetalhe = () => {
                   <div>
                     <div className="flex items-center gap-3 mb-1">
                       <h1 className="text-xl font-bold text-foreground">{lote.codigo}</h1>
-                      {getStatusBadge(lote.status)}
+                      <LotePreFaturamentoBadge status={lote.status} />
                     </div>
                     <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground">
                       <span><strong>Convênio:</strong> {lote.convenio}</span>
@@ -485,30 +658,50 @@ const PreFaturamentoLoteDetalhe = () => {
                   </div>
                 </div>
                 
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <div>
-                      <Button 
-                        onClick={handleCloseLote}
-                        disabled={lote.status !== "transicao"}
-                        className="gap-2"
-                      >
-                        <CheckCircle2 className="h-4 w-4" />
-                        Fechar Lote
+                <div className="flex items-center gap-2">
+                  {/* Timeline Sheet */}
+                  <Sheet>
+                    <SheetTrigger asChild>
+                      <Button variant="outline" size="sm" className="gap-2">
+                        <History className="h-4 w-4" />
+                        Histórico
                       </Button>
-                    </div>
-                  </TooltipTrigger>
-                  {hasPendencias && lote.status === "transicao" && (
-                    <TooltipContent>
-                      <p>Existem {pendentesCount} guia(s) com pendências</p>
-                    </TooltipContent>
-                  )}
-                </Tooltip>
+                    </SheetTrigger>
+                    <SheetContent className="w-[400px] sm:w-[450px]">
+                      <SheetHeader>
+                        <SheetTitle>Histórico do Lote</SheetTitle>
+                      </SheetHeader>
+                      <div className="mt-6">
+                        <FaturamentoTimeline events={lote.timeline} title="" maxHeight="calc(100vh - 150px)" />
+                      </div>
+                    </SheetContent>
+                  </Sheet>
+                  
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div>
+                        <Button 
+                          onClick={handleCloseLote}
+                          disabled={lote.status !== "transicao"}
+                          className="gap-2"
+                        >
+                          <CheckCircle2 className="h-4 w-4" />
+                          Fechar Lote
+                        </Button>
+                      </div>
+                    </TooltipTrigger>
+                    {hasPendencias && lote.status === "transicao" && (
+                      <TooltipContent>
+                        <p>Existem {pendentesCount} guia(s) com pendências</p>
+                      </TooltipContent>
+                    )}
+                  </Tooltip>
+                </div>
               </div>
             </div>
 
             {/* Summary Cards */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 animate-fade-in">
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-6 animate-fade-in">
               <div className="bg-card rounded-xl border border-border/50 shadow-sm p-4">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
@@ -523,8 +716,8 @@ const PreFaturamentoLoteDetalhe = () => {
               
               <div className="bg-card rounded-xl border border-border/50 shadow-sm p-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-destructive/10 flex items-center justify-center">
-                    <AlertCircle className="h-5 w-5 text-destructive" />
+                  <div className="w-10 h-10 rounded-lg bg-warning/10 flex items-center justify-center">
+                    <Clock className="h-5 w-5 text-warning" />
                   </div>
                   <div>
                     <p className="text-2xl font-bold text-foreground">{pendentesCount}</p>
@@ -544,6 +737,34 @@ const PreFaturamentoLoteDetalhe = () => {
                   </div>
                 </div>
               </div>
+              
+              {itemStatusCounts.glosado > 0 && (
+                <div className="bg-card rounded-xl border border-border/50 shadow-sm p-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-destructive/10 flex items-center justify-center">
+                      <AlertCircle className="h-5 w-5 text-destructive" />
+                    </div>
+                    <div>
+                      <p className="text-2xl font-bold text-foreground">{itemStatusCounts.glosado}</p>
+                      <p className="text-xs text-muted-foreground">Itens Glosados</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+              
+              {itemStatusCounts.recebido > 0 && (
+                <div className="bg-card rounded-xl border border-border/50 shadow-sm p-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-success/10 flex items-center justify-center">
+                      <DollarSign className="h-5 w-5 text-success" />
+                    </div>
+                    <div>
+                      <p className="text-2xl font-bold text-foreground">{itemStatusCounts.recebido}</p>
+                      <p className="text-xs text-muted-foreground">Itens Recebidos</p>
+                    </div>
+                  </div>
+                </div>
+              )}
               
               <div className="bg-card rounded-xl border border-border/50 shadow-sm p-4">
                 <div className="flex items-center gap-3">
@@ -578,6 +799,7 @@ const PreFaturamentoLoteDetalhe = () => {
                       <TableHead className="font-semibold text-right">Valor Total</TableHead>
                       <TableHead className="font-semibold text-center">Status</TableHead>
                       <TableHead className="font-semibold">Motivo Pendência</TableHead>
+                      <TableHead className="font-semibold text-center w-16">Histórico</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -589,7 +811,7 @@ const PreFaturamentoLoteDetalhe = () => {
                           className={cn(
                             "cursor-pointer transition-colors",
                             guia.selected && "bg-primary/5",
-                            guia.status === "pendente" && "bg-destructive/5",
+                            guia.status === "pendente" && "bg-warning/5",
                             guia.status === "cancelada" && "opacity-60"
                           )}
                         >
@@ -623,13 +845,13 @@ const PreFaturamentoLoteDetalhe = () => {
                             {guia.valorTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                           </TableCell>
                           <TableCell className="text-center" onClick={() => toggleExpand(guia.id)}>
-                            {getGuiaStatusBadge(guia.status)}
+                            <GuiaBadge status={guia.status} />
                           </TableCell>
                           <TableCell onClick={() => toggleExpand(guia.id)}>
                             {guia.motivoPendencia && (
                               <Tooltip>
                                 <TooltipTrigger asChild>
-                                  <span className="text-sm text-destructive truncate max-w-[200px] block">
+                                  <span className="text-sm text-warning truncate max-w-[200px] block">
                                     {guia.motivoPendencia.length > 30 
                                       ? `${guia.motivoPendencia.slice(0, 30)}...` 
                                       : guia.motivoPendencia}
@@ -641,12 +863,29 @@ const PreFaturamentoLoteDetalhe = () => {
                               </Tooltip>
                             )}
                           </TableCell>
+                          <TableCell className="text-center">
+                            <Sheet>
+                              <SheetTrigger asChild>
+                                <Button variant="ghost" size="icon" className="h-7 w-7">
+                                  <History className="h-4 w-4 text-muted-foreground" />
+                                </Button>
+                              </SheetTrigger>
+                              <SheetContent className="w-[400px] sm:w-[450px]">
+                                <SheetHeader>
+                                  <SheetTitle>Histórico da Guia {guia.codigo}</SheetTitle>
+                                </SheetHeader>
+                                <div className="mt-6">
+                                  <FaturamentoTimeline events={guia.timeline} title="" maxHeight="calc(100vh - 150px)" />
+                                </div>
+                              </SheetContent>
+                            </Sheet>
+                          </TableCell>
                         </TableRow>
 
                         {/* Expanded Sub-table */}
                         {expandedGuias.has(guia.id) && (
                           <TableRow className="hover:bg-transparent">
-                            <TableCell colSpan={9} className="p-0 bg-muted/20">
+                            <TableCell colSpan={10} className="p-0 bg-muted/20">
                               <div className="p-4 pl-14">
                                 <h4 className="text-sm font-semibold text-foreground mb-3">Itens da Guia</h4>
                                 <div className="bg-background rounded-lg border border-border overflow-hidden">
@@ -658,9 +897,9 @@ const PreFaturamentoLoteDetalhe = () => {
                                         <TableHead className="text-xs font-semibold text-center w-24">Quantidade</TableHead>
                                         <TableHead className="text-xs font-semibold text-right w-32">Valor Unitário</TableHead>
                                         <TableHead className="text-xs font-semibold text-right w-32">Valor Total</TableHead>
-                                        <TableHead className="text-xs font-semibold text-center w-28">Situação</TableHead>
+                                        <TableHead className="text-xs font-semibold text-center w-32">Situação</TableHead>
                                         <TableHead className="text-xs font-semibold">Motivo Pendência</TableHead>
-                                        <TableHead className="text-xs font-semibold text-center w-24">Ações</TableHead>
+                                        <TableHead className="text-xs font-semibold text-center w-28">Ações</TableHead>
                                       </TableRow>
                                     </TableHeader>
                                     <TableBody>
@@ -668,7 +907,10 @@ const PreFaturamentoLoteDetalhe = () => {
                                         <TableRow 
                                           key={item.id}
                                           className={cn(
-                                            item.situacao === "pendente" && "bg-destructive/5"
+                                            item.situacao === "pendente" && "bg-warning/5",
+                                            item.situacao === "glosado" && "bg-destructive/5",
+                                            item.situacao === "cancelado" && "opacity-60",
+                                            item.situacao === "recebido" && "bg-success/5"
                                           )}
                                         >
                                           <TableCell className="text-sm font-medium text-muted-foreground">
@@ -682,7 +924,7 @@ const PreFaturamentoLoteDetalhe = () => {
                                               value={item.quantidade}
                                               onChange={(e) => handleItemQuantityChange(guia.id, item.id, e.target.value)}
                                               className="h-8 w-16 text-center text-sm mx-auto"
-                                              disabled={lote.status !== "transicao"}
+                                              disabled={lote.status !== "transicao" || ["recebido", "glosa_acatada", "cancelado"].includes(item.situacao)}
                                             />
                                           </TableCell>
                                           <TableCell className="text-right">
@@ -693,20 +935,23 @@ const PreFaturamentoLoteDetalhe = () => {
                                               value={item.valorUnitario}
                                               onChange={(e) => handleItemValueChange(guia.id, item.id, e.target.value)}
                                               className="h-8 w-24 text-right text-sm ml-auto"
-                                              disabled={lote.status !== "transicao"}
+                                              disabled={lote.status !== "transicao" || ["recebido", "glosa_acatada", "cancelado"].includes(item.situacao)}
                                             />
                                           </TableCell>
                                           <TableCell className="text-right text-sm font-medium">
                                             {item.valorTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                                           </TableCell>
                                           <TableCell className="text-center">
-                                            {getItemStatusBadge(item.situacao)}
+                                            <ItemGuiaBadge status={item.situacao} />
                                           </TableCell>
                                           <TableCell>
                                             {item.motivoPendencia && (
                                               <Tooltip>
                                                 <TooltipTrigger asChild>
-                                                  <span className="text-xs text-destructive truncate max-w-[150px] block">
+                                                  <span className={cn(
+                                                    "text-xs truncate max-w-[150px] block",
+                                                    item.situacao === "glosado" ? "text-destructive" : "text-warning"
+                                                  )}>
                                                     {item.motivoPendencia.length > 25 
                                                       ? `${item.motivoPendencia.slice(0, 25)}...` 
                                                       : item.motivoPendencia}
@@ -720,36 +965,7 @@ const PreFaturamentoLoteDetalhe = () => {
                                           </TableCell>
                                           <TableCell>
                                             <div className="flex items-center justify-center gap-1">
-                                              {item.situacao === "pendente" && lote.status === "transicao" && (
-                                                <Tooltip>
-                                                  <TooltipTrigger asChild>
-                                                    <Button
-                                                      variant="ghost"
-                                                      size="icon"
-                                                      className="h-7 w-7 text-success hover:text-success hover:bg-success/10"
-                                                      onClick={() => handleCorrectItem(guia.id, item.id)}
-                                                    >
-                                                      <CheckCircle2 className="h-4 w-4" />
-                                                    </Button>
-                                                  </TooltipTrigger>
-                                                  <TooltipContent>Corrigir pendência</TooltipContent>
-                                                </Tooltip>
-                                              )}
-                                              {lote.status === "transicao" && (
-                                                <Tooltip>
-                                                  <TooltipTrigger asChild>
-                                                    <Button
-                                                      variant="ghost"
-                                                      size="icon"
-                                                      className="h-7 w-7 text-destructive hover:text-destructive hover:bg-destructive/10"
-                                                      onClick={() => handleRemoveItem(guia.id, item.id)}
-                                                    >
-                                                      <Trash2 className="h-4 w-4" />
-                                                    </Button>
-                                                  </TooltipTrigger>
-                                                  <TooltipContent>Excluir item</TooltipContent>
-                                                </Tooltip>
-                                              )}
+                                              {getItemActions(guia, item)}
                                             </div>
                                           </TableCell>
                                         </TableRow>
