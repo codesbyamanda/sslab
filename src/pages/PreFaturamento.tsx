@@ -65,8 +65,19 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import { 
+  LotePreFaturamentoBadge, 
+  getLotePreFaturamentoLegenda,
+  type LotePreFaturamentoStatus 
+} from "@/components/faturamento/StatusBadge";
 
 // Mock data for lotes
 const mockLotes = [
@@ -213,15 +224,8 @@ const PreFaturamento = () => {
     });
   };
 
-  const getStatusBadge = (status: LoteStatus) => {
-    switch (status) {
-      case "transicao":
-        return <Badge className="bg-amarelo-alerta/20 text-amarelo-alerta border-amarelo-alerta/30">Em Transição</Badge>;
-      case "fechado":
-        return <Badge className="bg-azul-claro/20 text-azul-escuro border-azul-claro/30">Fechado</Badge>;
-      case "faturado":
-        return <Badge className="bg-verde-ativo/20 text-verde-ativo border-verde-ativo/30">Faturado</Badge>;
-    }
+  const getStatusBadge = (status: LotePreFaturamentoStatus) => {
+    return <LotePreFaturamentoBadge status={status} />;
   };
 
   const getGuiaStatusBadge = (status: GuiaStatus) => {
@@ -437,7 +441,7 @@ const PreFaturamento = () => {
                           <TableCell>{lote.dataFechamento ? new Date(lote.dataFechamento).toLocaleDateString('pt-BR') : "—"}</TableCell>
                           <TableCell className="text-center">{lote.qtdGuias}</TableCell>
                           <TableCell className="text-right font-medium">{lote.total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</TableCell>
-                          <TableCell>{getStatusBadge(lote.status as LoteStatus)}</TableCell>
+                          <TableCell>{getStatusBadge(lote.status as LotePreFaturamentoStatus)}</TableCell>
                           <TableCell className="text-center" onClick={(e) => e.stopPropagation()}>
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
@@ -477,25 +481,14 @@ const PreFaturamento = () => {
 
                 {/* Status Legend */}
                 <div className="p-4 border-t border-border/50 bg-muted/20">
-                  <p className="text-xs font-medium text-muted-foreground mb-2">Legenda de Status:</p>
-                  <div className="flex flex-wrap gap-4">
-                    <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 rounded-full bg-verde-ativo" />
-                      <span className="text-xs text-muted-foreground">Lote Faturado</span>
+                  <p className="text-xs font-medium text-muted-foreground mb-3">Legenda de Status do Lote:</p>
+                  <TooltipProvider>
+                    <div className="flex flex-wrap gap-3">
+                      {getLotePreFaturamentoLegenda().map((item) => (
+                        <LotePreFaturamentoBadge key={item.status} status={item.status} />
+                      ))}
                     </div>
-                    <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 rounded-full bg-azul-claro" />
-                      <span className="text-xs text-muted-foreground">Lote Pré-Faturado (Fechado)</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 rounded-full bg-amarelo-alerta" />
-                      <span className="text-xs text-muted-foreground">Guias Pendentes / Em Transição</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 rounded-full bg-muted-foreground" />
-                      <span className="text-xs text-muted-foreground">Guia Cancelada</span>
-                    </div>
-                  </div>
+                  </TooltipProvider>
                 </div>
               </div>
             </div>
