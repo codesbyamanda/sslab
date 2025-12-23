@@ -36,6 +36,7 @@ import RelatorioFaturamentos from "./pages/relatorios/RelatorioFaturamentos";
 import Configuracoes from "./pages/Configuracoes";
 import SaudeFaturamento from "./pages/SaudeFaturamento";
 import PreFaturamento from "./pages/PreFaturamento";
+import PreFaturamentoLoteDetalhe from "./pages/faturamento/PreFaturamentoLoteDetalhe";
 import Faturamento from "./pages/Faturamento";
 import GuiasFaturamento from "./pages/faturamento/Guias";
 import RecalculoGuias from "./pages/faturamento/RecalculoGuias";
@@ -115,6 +116,7 @@ const App = () => (
           <Route path="/atendimento/configuracoes" element={<Configuracoes />} />
           <Route path="/faturamento" element={<SaudeFaturamento />} />
           <Route path="/faturamento/pre-faturamento" element={<PreFaturamento />} />
+          <Route path="/faturamento/pre-faturamento/:id" element={<PreFaturamentoLoteDetalhe />} />
           <Route path="/faturamento/faturamento" element={<Faturamento />} />
           <Route path="/faturamento/guias" element={<GuiasFaturamento />} />
           <Route path="/faturamento/recalculo-guias" element={<RecalculoGuias />} />

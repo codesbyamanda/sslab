@@ -126,9 +126,8 @@ const PreFaturamento = () => {
   const [showFaturaAlert, setShowFaturaAlert] = useState(false);
 
   const handleOpenLote = (lote: typeof mockLotes[0]) => {
-    setSelectedLote(lote);
-    setViewMode("detail");
-    setDetailConvenio(lote.convenio);
+    // Navigate to the new detail page
+    navigate(`/faturamento/pre-faturamento/${lote.id}`);
   };
 
   const handleNewLote = () => {
