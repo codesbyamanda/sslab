@@ -75,16 +75,17 @@ export const ResultadoBadge = ({ status }: { status: ResultadoStatus }) => {
 // 3. SITUAÇÃO DOS ITENS DE GUIA (NÚCLEO DO FATURAMENTO)
 // ==============================
 export type ItemGuiaStatus = 
-  | "aberto"      // AB
-  | "pendente"    // PD
-  | "pre_faturado" // PF
-  | "em_faturamento" // FT
-  | "recebido"    // RC
-  | "glosado"     // GT
-  | "glosa_acatada" // GA
-  | "reapresentado" // RP
-  | "em_refaturamento" // RF
-  | "cancelado";  // CN
+  | "aberto"         // AB - Aberto
+  | "pendente"       // PD - Pendente
+  | "pre_faturado"   // PF - Pré-faturado
+  | "em_faturamento" // FT - Em Faturamento
+  | "recebido"       // RC - Recebido
+  | "glosa_total"    // GT - Glosa Total
+  | "glosa_parcial"  // GP - Glosa Parcial
+  | "glosa_acatada"  // GA - Glosa Acatada
+  | "reapresentado"  // RP - Reapresentado
+  | "em_refaturamento" // RF - Em Refaturamento
+  | "cancelado";     // CN - Cancelado
 
 const itemGuiaConfig: Record<ItemGuiaStatus, {
   label: string;
@@ -128,17 +129,24 @@ const itemGuiaConfig: Record<ItemGuiaStatus, {
     className: "bg-success/15 text-success border-success/30",
     icon: CheckCircle2,
   },
-  glosado: {
-    label: "Glosado",
+  glosa_total: {
+    label: "Glosa Total",
     sigla: "GT",
-    tooltip: "Item glosado pelo convênio. Requer tratamento de glosa.",
+    tooltip: "Item glosado totalmente pelo convênio. Requer tratamento de glosa.",
     className: "bg-destructive/15 text-destructive border-destructive/30",
     icon: XCircle,
+  },
+  glosa_parcial: {
+    label: "Glosa Parcial",
+    sigla: "GP",
+    tooltip: "Item glosado parcialmente. Valor ajustado pelo convênio. Requer análise.",
+    className: "bg-orange-500/15 text-orange-600 border-orange-500/30 dark:text-orange-400",
+    icon: AlertCircle,
   },
   glosa_acatada: {
     label: "Glosa Acatada",
     sigla: "GA",
-    tooltip: "Glosa aceita. Item não será cobrado.",
+    tooltip: "Glosa aceita. Item não será cobrado ou valor ajustado aceito.",
     className: "bg-muted text-muted-foreground border-border",
     icon: Ban,
   },
@@ -206,8 +214,10 @@ export const getItemGuiaActions = (status: ItemGuiaStatus): string[] => {
       return ["resolver_pendencia", "cancelar"];
     case "pre_faturado":
       return ["remover_pre_faturamento"];
-    case "glosado":
-      return ["tratar_glosa", "acatar_glosa", "reapresentar"];
+    case "glosa_total":
+      return ["aceitar_glosa", "reapresentar", "cancelar"];
+    case "glosa_parcial":
+      return ["aceitar_glosa", "reapresentar", "cancelar"];
     case "reapresentado":
       return ["acompanhar_retorno"];
     case "recebido":
@@ -217,6 +227,16 @@ export const getItemGuiaActions = (status: ItemGuiaStatus): string[] => {
     default:
       return [];
   }
+};
+
+// Helper para verificar se um item está glosado (total ou parcial)
+export const isGlosado = (status: ItemGuiaStatus): boolean => {
+  return status === "glosa_total" || status === "glosa_parcial";
+};
+
+// Helper para verificar se um item pode ser editado
+export const isItemEditavel = (status: ItemGuiaStatus): boolean => {
+  return !["recebido", "glosa_acatada", "cancelado"].includes(status);
 };
 
 // ==============================

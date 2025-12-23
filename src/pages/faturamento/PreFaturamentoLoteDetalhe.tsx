@@ -271,7 +271,7 @@ const mockLote: Lote = {
       ],
       itens: [
         { id: 21, codigo: "40304361", descricao: "Hemograma Completo", quantidade: 1, valorUnitario: 35.00, valorTotal: 35.00, situacao: "recebido", motivoPendencia: null },
-        { id: 22, codigo: "40302504", descricao: "Glicemia de Jejum", quantidade: 1, valorUnitario: 25.00, valorTotal: 25.00, situacao: "glosado", motivoPendencia: "Procedimento não autorizado na guia" },
+        { id: 22, codigo: "40302504", descricao: "Glicemia de Jejum", quantidade: 1, valorUnitario: 25.00, valorTotal: 25.00, situacao: "glosa_total", motivoPendencia: "Procedimento não autorizado na guia" },
         { id: 23, codigo: "40301630", descricao: "Colesterol Total e Frações", quantidade: 1, valorUnitario: 120.00, valorTotal: 120.00, situacao: "reapresentado", motivoPendencia: null },
         { id: 24, codigo: "40316521", descricao: "TSH", quantidade: 1, valorUnitario: 85.00, valorTotal: 85.00, situacao: "glosa_acatada", motivoPendencia: "Glosa aceita - sem cobertura" },
       ]
@@ -303,7 +303,7 @@ const PreFaturamentoLoteDetalhe = () => {
   const itemStatusCounts = useMemo(() => {
     const counts: Record<ItemGuiaStatus, number> = {
       aberto: 0, pendente: 0, pre_faturado: 0, em_faturamento: 0,
-      recebido: 0, glosado: 0, glosa_acatada: 0, reapresentado: 0,
+      recebido: 0, glosa_total: 0, glosa_parcial: 0, glosa_acatada: 0, reapresentado: 0,
       em_refaturamento: 0, cancelado: 0
     };
     lote.guias.forEach(g => {
@@ -568,7 +568,7 @@ const PreFaturamentoLoteDetalhe = () => {
       );
     }
     
-    if (item.situacao === "glosado") {
+    if (item.situacao === "glosa_total" || item.situacao === "glosa_parcial") {
       actions.push(
         <Tooltip key="tratar">
           <TooltipTrigger asChild>
@@ -738,14 +738,14 @@ const PreFaturamentoLoteDetalhe = () => {
                 </div>
               </div>
               
-              {itemStatusCounts.glosado > 0 && (
+              {(itemStatusCounts.glosa_total + itemStatusCounts.glosa_parcial) > 0 && (
                 <div className="bg-card rounded-xl border border-border/50 shadow-sm p-4">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-lg bg-destructive/10 flex items-center justify-center">
                       <AlertCircle className="h-5 w-5 text-destructive" />
                     </div>
                     <div>
-                      <p className="text-2xl font-bold text-foreground">{itemStatusCounts.glosado}</p>
+                      <p className="text-2xl font-bold text-foreground">{itemStatusCounts.glosa_total + itemStatusCounts.glosa_parcial}</p>
                       <p className="text-xs text-muted-foreground">Itens Glosados</p>
                     </div>
                   </div>
@@ -908,7 +908,7 @@ const PreFaturamentoLoteDetalhe = () => {
                                           key={item.id}
                                           className={cn(
                                             item.situacao === "pendente" && "bg-warning/5",
-                                            item.situacao === "glosado" && "bg-destructive/5",
+                                            (item.situacao === "glosa_total" || item.situacao === "glosa_parcial") && "bg-destructive/5",
                                             item.situacao === "cancelado" && "opacity-60",
                                             item.situacao === "recebido" && "bg-success/5"
                                           )}
@@ -950,7 +950,7 @@ const PreFaturamentoLoteDetalhe = () => {
                                                 <TooltipTrigger asChild>
                                                   <span className={cn(
                                                     "text-xs truncate max-w-[150px] block",
-                                                    item.situacao === "glosado" ? "text-destructive" : "text-warning"
+                                                    (item.situacao === "glosa_total" || item.situacao === "glosa_parcial") ? "text-destructive" : "text-warning"
                                                   )}>
                                                     {item.motivoPendencia.length > 25 
                                                       ? `${item.motivoPendencia.slice(0, 25)}...` 

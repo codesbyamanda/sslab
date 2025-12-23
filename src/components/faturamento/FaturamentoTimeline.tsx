@@ -43,6 +43,7 @@ export type TimelineEventType =
   | "item_incluido"
   | "item_removido"
   | "item_corrigido"
+  | "item_cancelado"
   | "lote_fechado"
   | "lote_aberto"
   | "fatura_gerada"
@@ -50,6 +51,15 @@ export type TimelineEventType =
   | "arquivo_gerado"
   | "fatura_enviada"
   | "retorno_recebido"
+  // Eventos de Glosa
+  | "glosa_total_identificada"
+  | "glosa_parcial_identificada"
+  | "glosa_aceita"
+  | "glosa_reapresentada"
+  | "glosa_recurso_enviado"
+  | "glosa_recurso_aceito"
+  | "glosa_recurso_negado"
+  // Legado (para compatibilidade)
   | "glosa_identificada"
   | "glosa_tratada"
   | "glosa_acatada"
@@ -89,6 +99,7 @@ const eventConfig: Record<TimelineEventType, {
   item_incluido: { icon: FileText, color: "text-primary", bgColor: "bg-primary/10" },
   item_removido: { icon: XCircle, color: "text-destructive", bgColor: "bg-destructive/10" },
   item_corrigido: { icon: CheckCircle2, color: "text-success", bgColor: "bg-success/10" },
+  item_cancelado: { icon: XCircle, color: "text-muted-foreground", bgColor: "bg-muted" },
   lote_fechado: { icon: Lock, color: "text-primary", bgColor: "bg-primary/10" },
   lote_aberto: { icon: Clock, color: "text-warning", bgColor: "bg-warning/10" },
   fatura_gerada: { icon: FileText, color: "text-primary", bgColor: "bg-primary/10" },
@@ -96,6 +107,15 @@ const eventConfig: Record<TimelineEventType, {
   arquivo_gerado: { icon: FileArchive, color: "text-accent", bgColor: "bg-accent/10" },
   fatura_enviada: { icon: Send, color: "text-accent", bgColor: "bg-accent/10" },
   retorno_recebido: { icon: FileCheck, color: "text-primary", bgColor: "bg-primary/10" },
+  // Eventos de Glosa
+  glosa_total_identificada: { icon: XCircle, color: "text-destructive", bgColor: "bg-destructive/10" },
+  glosa_parcial_identificada: { icon: AlertCircle, color: "text-orange-600", bgColor: "bg-orange-500/10" },
+  glosa_aceita: { icon: CheckCircle2, color: "text-muted-foreground", bgColor: "bg-muted" },
+  glosa_reapresentada: { icon: RefreshCw, color: "text-warning", bgColor: "bg-warning/10" },
+  glosa_recurso_enviado: { icon: Send, color: "text-warning", bgColor: "bg-warning/10" },
+  glosa_recurso_aceito: { icon: CheckCircle2, color: "text-success", bgColor: "bg-success/10" },
+  glosa_recurso_negado: { icon: XCircle, color: "text-destructive", bgColor: "bg-destructive/10" },
+  // Legado (compatibilidade)
   glosa_identificada: { icon: AlertCircle, color: "text-destructive", bgColor: "bg-destructive/10" },
   glosa_tratada: { icon: RefreshCw, color: "text-warning", bgColor: "bg-warning/10" },
   glosa_acatada: { icon: XCircle, color: "text-muted-foreground", bgColor: "bg-muted" },
@@ -250,6 +270,7 @@ const getEventTitle = (type: TimelineEventType): string => {
     item_incluido: "Item incluído",
     item_removido: "Item removido",
     item_corrigido: "Item corrigido",
+    item_cancelado: "Item cancelado",
     lote_fechado: "Lote fechado",
     lote_aberto: "Lote aberto",
     fatura_gerada: "Fatura gerada",
@@ -257,6 +278,15 @@ const getEventTitle = (type: TimelineEventType): string => {
     arquivo_gerado: "Arquivo magnético gerado",
     fatura_enviada: "Fatura enviada ao convênio",
     retorno_recebido: "Retorno recebido",
+    // Eventos de Glosa
+    glosa_total_identificada: "Glosa total identificada",
+    glosa_parcial_identificada: "Glosa parcial identificada",
+    glosa_aceita: "Glosa aceita",
+    glosa_reapresentada: "Item reapresentado",
+    glosa_recurso_enviado: "Recurso de glosa enviado",
+    glosa_recurso_aceito: "Recurso aceito pelo convênio",
+    glosa_recurso_negado: "Recurso negado pelo convênio",
+    // Legado
     glosa_identificada: "Glosa identificada",
     glosa_tratada: "Glosa tratada",
     glosa_acatada: "Glosa acatada",
