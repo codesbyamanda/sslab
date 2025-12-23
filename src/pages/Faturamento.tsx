@@ -22,7 +22,6 @@ import FaturamentoNavbar from "@/components/faturamento/FaturamentoNavbar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
@@ -57,18 +56,11 @@ import {
   SheetContent,
   SheetHeader,
   SheetTitle,
-  SheetTrigger,
 } from "@/components/ui/sheet";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { FaturaBadge, type FaturaStatus } from "@/components/faturamento/StatusBadge";
-import { FaturamentoTimeline, type TimelineEvent, createTimelineEvent } from "@/components/faturamento/FaturamentoTimeline";
+import { FaturamentoTimeline, type TimelineEvent, createFaturaTimelineEvent } from "@/components/faturamento/FaturamentoTimeline";
 
 // Mock data for pre-faturas fechadas
 const mockPreFaturas = [
@@ -93,6 +85,160 @@ interface Fatura {
   status: FaturaStatus;
   timeline: TimelineEvent[];
 }
+
+const Faturamento = () => {
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  
+  // States
+  const [isInfoExpanded, setIsInfoExpanded] = useState(false);
+  const [filterConvenio, setFilterConvenio] = useState<string>("all");
+  const [filterDataInicio, setFilterDataInicio] = useState<string>("");
+  const [filterDataFim, setFilterDataFim] = useState<string>("");
+  const [hasFiltered, setHasFiltered] = useState(false);
+  const [preFaturas, setPreFaturas] = useState(mockPreFaturas);
+  const [faturaGerada, setFaturaGerada] = useState<Fatura | null>(null);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showCloseConfirmModal, setShowCloseConfirmModal] = useState(false);
+  const [showTimelineSheet, setShowTimelineSheet] = useState(false);
+
+  // Computed values
+  const selectedPreFaturas = preFaturas.filter(pf => pf.selected);
+  const totalGuias = selectedPreFaturas.reduce((acc, pf) => acc + pf.qtdGuias, 0);
+  const totalValor = selectedPreFaturas.reduce((acc, pf) => acc + pf.total, 0);
+
+  // Handlers
+  const handleFilter = () => {
+    setHasFiltered(true);
+    let filtered = [...mockPreFaturas];
+    
+    if (filterConvenio && filterConvenio !== "all") {
+      filtered = filtered.filter(pf => pf.convenio === filterConvenio);
+    }
+    
+    if (filterDataInicio) {
+      filtered = filtered.filter(pf => pf.dataFechamento >= filterDataInicio);
+    }
+    
+    if (filterDataFim) {
+      filtered = filtered.filter(pf => pf.dataFechamento <= filterDataFim);
+    }
+    
+    setPreFaturas(filtered);
+  };
+
+  const clearFilters = () => {
+    setFilterConvenio("all");
+    setFilterDataInicio("");
+    setFilterDataFim("");
+    setHasFiltered(false);
+    setPreFaturas(mockPreFaturas);
+    setFaturaGerada(null);
+  };
+
+  const handleSelectAll = (checked: boolean) => {
+    setPreFaturas(preFaturas.map(pf => ({ ...pf, selected: checked })));
+  };
+
+  const handlePreFaturaSelect = (id: number, checked: boolean) => {
+    setPreFaturas(preFaturas.map(pf => 
+      pf.id === id ? { ...pf, selected: checked } : pf
+    ));
+  };
+
+  const handleGerarFatura = () => {
+    if (selectedPreFaturas.length === 0) {
+      toast({
+        title: "Nenhuma pré-fatura selecionada",
+        description: "Selecione ao menos uma pré-fatura para gerar a fatura.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const now = new Date().toISOString();
+    const novaFatura: Fatura = {
+      codigo: `FAT-2024-${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}`,
+      convenio: selectedPreFaturas[0].convenio,
+      dataCriacao: now,
+      dataFechamento: null,
+      dataEnvio: null,
+      qtdPreLotes: selectedPreFaturas.length,
+      qtdGuias: totalGuias,
+      total: totalValor,
+      status: "aberto",
+      timeline: [
+        createFaturaTimelineEvent("fatura_gerada", "Sistema", `Fatura gerada a partir de ${selectedPreFaturas.length} pré-lote(s)`)
+      ]
+    };
+
+    setFaturaGerada(novaFatura);
+    setShowSuccessModal(true);
+  };
+
+  const handleFecharFatura = () => {
+    setShowCloseConfirmModal(true);
+  };
+
+  const confirmFecharFatura = () => {
+    if (faturaGerada) {
+      const now = new Date().toISOString();
+      setFaturaGerada({
+        ...faturaGerada,
+        status: "fechado",
+        dataFechamento: now,
+        timeline: [
+          ...faturaGerada.timeline,
+          createFaturaTimelineEvent("fatura_fechada", "Usuário", "Fatura fechada e pronta para geração de arquivo magnético")
+        ]
+      });
+      setShowCloseConfirmModal(false);
+      toast({
+        title: "Fatura fechada com sucesso",
+        description: "Agora você pode gerar o arquivo magnético.",
+      });
+    }
+  };
+
+  const handleGerarArquivoMagnetico = () => {
+    if (faturaGerada && faturaGerada.status === "fechado") {
+      setFaturaGerada({
+        ...faturaGerada,
+        status: "arquivo_gerado",
+        timeline: [
+          ...faturaGerada.timeline,
+          createFaturaTimelineEvent("arquivo_gerado", "Sistema", "Arquivo XML TISS gerado com sucesso")
+        ]
+      });
+      toast({
+        title: "Arquivo magnético gerado",
+        description: "O arquivo foi gerado e está pronto para download.",
+      });
+    }
+  };
+
+  const handleEnviarConvenio = () => {
+    if (faturaGerada && faturaGerada.status === "arquivo_gerado") {
+      const now = new Date().toISOString();
+      setFaturaGerada({
+        ...faturaGerada,
+        status: "enviado",
+        dataEnvio: now,
+        timeline: [
+          ...faturaGerada.timeline,
+          createFaturaTimelineEvent("fatura_enviada", "Sistema", `Enviada para ${faturaGerada.convenio}`)
+        ]
+      });
+      toast({
+        title: "Fatura enviada",
+        description: `Fatura enviada para ${faturaGerada.convenio} com sucesso.`,
+      });
+    }
+  };
+
+  const handleNovaFatura = () => {
+    clearFilters();
+  };
 
   return (
     <div className="flex min-h-screen w-full bg-gradient-services">
@@ -326,7 +472,13 @@ interface Fatura {
                       <p className="text-sm text-muted-foreground">Detalhes da fatura gerada</p>
                     </div>
                   </div>
-                  {getStatusBadge(faturaGerada.status)}
+                  <div className="flex items-center gap-2">
+                    <FaturaBadge status={faturaGerada.status} />
+                    <Button variant="outline" size="sm" onClick={() => setShowTimelineSheet(true)}>
+                      <History className="h-4 w-4 mr-2" />
+                      Histórico
+                    </Button>
+                  </div>
                 </div>
 
                 <div className="p-5">
@@ -366,25 +518,46 @@ interface Fatura {
                       </div>
                     </div>
                   )}
+
+                  {faturaGerada.dataEnvio && (
+                    <div className="mt-2">
+                      <div className="flex items-center gap-2 text-sm">
+                        <Send className="h-4 w-4 text-primary" />
+                        <span className="text-muted-foreground">Enviada em:</span>
+                        <span className="font-medium">{new Date(faturaGerada.dataEnvio).toLocaleDateString('pt-BR')}</span>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Actions */}
                 <div className="p-5 border-t border-border/50 bg-muted/20 flex flex-wrap gap-3">
-                  {faturaGerada.status === "aberta" && (
+                  {faturaGerada.status === "aberto" && (
                     <Button onClick={handleFecharFatura}>
                       <Lock className="h-4 w-4 mr-2" />
                       Fechar Fatura
                     </Button>
                   )}
                   
-                  <Button 
-                    variant={faturaGerada.status === "fechada" ? "default" : "outline"}
-                    onClick={handleGerarArquivoMagnetico}
-                    disabled={faturaGerada.status !== "fechada"}
-                  >
-                    <FileArchive className="h-4 w-4 mr-2" />
-                    Gerar Arquivo Magnético
-                  </Button>
+                  {faturaGerada.status === "fechado" && (
+                    <Button onClick={handleGerarArquivoMagnetico}>
+                      <FileArchive className="h-4 w-4 mr-2" />
+                      Gerar Arquivo Magnético
+                    </Button>
+                  )}
+
+                  {faturaGerada.status === "arquivo_gerado" && (
+                    <>
+                      <Button variant="outline">
+                        <Download className="h-4 w-4 mr-2" />
+                        Baixar Arquivo
+                      </Button>
+                      <Button onClick={handleEnviarConvenio}>
+                        <Send className="h-4 w-4 mr-2" />
+                        Marcar como Enviada
+                      </Button>
+                    </>
+                  )}
 
                   <Button variant="ghost" onClick={handleNovaFatura}>
                     <Plus className="h-4 w-4 mr-2" />
@@ -394,7 +567,7 @@ interface Fatura {
               </div>
 
               {/* Help text for next steps */}
-              {faturaGerada.status === "aberta" && (
+              {faturaGerada.status === "aberto" && (
                 <div className="bg-amarelo-alerta/10 border border-amarelo-alerta/30 rounded-xl p-4 flex items-start gap-3">
                   <Info className="h-5 w-5 text-amarelo-alerta flex-shrink-0 mt-0.5" />
                   <div>
@@ -406,13 +579,37 @@ interface Fatura {
                 </div>
               )}
 
-              {faturaGerada.status === "fechada" && (
+              {faturaGerada.status === "fechado" && (
                 <div className="bg-verde-ativo/10 border border-verde-ativo/30 rounded-xl p-4 flex items-start gap-3">
                   <CheckCircle2 className="h-5 w-5 text-verde-ativo flex-shrink-0 mt-0.5" />
                   <div>
-                    <p className="font-medium text-foreground">Fatura pronta para envio</p>
+                    <p className="font-medium text-foreground">Fatura pronta para geração de arquivo</p>
                     <p className="text-sm text-muted-foreground">
                       Agora você pode gerar o arquivo magnético para envio ao convênio clicando no botão "Gerar Arquivo Magnético".
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {faturaGerada.status === "arquivo_gerado" && (
+                <div className="bg-primary/10 border border-primary/30 rounded-xl p-4 flex items-start gap-3">
+                  <FileArchive className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-medium text-foreground">Arquivo gerado com sucesso</p>
+                    <p className="text-sm text-muted-foreground">
+                      Baixe o arquivo e envie ao convênio. Após o envio, clique em "Marcar como Enviada" para registrar.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {faturaGerada.status === "enviado" && (
+                <div className="bg-verde-ativo/10 border border-verde-ativo/30 rounded-xl p-4 flex items-start gap-3">
+                  <Send className="h-5 w-5 text-verde-ativo flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-medium text-foreground">Fatura enviada ao convênio</p>
+                    <p className="text-sm text-muted-foreground">
+                      A fatura foi marcada como enviada. Aguarde o retorno do convênio para dar continuidade ao processo.
                     </p>
                   </div>
                 </div>
@@ -468,6 +665,20 @@ interface Fatura {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Timeline Sheet */}
+      <Sheet open={showTimelineSheet} onOpenChange={setShowTimelineSheet}>
+        <SheetContent className="bg-background border-border w-[400px] sm:w-[540px]">
+          <SheetHeader>
+            <SheetTitle>Histórico da Fatura</SheetTitle>
+          </SheetHeader>
+          <div className="mt-6">
+            {faturaGerada && (
+              <FaturamentoTimeline events={faturaGerada.timeline} title="Linha do Tempo" />
+            )}
+          </div>
+        </SheetContent>
+      </Sheet>
     </div>
   );
 };

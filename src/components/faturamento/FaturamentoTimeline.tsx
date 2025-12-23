@@ -204,7 +204,7 @@ export const FaturamentoTimeline = ({
   );
 };
 
-// Helper para criar eventos
+// Helper para criar eventos com type inferido
 export const createTimelineEvent = (
   type: TimelineEventType,
   title: string,
@@ -227,3 +227,43 @@ export const createTimelineEvent = (
   user: options?.user,
   origem: options?.origem || "usuario",
 });
+
+// Helper simplificado para criar eventos de fatura
+export const createFaturaTimelineEvent = (
+  type: TimelineEventType,
+  user?: string,
+  description?: string
+): TimelineEvent => createTimelineEvent(type, getEventTitle(type), { user, description, origem: user ? "usuario" : "sistema" });
+
+const getEventTitle = (type: TimelineEventType): string => {
+  const titles: Record<TimelineEventType, string> = {
+    amostra_coletada: "Amostra coletada",
+    amostra_transito: "Amostra em trânsito",
+    amostra_recebida: "Amostra recebida",
+    amostra_analise: "Amostra em análise",
+    amostra_processada: "Amostra processada",
+    amostra_repetida: "Amostra repetida",
+    amostra_descartada: "Amostra descartada",
+    guia_criada: "Guia criada",
+    guia_pendente: "Guia pendente",
+    guia_corrigida: "Guia corrigida",
+    item_incluido: "Item incluído",
+    item_removido: "Item removido",
+    item_corrigido: "Item corrigido",
+    lote_fechado: "Lote fechado",
+    lote_aberto: "Lote aberto",
+    fatura_gerada: "Fatura gerada",
+    fatura_fechada: "Fatura fechada",
+    arquivo_gerado: "Arquivo magnético gerado",
+    fatura_enviada: "Fatura enviada ao convênio",
+    retorno_recebido: "Retorno recebido",
+    glosa_identificada: "Glosa identificada",
+    glosa_tratada: "Glosa tratada",
+    glosa_acatada: "Glosa acatada",
+    item_reapresentado: "Item reapresentado",
+    pagamento_recebido: "Pagamento recebido",
+    observacao: "Observação",
+    alteracao: "Alteração",
+  };
+  return titles[type] || type;
+};

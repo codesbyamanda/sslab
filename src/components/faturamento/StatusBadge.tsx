@@ -277,7 +277,7 @@ export const LotePreFaturamentoBadge = ({ status }: { status: LotePreFaturamento
 // ==============================
 // 5. SITUAÇÃO DO LOTE DE FATURAMENTO (FATURA)
 // ==============================
-export type FaturaStatus = "aberto" | "arquivo_gerado" | "enviado" | "fechado";
+export type FaturaStatus = "aberto" | "fechado" | "arquivo_gerado" | "enviado";
 
 const faturaConfig: Record<FaturaStatus, {
   label: string;
@@ -293,26 +293,26 @@ const faturaConfig: Record<FaturaStatus, {
     className: "bg-warning/15 text-warning border-warning/30",
     icon: Clock,
   },
+  fechado: {
+    label: "Fechado",
+    sigla: "FD",
+    tooltip: "Fatura fechada. Pronta para geração de arquivo.",
+    className: "bg-primary/15 text-primary border-primary/30",
+    icon: Lock,
+  },
   arquivo_gerado: {
     label: "Arquivo Gerado",
     sigla: "AR",
     tooltip: "Arquivo magnético gerado. Pronto para envio.",
-    className: "bg-primary/15 text-primary border-primary/30",
+    className: "bg-accent/15 text-accent border-accent/30",
     icon: FileArchive,
   },
   enviado: {
     label: "Enviado ao Convênio",
     sigla: "PC",
     tooltip: "Fatura enviada ao convênio. Aguardando retorno.",
-    className: "bg-accent/15 text-accent border-accent/30",
-    icon: Send,
-  },
-  fechado: {
-    label: "Fechado",
-    sigla: "FD",
-    tooltip: "Fatura fechada e processada.",
     className: "bg-success/15 text-success border-success/30",
-    icon: CheckCircle2,
+    icon: Send,
   },
 };
 
