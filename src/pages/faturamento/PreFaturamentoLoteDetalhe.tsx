@@ -65,6 +65,8 @@ import {
   LotePreFaturamentoBadge, 
   GuiaBadge, 
   ItemGuiaBadge,
+  getItemGuiaLegenda,
+  getLotePreFaturamentoLegenda,
   type LotePreFaturamentoStatus,
   type GuiaStatus,
   type ItemGuiaStatus
@@ -74,6 +76,7 @@ import {
   type TimelineEvent,
   createTimelineEvent 
 } from "@/components/faturamento/FaturamentoTimeline";
+import { TratarGlosaModal, type GlosaItem, type GlosaAction } from "@/components/faturamento/TratarGlosaModal";
 
 interface Item {
   id: number;
@@ -291,6 +294,8 @@ const PreFaturamentoLoteDetalhe = () => {
   const [showCloseAlert, setShowCloseAlert] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
   const [selectedGuiaForTimeline, setSelectedGuiaForTimeline] = useState<Guia | null>(null);
+  const [glosaModalOpen, setGlosaModalOpen] = useState(false);
+  const [selectedGlosaItem, setSelectedGlosaItem] = useState<{ guiaId: number; item: GlosaItem } | null>(null);
 
   // Computed values
   const selectedGuias = useMemo(() => lote.guias.filter(g => g.selected), [lote.guias]);
@@ -304,11 +309,13 @@ const PreFaturamentoLoteDetalhe = () => {
     const counts: Record<ItemGuiaStatus, number> = {
       aberto: 0, pendente: 0, pre_faturado: 0, em_faturamento: 0,
       recebido: 0, glosa_total: 0, glosa_parcial: 0, glosa_acatada: 0, reapresentado: 0,
-      em_refaturamento: 0, cancelado: 0
+      em_refaturamento: 0, refaturamento_parcial: 0, recebimento_parcial: 0, cancelado: 0, processado: 0
     };
     lote.guias.forEach(g => {
       g.itens.forEach(item => {
-        counts[item.situacao]++;
+        if (counts[item.situacao] !== undefined) {
+          counts[item.situacao]++;
+        }
       });
     });
     return counts;
@@ -435,10 +442,86 @@ const PreFaturamentoLoteDetalhe = () => {
     });
   };
 
-  const handleTratarGlosa = (guiaId: number, itemId: number) => {
+  const handleTratarGlosa = (guiaId: number, item: Item) => {
+    const glosaItem: GlosaItem = {
+      id: item.id,
+      codigo: item.codigo,
+      descricao: item.descricao,
+      valorOriginal: item.valorTotal,
+      valorGlosado: item.situacao === "glosa_total" ? 0 : item.valorTotal * 0.7, // Simula valor glosado
+      situacao: item.situacao,
+      motivoGlosa: item.motivoPendencia || "Motivo não informado pelo convênio"
+    };
+    setSelectedGlosaItem({ guiaId, item: glosaItem });
+    setGlosaModalOpen(true);
+  };
+
+  const handleGlosaConfirm = (itemId: number, action: GlosaAction, justificativa: string, valorRecurso?: number) => {
+    if (!selectedGlosaItem) return;
+    
+    const { guiaId } = selectedGlosaItem;
+    
+    let newStatus: ItemGuiaStatus;
+    let eventType: string;
+    let eventTitle: string;
+    
+    switch (action) {
+      case "aceitar":
+        newStatus = "glosa_acatada";
+        eventType = "glosa_aceita";
+        eventTitle = "Glosa aceita";
+        break;
+      case "reapresentar":
+        newStatus = "reapresentado";
+        eventType = "item_reapresentado";
+        eventTitle = "Item reapresentado ao convênio";
+        break;
+      case "cancelar":
+        newStatus = "cancelado";
+        eventType = "item_removido";
+        eventTitle = "Item cancelado";
+        break;
+      default:
+        return;
+    }
+    
+    setLote(prev => ({
+      ...prev,
+      guias: prev.guias.map(g => {
+        if (g.id !== guiaId) return g;
+        const updatedItens = g.itens.map(item => {
+          if (item.id !== itemId) return item;
+          return { 
+            ...item, 
+            situacao: newStatus, 
+            motivoPendencia: action === "aceitar" ? `Glosa acatada: ${justificativa}` : null,
+            valorTotal: action === "reapresentar" && valorRecurso ? valorRecurso : item.valorTotal
+          };
+        });
+        const newTotal = updatedItens.reduce((sum, item) => {
+          if (item.situacao === "cancelado" || item.situacao === "glosa_acatada") return sum;
+          return sum + item.valorTotal;
+        }, 0);
+        return { 
+          ...g, 
+          itens: updatedItens,
+          valorTotal: newTotal,
+          timeline: [...g.timeline, createTimelineEvent(eventType as any, eventTitle, { user: "Usuário Atual", description: justificativa })]
+        };
+      }),
+      timeline: [...prev.timeline, createTimelineEvent(eventType as any, eventTitle, { user: "Usuário Atual" })]
+    }));
+    
+    setHasChanges(true);
+    setSelectedGlosaItem(null);
+    
     toast({
-      title: "Tratar Glosa",
-      description: "Abrindo tela de tratamento de glosa...",
+      title: action === "aceitar" ? "Glosa aceita" : action === "reapresentar" ? "Item reapresentado" : "Item cancelado",
+      description: action === "aceitar" 
+        ? "A glosa foi aceita e o item não será cobrado." 
+        : action === "reapresentar" 
+        ? "O item foi marcado para reapresentação ao convênio."
+        : "O item foi cancelado.",
     });
   };
 
@@ -576,7 +659,7 @@ const PreFaturamentoLoteDetalhe = () => {
               variant="ghost"
               size="icon"
               className="h-7 w-7 text-warning hover:text-warning hover:bg-warning/10"
-              onClick={() => handleTratarGlosa(guia.id, item.id)}
+              onClick={() => handleTratarGlosa(guia.id, item)}
             >
               <Gavel className="h-4 w-4" />
             </Button>
@@ -1108,6 +1191,14 @@ const PreFaturamentoLoteDetalhe = () => {
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
+        
+        {/* Glosa Treatment Modal */}
+        <TratarGlosaModal
+          open={glosaModalOpen}
+          onOpenChange={setGlosaModalOpen}
+          item={selectedGlosaItem?.item || null}
+          onConfirm={handleGlosaConfirm}
+        />
       </div>
     </TooltipProvider>
   );

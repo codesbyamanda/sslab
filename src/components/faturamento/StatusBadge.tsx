@@ -17,7 +17,10 @@ import {
   Send,
   Lock,
   FileArchive,
-  CircleDot
+  CircleDot,
+  RotateCcw,
+  Percent,
+  CheckCheck
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -46,7 +49,7 @@ const resultadoConfig: Record<ResultadoStatus, {
   },
   absurdo: {
     label: "Absurdo",
-    tooltip: "Valor biologicamente incompatível. Possível erro de digitação.",
+    tooltip: "Valor biologicamente incompatível. Possível erro de digitação. Requer confirmação obrigatória.",
     className: "bg-destructive/15 text-destructive border-destructive/30",
     icon: AlertCircle,
   },
@@ -73,19 +76,23 @@ export const ResultadoBadge = ({ status }: { status: ResultadoStatus }) => {
 
 // ==============================
 // 3. SITUAÇÃO DOS ITENS DE GUIA (NÚCLEO DO FATURAMENTO)
+// CONFORME ESPECIFICAÇÃO COMPLETA
 // ==============================
 export type ItemGuiaStatus = 
-  | "aberto"         // AB - Aberto
-  | "pendente"       // PD - Pendente
-  | "pre_faturado"   // PF - Pré-faturado
-  | "em_faturamento" // FT - Em Faturamento
-  | "recebido"       // RC - Recebido
-  | "glosa_total"    // GT - Glosa Total
-  | "glosa_parcial"  // GP - Glosa Parcial
-  | "glosa_acatada"  // GA - Glosa Acatada
-  | "reapresentado"  // RP - Reapresentado
-  | "em_refaturamento" // RF - Em Refaturamento
-  | "cancelado";     // CN - Cancelado
+  | "aberto"              // AB - Aberto
+  | "pendente"            // PD - Pendente
+  | "pre_faturado"        // PF - Pré-faturado
+  | "em_faturamento"      // FT - Em Faturamento
+  | "recebido"            // RC - Recebido
+  | "glosa_parcial"       // GP - Glosa Parcial
+  | "glosa_total"         // GT - Glosa Total
+  | "glosa_acatada"       // GA - Glosa Acatada
+  | "reapresentado"       // RP - Reapresentado
+  | "em_refaturamento"    // RF - Em Refaturamento
+  | "refaturamento_parcial" // RP - Em Refaturamento Parcial
+  | "recebimento_parcial" // PR - Recebimento Parcial
+  | "cancelado"           // CN - Cancelado
+  | "processado";         // PC - Processado
 
 const itemGuiaConfig: Record<ItemGuiaStatus, {
   label: string;
@@ -125,9 +132,16 @@ const itemGuiaConfig: Record<ItemGuiaStatus, {
   recebido: {
     label: "Recebido",
     sigla: "RC",
-    tooltip: "Item faturado e recebido pelo convênio",
+    tooltip: "Item faturado e recebido pelo convênio - pagamento confirmado",
     className: "bg-success/15 text-success border-success/30",
     icon: CheckCircle2,
+  },
+  glosa_parcial: {
+    label: "Glosa Parcial",
+    sigla: "GP",
+    tooltip: "Item glosado parcialmente. Valor ajustado pelo convênio. Requer análise.",
+    className: "bg-orange-500/15 text-orange-600 border-orange-500/30 dark:text-orange-400",
+    icon: Percent,
   },
   glosa_total: {
     label: "Glosa Total",
@@ -135,13 +149,6 @@ const itemGuiaConfig: Record<ItemGuiaStatus, {
     tooltip: "Item glosado totalmente pelo convênio. Requer tratamento de glosa.",
     className: "bg-destructive/15 text-destructive border-destructive/30",
     icon: XCircle,
-  },
-  glosa_parcial: {
-    label: "Glosa Parcial",
-    sigla: "GP",
-    tooltip: "Item glosado parcialmente. Valor ajustado pelo convênio. Requer análise.",
-    className: "bg-orange-500/15 text-orange-600 border-orange-500/30 dark:text-orange-400",
-    icon: AlertCircle,
   },
   glosa_acatada: {
     label: "Glosa Acatada",
@@ -162,7 +169,21 @@ const itemGuiaConfig: Record<ItemGuiaStatus, {
     sigla: "RF",
     tooltip: "Item em processo de refaturamento após recurso",
     className: "bg-petroleo/15 text-petroleo border-petroleo/30",
-    icon: RefreshCw,
+    icon: RotateCcw,
+  },
+  refaturamento_parcial: {
+    label: "Refaturamento Parcial",
+    sigla: "RP",
+    tooltip: "Item em processo de refaturamento com valor parcial",
+    className: "bg-petroleo/15 text-petroleo border-petroleo/30",
+    icon: RotateCcw,
+  },
+  recebimento_parcial: {
+    label: "Recebimento Parcial",
+    sigla: "PR",
+    tooltip: "Item com recebimento parcial confirmado pelo convênio",
+    className: "bg-success/15 text-success border-success/30",
+    icon: DollarSign,
   },
   cancelado: {
     label: "Cancelado",
@@ -170,6 +191,13 @@ const itemGuiaConfig: Record<ItemGuiaStatus, {
     tooltip: "Item cancelado. Não será faturado.",
     className: "bg-muted text-muted-foreground border-border",
     icon: Ban,
+  },
+  processado: {
+    label: "Processado",
+    sigla: "PC",
+    tooltip: "Item processado e finalizado no sistema",
+    className: "bg-success/15 text-success border-success/30",
+    icon: CheckCheck,
   },
 };
 
@@ -183,6 +211,7 @@ export const ItemGuiaBadge = ({
   size?: "sm" | "default";
 }) => {
   const config = itemGuiaConfig[status];
+  if (!config) return null;
   const Icon = config.icon;
   
   return (
@@ -220,9 +249,16 @@ export const getItemGuiaActions = (status: ItemGuiaStatus): string[] => {
       return ["aceitar_glosa", "reapresentar", "cancelar"];
     case "reapresentado":
       return ["acompanhar_retorno"];
+    case "em_refaturamento":
+      return ["acompanhar_retorno"];
+    case "refaturamento_parcial":
+      return ["acompanhar_retorno"];
+    case "recebimento_parcial":
+      return []; // Somente leitura
     case "recebido":
     case "glosa_acatada":
     case "cancelado":
+    case "processado":
       return []; // Somente leitura
     default:
       return [];
@@ -236,7 +272,12 @@ export const isGlosado = (status: ItemGuiaStatus): boolean => {
 
 // Helper para verificar se um item pode ser editado
 export const isItemEditavel = (status: ItemGuiaStatus): boolean => {
-  return !["recebido", "glosa_acatada", "cancelado"].includes(status);
+  return !["recebido", "glosa_acatada", "cancelado", "processado", "recebimento_parcial"].includes(status);
+};
+
+// Helper para obter a configuração do status
+export const getItemGuiaConfig = (status: ItemGuiaStatus) => {
+  return itemGuiaConfig[status];
 };
 
 // ==============================
@@ -292,6 +333,14 @@ export const LotePreFaturamentoBadge = ({ status }: { status: LotePreFaturamento
       </TooltipContent>
     </Tooltip>
   );
+};
+
+// Helper para legenda de status do lote
+export const getLotePreFaturamentoLegenda = () => {
+  return Object.entries(lotePreFaturamentoConfig).map(([key, config]) => ({
+    status: key as LotePreFaturamentoStatus,
+    ...config
+  }));
 };
 
 // ==============================
@@ -410,4 +459,14 @@ export const GuiaBadge = ({ status }: { status: GuiaStatus }) => {
       </TooltipContent>
     </Tooltip>
   );
+};
+
+// ==============================
+// LEGENDA DE STATUS DOS ITENS DE GUIA
+// ==============================
+export const getItemGuiaLegenda = () => {
+  return Object.entries(itemGuiaConfig).map(([key, config]) => ({
+    status: key as ItemGuiaStatus,
+    ...config
+  }));
 };
