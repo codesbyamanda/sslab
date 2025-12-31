@@ -65,8 +65,11 @@ import {
   LotePreFaturamentoBadge, 
   GuiaBadge, 
   ItemGuiaBadge,
+  LoteGlosaBadge,
   getItemGuiaLegenda,
   getLotePreFaturamentoLegenda,
+  isGuiaGlosada,
+  hasGlosaPendente,
   type LotePreFaturamentoStatus,
   type GuiaStatus,
   type ItemGuiaStatus
@@ -264,8 +267,8 @@ const mockLote: Lote = {
       plano: "Empresarial",
       dataAtendimento: "2024-01-12",
       valorTotal: 245.00,
-      status: "aberta",
-      motivoPendencia: null,
+      status: "glosa_total", // Status explícito de glosa na guia
+      motivoPendencia: "Itens glosados pelo convênio",
       selected: false,
       timeline: [
         { id: "g7-1", type: "guia_criada", title: "Guia criada", timestamp: "12/01 09:00", user: "Sistema", origem: "sistema" },
@@ -277,6 +280,27 @@ const mockLote: Lote = {
         { id: 22, codigo: "40302504", descricao: "Glicemia de Jejum", quantidade: 1, valorUnitario: 25.00, valorTotal: 25.00, situacao: "glosa_total", motivoPendencia: "Procedimento não autorizado na guia" },
         { id: 23, codigo: "40301630", descricao: "Colesterol Total e Frações", quantidade: 1, valorUnitario: 120.00, valorTotal: 120.00, situacao: "reapresentado", motivoPendencia: null },
         { id: 24, codigo: "40316521", descricao: "TSH", quantidade: 1, valorUnitario: 85.00, valorTotal: 85.00, situacao: "glosa_acatada", motivoPendencia: "Glosa aceita - sem cobertura" },
+      ]
+    },
+    // Guia com glosa parcial
+    {
+      id: 8,
+      codigo: "REQ-2024-0008",
+      paciente: "Carla Fernandes",
+      convenio: "Unimed",
+      plano: "Nacional",
+      dataAtendimento: "2024-01-11",
+      valorTotal: 180.00,
+      status: "glosa_parcial", // Glosa Parcial
+      motivoPendencia: "Valor do procedimento ajustado pelo convênio",
+      selected: false,
+      timeline: [
+        { id: "g8-1", type: "guia_criada", title: "Guia criada", timestamp: "11/01 10:00", user: "Sistema", origem: "sistema" },
+        { id: "g8-2", type: "glosa_identificada", title: "Glosa parcial identificada", timestamp: "22/01 09:00", origem: "sistema" },
+      ],
+      itens: [
+        { id: 25, codigo: "40304361", descricao: "Hemograma Completo", quantidade: 1, valorUnitario: 35.00, valorTotal: 35.00, situacao: "recebido", motivoPendencia: null },
+        { id: 26, codigo: "40302504", descricao: "Glicemia de Jejum", quantidade: 1, valorUnitario: 25.00, valorTotal: 25.00, situacao: "glosa_parcial", motivoPendencia: "Valor ajustado de R$ 25,00 para R$ 18,00" },
       ]
     },
   ]
@@ -303,6 +327,27 @@ const PreFaturamentoLoteDetalhe = () => {
   const canceladasCount = useMemo(() => lote.guias.filter(g => g.status === "cancelada").length, [lote.guias]);
   const totalLote = useMemo(() => lote.guias.filter(g => g.status !== "cancelada").reduce((sum, g) => sum + g.valorTotal, 0), [lote.guias]);
   const hasPendencias = pendentesCount > 0;
+  
+  // Contagem de glosas
+  const glosaStats = useMemo(() => {
+    let totalItensGlosados = 0;
+    let valorGlosado = 0;
+    let itensPendentesGlosa = 0;
+    
+    lote.guias.forEach(g => {
+      g.itens.forEach(item => {
+        if (item.situacao === "glosa_total" || item.situacao === "glosa_parcial") {
+          totalItensGlosados++;
+          itensPendentesGlosa++;
+          valorGlosado += item.situacao === "glosa_total" ? item.valorTotal : item.valorTotal * 0.3;
+        }
+      });
+    });
+    
+    return { totalItensGlosados, valorGlosado, itensPendentesGlosa };
+  }, [lote.guias]);
+  
+  const hasGlosasPendentes = glosaStats.itensPendentesGlosa > 0;
   
   // Contagem de itens por status
   const itemStatusCounts = useMemo(() => {
@@ -729,9 +774,13 @@ const PreFaturamentoLoteDetalhe = () => {
                     <FileText className="h-6 w-6 text-primary" />
                   </div>
                   <div>
-                    <div className="flex items-center gap-3 mb-1">
+                    <div className="flex items-center gap-3 mb-1 flex-wrap">
                       <h1 className="text-xl font-bold text-foreground">{lote.codigo}</h1>
                       <LotePreFaturamentoBadge status={lote.status} />
+                      <LoteGlosaBadge 
+                        qtdItensGlosados={glosaStats.totalItensGlosados} 
+                        valorGlosado={glosaStats.valorGlosado} 
+                      />
                     </div>
                     <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground">
                       <span><strong>Convênio:</strong> {lote.convenio}</span>
@@ -741,7 +790,30 @@ const PreFaturamentoLoteDetalhe = () => {
                   </div>
                 </div>
                 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
+                  {/* CTA Principal - Tratar Glosas */}
+                  {hasGlosasPendentes && (
+                    <Button 
+                      variant="destructive"
+                      size="sm"
+                      className="gap-2"
+                      onClick={() => {
+                        // Encontra o primeiro item glosado
+                        for (const guia of lote.guias) {
+                          for (const item of guia.itens) {
+                            if (item.situacao === "glosa_total" || item.situacao === "glosa_parcial") {
+                              handleTratarGlosa(guia.id, item);
+                              return;
+                            }
+                          }
+                        }
+                      }}
+                    >
+                      <Gavel className="h-4 w-4" />
+                      Tratar Glosas ({glosaStats.itensPendentesGlosa})
+                    </Button>
+                  )}
+                  
                   {/* Timeline Sheet */}
                   <Sheet>
                     <SheetTrigger asChild>
@@ -821,18 +893,32 @@ const PreFaturamentoLoteDetalhe = () => {
                 </div>
               </div>
               
-              {(itemStatusCounts.glosa_total + itemStatusCounts.glosa_parcial) > 0 && (
-                <div className="bg-card rounded-xl border border-border/50 shadow-sm p-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-destructive/10 flex items-center justify-center">
-                      <AlertCircle className="h-5 w-5 text-destructive" />
-                    </div>
-                    <div>
-                      <p className="text-2xl font-bold text-foreground">{itemStatusCounts.glosa_total + itemStatusCounts.glosa_parcial}</p>
-                      <p className="text-xs text-muted-foreground">Itens Glosados</p>
+              {glosaStats.totalItensGlosados > 0 && (
+                <>
+                  <div className="bg-card rounded-xl border border-destructive/30 shadow-sm p-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-lg bg-destructive/10 flex items-center justify-center">
+                        <AlertCircle className="h-5 w-5 text-destructive" />
+                      </div>
+                      <div>
+                        <p className="text-2xl font-bold text-destructive">{glosaStats.totalItensGlosados}</p>
+                        <p className="text-xs text-muted-foreground">Itens Glosados</p>
+                      </div>
                     </div>
                   </div>
-                </div>
+                  
+                  <div className="bg-card rounded-xl border border-destructive/30 shadow-sm p-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-lg bg-destructive/10 flex items-center justify-center">
+                        <DollarSign className="h-5 w-5 text-destructive" />
+                      </div>
+                      <div>
+                        <p className="text-2xl font-bold text-destructive">{glosaStats.valorGlosado.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
+                        <p className="text-xs text-muted-foreground">Valor Glosado</p>
+                      </div>
+                    </div>
+                  </div>
+                </>
               )}
               
               {itemStatusCounts.recebido > 0 && (
@@ -895,7 +981,8 @@ const PreFaturamentoLoteDetalhe = () => {
                             "cursor-pointer transition-colors",
                             guia.selected && "bg-primary/5",
                             guia.status === "pendente" && "bg-warning/5",
-                            guia.status === "cancelada" && "opacity-60"
+                            guia.status === "cancelada" && "opacity-60",
+                            (guia.status === "glosa_total" || guia.status === "glosa_parcial") && "bg-destructive/5 border-l-2 border-l-destructive"
                           )}
                         >
                           <TableCell onClick={(e) => e.stopPropagation()}>
@@ -927,14 +1014,38 @@ const PreFaturamentoLoteDetalhe = () => {
                           <TableCell className="text-right font-medium" onClick={() => toggleExpand(guia.id)}>
                             {guia.valorTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                           </TableCell>
-                          <TableCell className="text-center" onClick={() => toggleExpand(guia.id)}>
-                            <GuiaBadge status={guia.status} />
+                          <TableCell className="text-center" onClick={(e) => e.stopPropagation()}>
+                            <div className="flex items-center justify-center gap-2">
+                              <GuiaBadge status={guia.status} />
+                              {(guia.status === "glosa_total" || guia.status === "glosa_parcial") && (
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      className="h-6 px-2 text-xs text-warning hover:text-warning hover:bg-warning/10"
+                                      onClick={() => {
+                                        const glosaItem = guia.itens.find(i => i.situacao === "glosa_total" || i.situacao === "glosa_parcial");
+                                        if (glosaItem) handleTratarGlosa(guia.id, glosaItem);
+                                      }}
+                                    >
+                                      <Gavel className="h-3 w-3 mr-1" />
+                                      Tratar
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent>Tratar glosa desta guia</TooltipContent>
+                                </Tooltip>
+                              )}
+                            </div>
                           </TableCell>
                           <TableCell onClick={() => toggleExpand(guia.id)}>
                             {guia.motivoPendencia && (
                               <Tooltip>
                                 <TooltipTrigger asChild>
-                                  <span className="text-sm text-warning truncate max-w-[200px] block">
+                                  <span className={cn(
+                                    "text-sm truncate max-w-[200px] block",
+                                    (guia.status === "glosa_total" || guia.status === "glosa_parcial") ? "text-destructive" : "text-warning"
+                                  )}>
                                     {guia.motivoPendencia.length > 30 
                                       ? `${guia.motivoPendencia.slice(0, 30)}...` 
                                       : guia.motivoPendencia}

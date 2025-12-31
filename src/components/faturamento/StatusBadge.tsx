@@ -407,55 +407,167 @@ export const FaturaBadge = ({ status }: { status: FaturaStatus }) => {
 
 // ==============================
 // GUIA STATUS (para compatibilidade com tela existente)
+// Com status explícitos de glosa conforme especificação
 // ==============================
-export type GuiaStatus = "aberta" | "pendente" | "cancelada" | "faturada";
+export type GuiaStatus = 
+  | "aberta" 
+  | "pendente" 
+  | "cancelada" 
+  | "faturada"
+  | "glosa_parcial"   // GP - Guia com glosa parcial
+  | "glosa_total"     // GT - Guia com glosa total
+  | "glosa_acatada"   // GA - Glosa acatada
+  | "reapresentada";  // RA - Guia reapresentada
 
 const guiaConfig: Record<GuiaStatus, {
   label: string;
+  sigla: string;
   tooltip: string;
   className: string;
   icon: React.ElementType;
 }> = {
   aberta: {
     label: "Aberta",
+    sigla: "AB",
     tooltip: "Guia disponível para faturamento",
     className: "bg-primary/15 text-primary border-primary/30",
     icon: CircleDot,
   },
   pendente: {
     label: "Pendente",
+    sigla: "PD",
     tooltip: "Guia com itens pendentes que precisam ser resolvidos",
     className: "bg-warning/15 text-warning border-warning/30",
     icon: Clock,
   },
   cancelada: {
     label: "Cancelada",
+    sigla: "CN",
     tooltip: "Guia cancelada. Não será faturada.",
     className: "bg-muted text-muted-foreground border-border",
     icon: Ban,
   },
   faturada: {
     label: "Faturada",
+    sigla: "FT",
     tooltip: "Guia já incluída em uma fatura",
     className: "bg-success/15 text-success border-success/30",
     icon: CheckCircle2,
   },
+  glosa_parcial: {
+    label: "Glosa Parcial",
+    sigla: "GP",
+    tooltip: "Guia com itens glosados parcialmente. Valor ajustado pelo convênio. Requer tratamento.",
+    className: "bg-orange-500/15 text-orange-600 border-orange-500/30 dark:text-orange-400",
+    icon: Percent,
+  },
+  glosa_total: {
+    label: "Glosa Total",
+    sigla: "GT",
+    tooltip: "Guia com itens glosados totalmente. Requer tratamento de glosa.",
+    className: "bg-destructive/15 text-destructive border-destructive/30",
+    icon: XCircle,
+  },
+  glosa_acatada: {
+    label: "Glosa Acatada",
+    sigla: "GA",
+    tooltip: "Glosa aceita pela empresa. O valor da glosa não será cobrado.",
+    className: "bg-muted text-muted-foreground border-border",
+    icon: Ban,
+  },
+  reapresentada: {
+    label: "Reapresentada",
+    sigla: "RA",
+    tooltip: "Guia reapresentada ao convênio após recurso de glosa",
+    className: "bg-warning/15 text-warning border-warning/30",
+    icon: RefreshCw,
+  },
 };
 
-export const GuiaBadge = ({ status }: { status: GuiaStatus }) => {
+export const GuiaBadge = ({ 
+  status,
+  showAction = false,
+  onTratarGlosa
+}: { 
+  status: GuiaStatus;
+  showAction?: boolean;
+  onTratarGlosa?: () => void;
+}) => {
   const config = guiaConfig[status];
+  if (!config) return null;
   const Icon = config.icon;
+  
+  const isGlosaStatus = status === "glosa_parcial" || status === "glosa_total";
+  
+  return (
+    <div className="flex items-center gap-2">
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Badge className={cn("gap-1 font-medium", config.className)}>
+            <Icon className="h-3 w-3" />
+            {config.label}
+          </Badge>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p className="font-medium">{config.label} ({config.sigla})</p>
+          <p className="text-xs text-muted-foreground">{config.tooltip}</p>
+        </TooltipContent>
+      </Tooltip>
+      {showAction && isGlosaStatus && onTratarGlosa && (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button 
+              onClick={(e) => {
+                e.stopPropagation();
+                onTratarGlosa();
+              }}
+              className="text-xs font-medium text-warning hover:text-warning/80 underline underline-offset-2"
+            >
+              Tratar
+            </button>
+          </TooltipTrigger>
+          <TooltipContent>Abrir tratamento de glosa</TooltipContent>
+        </Tooltip>
+      )}
+    </div>
+  );
+};
+
+// Helper para verificar se guia está glosada
+export const isGuiaGlosada = (status: GuiaStatus): boolean => {
+  return status === "glosa_total" || status === "glosa_parcial";
+};
+
+// Helper para verificar se guia tem glosa pendente de tratamento
+export const hasGlosaPendente = (status: GuiaStatus): boolean => {
+  return status === "glosa_total" || status === "glosa_parcial";
+};
+
+// ==============================
+// BADGE ESPECIAL "COM GLOSA" PARA LOTES
+// ==============================
+export const LoteGlosaBadge = ({ 
+  qtdItensGlosados,
+  valorGlosado 
+}: { 
+  qtdItensGlosados: number;
+  valorGlosado: number;
+}) => {
+  if (qtdItensGlosados === 0) return null;
   
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <Badge className={cn("gap-1 font-medium", config.className)}>
-          <Icon className="h-3 w-3" />
-          {config.label}
+        <Badge className="gap-1 font-medium bg-destructive/15 text-destructive border-destructive/30">
+          <AlertCircle className="h-3 w-3" />
+          Com Glosa ({qtdItensGlosados})
         </Badge>
       </TooltipTrigger>
       <TooltipContent>
-        <p>{config.tooltip}</p>
+        <p className="font-medium">Lote com itens glosados</p>
+        <p className="text-xs text-muted-foreground">
+          {qtdItensGlosados} item(s) glosado(s) - Total: {valorGlosado.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+        </p>
       </TooltipContent>
     </Tooltip>
   );
@@ -467,6 +579,14 @@ export const GuiaBadge = ({ status }: { status: GuiaStatus }) => {
 export const getItemGuiaLegenda = () => {
   return Object.entries(itemGuiaConfig).map(([key, config]) => ({
     status: key as ItemGuiaStatus,
+    ...config
+  }));
+};
+
+// Legenda de status das guias
+export const getGuiaLegenda = () => {
+  return Object.entries(guiaConfig).map(([key, config]) => ({
+    status: key as GuiaStatus,
     ...config
   }));
 };
