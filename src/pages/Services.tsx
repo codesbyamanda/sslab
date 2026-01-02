@@ -1,7 +1,7 @@
 import ServicesNavbar from "@/components/services/ServicesNavbar";
 import ServiceCard from "@/components/services/ServiceCard";
 import { useNavigate } from "react-router-dom";
-import { Stethoscope, UserPlus, Receipt, DollarSign, Monitor, FlaskConical, Shield, ArrowLeftRight, BarChart3 } from "lucide-react";
+import { Stethoscope, UserPlus, Receipt, DollarSign, Cpu, FlaskConical, Shield, ArrowLeftRight, BarChart3 } from "lucide-react";
 
 const services = [
   {
@@ -29,9 +29,9 @@ const services = [
     enabled: true
   },
   {
-    title: "Saúde Informática",
-    description: "Suporte técnico e infraestrutura de TI",
-    icon: Monitor,
+    title: "Saúde Interfaciamento",
+    description: "Automação laboratorial e comunicação com equipamentos",
+    icon: Cpu,
     enabled: true
   },
   {
@@ -72,7 +72,7 @@ const Services = () => {
       "Saúde Cadastro": "/cadastro",
       "Saúde Faturamento": "/faturamento",
       "Saúde Financeiro": "/financeiro",
-      "Saúde Informática": "/informatica",
+      "Saúde Interfaciamento": "/interfaciamento",
       "Saúde Laboratório": "/laboratorio",
       "Saúde Segurança": "/seguranca",
       "Saúde Transferência": "/transferencia",
