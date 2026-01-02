@@ -58,10 +58,11 @@ const faturamentoItems = [
 ];
 
 const relatoriosItems = [
-  { title: "Faturamento Clínica / Médico – Sintético", url: "/faturamento/relatorios/clinica-sintetico", icon: BarChart3 },
-  { title: "Faturamento Clínica – Analítico", url: "/faturamento/relatorios/clinica-analitico", icon: FileBarChart },
+  { title: "Visão Geral", url: "/faturamento/relatorios", icon: FileBarChart },
+  { title: "Clínica / Médico – Sintético", url: "/faturamento/relatorios/clinica-sintetico", icon: BarChart3 },
+  { title: "Clínica – Analítico", url: "/faturamento/relatorios/clinica-analitico", icon: FileBarChart },
   { title: "Rendimentos por Solicitantes", url: "/faturamento/relatorios/rendimentos-solicitantes", icon: Users },
-  { title: "Qtde Exames por Serviços", url: "/faturamento/relatorios/exames-servicos", icon: ClipboardList },
+  { title: "Exames por Serviços", url: "/faturamento/relatorios/exames-servicos", icon: ClipboardList },
 ];
 
 interface MenuItemProps {
