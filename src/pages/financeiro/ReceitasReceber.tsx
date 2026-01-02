@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowLeft, Plus, Search, Filter, Edit, Trash2, ChevronDown, ChevronUp, AlertCircle } from "lucide-react";
+import { ArrowLeft, Search, Filter, Eye, DollarSign, RotateCcw, ChevronDown, ChevronUp, AlertCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import FinanceiroSidebar from "@/components/financeiro/FinanceiroSidebar";
 import FinanceiroNavbar from "@/components/financeiro/FinanceiroNavbar";
@@ -27,7 +27,11 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import ReceitaModal from "@/components/financeiro/ReceitaModal";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 // Mock data
 const mockReceitas = [
@@ -100,8 +104,6 @@ const ReceitasReceber = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [showFilters, setShowFilters] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedReceita, setSelectedReceita] = useState<typeof mockReceitas[0] | null>(null);
   const [sortField, setSortField] = useState<SortField>("data");
   const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
 
@@ -175,16 +177,6 @@ const ReceitasReceber = () => {
     return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
   };
 
-  const handleNewReceita = () => {
-    setSelectedReceita(null);
-    setIsModalOpen(true);
-  };
-
-  const handleEditReceita = (receita: typeof mockReceitas[0]) => {
-    setSelectedReceita(receita);
-    setIsModalOpen(true);
-  };
-
   const clearFilters = () => {
     setFilterTipoReceita("");
     setFilterSituacao("");
@@ -192,6 +184,12 @@ const ReceitasReceber = () => {
     setFilterDataFim("");
     setSearchTerm("");
   };
+
+  const hasRecebimentos = (receita: typeof mockReceitas[0]) => {
+    // Mock: considerar que receitas parciais ou quitadas têm recebimentos
+    return receita.situacao === "Parcial" || receita.situacao === "Quitado";
+  };
+
 
   return (
     <div className="min-h-screen flex w-full bg-background">
@@ -229,10 +227,6 @@ const ReceitasReceber = () => {
                 >
                   <Filter className="h-4 w-4" />
                   Filtrar
-                </Button>
-                <Button onClick={handleNewReceita} className="gap-2">
-                  <Plus className="h-4 w-4" />
-                  Novo Recebimento
                 </Button>
               </div>
             </div>
@@ -424,21 +418,51 @@ const ReceitasReceber = () => {
                           </TableCell>
                           <TableCell>
                             <div className="flex items-center justify-center gap-1">
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-8 w-8"
-                                onClick={() => handleEditReceita(receita)}
-                              >
-                                <Edit className="h-4 w-4" />
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-8 w-8 text-destructive hover:text-destructive"
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-8 w-8"
+                                    onClick={() => navigate(`/financeiro/receitas/${receita.id}`)}
+                                  >
+                                    <Eye className="h-4 w-4" />
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>Visualizar Receita</TooltipContent>
+                              </Tooltip>
+                              
+                              {receita.situacao !== "Quitado" && (
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      className="h-8 w-8 text-green-600 hover:text-green-700"
+                                      onClick={() => navigate(`/financeiro/receitas/${receita.id}/recebimento`)}
+                                    >
+                                      <DollarSign className="h-4 w-4" />
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent>Registrar Recebimento</TooltipContent>
+                                </Tooltip>
+                              )}
+                              
+                              {hasRecebimentos(receita) && (
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      className="h-8 w-8 text-orange-600 hover:text-orange-700"
+                                      onClick={() => navigate(`/financeiro/receitas/${receita.id}/extorno`)}
+                                    >
+                                      <RotateCcw className="h-4 w-4" />
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent>Extornar Recebimento</TooltipContent>
+                                </Tooltip>
+                              )}
                             </div>
                           </TableCell>
                         </TableRow>
@@ -514,11 +538,6 @@ const ReceitasReceber = () => {
         </main>
       </div>
 
-      <ReceitaModal 
-        open={isModalOpen} 
-        onOpenChange={setIsModalOpen}
-        receita={selectedReceita}
-      />
     </div>
   );
 };
