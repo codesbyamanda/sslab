@@ -41,6 +41,7 @@ import Faturamento from "./pages/Faturamento";
 import GuiasFaturamento from "./pages/faturamento/Guias";
 import RecalculoGuias from "./pages/faturamento/RecalculoGuias";
 import ListagemFaturamentoGuias from "./pages/faturamento/ListagemFaturamentoGuias";
+import FaturaVisualizacao from "./pages/faturamento/FaturaVisualizacao";
 import SaudeFinanceiro from "./pages/SaudeFinanceiro";
 import ReceitasReceber from "./pages/financeiro/ReceitasReceber";
 import Cheques from "./pages/financeiro/Cheques";
@@ -121,6 +122,7 @@ const App = () => (
           <Route path="/faturamento/faturamento" element={<Faturamento />} />
           <Route path="/faturamento/guias" element={<GuiasFaturamento />} />
           <Route path="/faturamento/listagem-faturamento" element={<ListagemFaturamentoGuias />} />
+          <Route path="/faturamento/listagem-faturamento/:id" element={<FaturaVisualizacao />} />
           <Route path="/financeiro" element={<SaudeFinanceiro />} />
           <Route path="/financeiro/receitas" element={<ReceitasReceber />} />
           <Route path="/financeiro/cheques" element={<Cheques />} />

@@ -542,7 +542,7 @@ const ListagemFaturamentoGuias = () => {
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end" className="bg-card border-border">
                             <DropdownMenuItem 
-                              onClick={() => navigate(`/faturamento/lote/${lote.id}`)}
+                              onClick={() => navigate(`/faturamento/listagem-faturamento/${lote.id}`)}
                               className="gap-2 cursor-pointer"
                             >
                               <Eye className="h-4 w-4" />
