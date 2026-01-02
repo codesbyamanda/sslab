@@ -57,6 +57,8 @@ import ChequeDetalhe from "./pages/financeiro/ChequeDetalhe";
 import TransacoesCartao from "./pages/financeiro/TransacoesCartao";
 import TransacaoCartaoDetalhe from "./pages/financeiro/TransacaoCartaoDetalhe";
 import Depositos from "./pages/financeiro/Depositos";
+import DepositoDetalhe from "./pages/financeiro/DepositoDetalhe";
+import NovoDeposito from "./pages/financeiro/NovoDeposito";
 import RepasseCartao from "./pages/financeiro/RepasseCartao";
 import WorkspaceVisaoGeral from "./pages/workspace/WorkspaceVisaoGeral";
 import WorkspaceAtendimento from "./pages/workspace/WorkspaceAtendimento";
@@ -150,6 +152,8 @@ const App = () => (
           <Route path="/financeiro/transacoes-cartao" element={<TransacoesCartao />} />
           <Route path="/financeiro/transacoes-cartao/:id" element={<TransacaoCartaoDetalhe />} />
           <Route path="/financeiro/depositos" element={<Depositos />} />
+          <Route path="/financeiro/depositos/novo" element={<NovoDeposito />} />
+          <Route path="/financeiro/depositos/:id" element={<DepositoDetalhe />} />
           <Route path="/financeiro/repasse-cartao" element={<RepasseCartao />} />
           <Route path="/financeiro/contas-pagar" element={<SaudeFinanceiro />} />
           <Route path="/financeiro/cheques-emitidos" element={<SaudeFinanceiro />} />
