@@ -79,6 +79,7 @@ import LaboratorioConfigImpressao from "./pages/laboratorio/LaboratorioConfigImp
 import LaboratorioConfigLaudoInternet from "./pages/laboratorio/LaboratorioConfigLaudoInternet";
 import LaboratorioRelatorios from "./pages/laboratorio/LaboratorioRelatorios";
 import NotFound from "./pages/NotFound";
+import ModuloEmConfiguracao from "./pages/ModuloEmConfiguracao";
 
 const queryClient = new QueryClient();
 
@@ -175,6 +176,11 @@ const App = () => (
           <Route path="/laboratorio/config-impressao" element={<LaboratorioConfigImpressao />} />
           <Route path="/laboratorio/config-laudo-internet" element={<LaboratorioConfigLaudoInternet />} />
           <Route path="/laboratorio/relatorios" element={<LaboratorioRelatorios />} />
+          {/* Módulos em configuração */}
+          <Route path="/cadastro" element={<ModuloEmConfiguracao />} />
+          <Route path="/informatica" element={<ModuloEmConfiguracao />} />
+          <Route path="/seguranca" element={<ModuloEmConfiguracao />} />
+          <Route path="/transferencia" element={<ModuloEmConfiguracao />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
