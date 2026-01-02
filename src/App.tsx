@@ -61,6 +61,10 @@ import DepositoDetalhe from "./pages/financeiro/DepositoDetalhe";
 import NovoDeposito from "./pages/financeiro/NovoDeposito";
 import RepasseCartao from "./pages/financeiro/RepasseCartao";
 import RepasseCartaoDetalhe from "./pages/financeiro/RepasseCartaoDetalhe";
+import ContasPagar from "./pages/financeiro/ContasPagar";
+import ContaPagarDetalhe from "./pages/financeiro/ContaPagarDetalhe";
+import NovaContaPagar from "./pages/financeiro/NovaContaPagar";
+import ContaPagarPagamento from "./pages/financeiro/ContaPagarPagamento";
 import WorkspaceVisaoGeral from "./pages/workspace/WorkspaceVisaoGeral";
 import WorkspaceAtendimento from "./pages/workspace/WorkspaceAtendimento";
 import WorkspaceFinanceiro from "./pages/workspace/WorkspaceFinanceiro";
@@ -158,7 +162,11 @@ const App = () => (
           <Route path="/financeiro/repasse-cartao" element={<RepasseCartao />} />
           <Route path="/financeiro/repasse-cartao/:id" element={<RepasseCartaoDetalhe />} />
           <Route path="/financeiro/repasse-cartao" element={<RepasseCartao />} />
-          <Route path="/financeiro/contas-pagar" element={<SaudeFinanceiro />} />
+          <Route path="/financeiro/repasse-cartao/:id" element={<RepasseCartaoDetalhe />} />
+          <Route path="/financeiro/contas-pagar" element={<ContasPagar />} />
+          <Route path="/financeiro/contas-pagar/nova" element={<NovaContaPagar />} />
+          <Route path="/financeiro/contas-pagar/:id" element={<ContaPagarDetalhe />} />
+          <Route path="/financeiro/contas-pagar/:id/pagamento" element={<ContaPagarPagamento />} />
           <Route path="/financeiro/cheques-emitidos" element={<SaudeFinanceiro />} />
           <Route path="/financeiro/caixas" element={<SaudeFinanceiro />} />
           <Route path="/financeiro/contas-correntes" element={<SaudeFinanceiro />} />
