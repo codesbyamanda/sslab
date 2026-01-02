@@ -14,7 +14,7 @@ const services = [
     title: "Saúde Cadastro",
     description: "Cadastro e gestão de pacientes e profissionais",
     icon: UserPlus,
-    enabled: false
+    enabled: true
   },
   {
     title: "Saúde Faturamento",
@@ -26,13 +26,13 @@ const services = [
     title: "Saúde Financeiro",
     description: "Gestão financeira e controle de pagamentos",
     icon: DollarSign,
-    enabled: false
+    enabled: true
   },
   {
     title: "Saúde Informática",
     description: "Suporte técnico e infraestrutura de TI",
     icon: Monitor,
-    enabled: false
+    enabled: true
   },
   {
     title: "Saúde Laboratório",
@@ -44,13 +44,13 @@ const services = [
     title: "Saúde Segurança",
     description: "Segurança da informação e compliance",
     icon: Shield,
-    enabled: false
+    enabled: true
   },
   {
     title: "Saúde Transferência",
     description: "Transferência de pacientes e prontuários",
     icon: ArrowLeftRight,
-    enabled: false
+    enabled: true
   },
   {
     title: "Workspace de Dashboards",
@@ -66,14 +66,22 @@ const Services = () => {
 
   const handleServiceClick = (service: string, enabled: boolean) => {
     if (!enabled) return;
-    if (service === "Saúde Atendimento") {
-      navigate("/atendimento");
-    } else if (service === "Workspace de Dashboards") {
-      navigate("/workspace");
-    } else if (service === "Saúde Laboratório") {
-      navigate("/laboratorio");
-    } else if (service === "Saúde Faturamento") {
-      navigate("/faturamento");
+    
+    const routes: Record<string, string> = {
+      "Saúde Atendimento": "/atendimento",
+      "Saúde Cadastro": "/cadastro",
+      "Saúde Faturamento": "/faturamento",
+      "Saúde Financeiro": "/financeiro",
+      "Saúde Informática": "/informatica",
+      "Saúde Laboratório": "/laboratorio",
+      "Saúde Segurança": "/seguranca",
+      "Saúde Transferência": "/transferencia",
+      "Workspace de Dashboards": "/workspace"
+    };
+    
+    const route = routes[service];
+    if (route) {
+      navigate(route);
     }
   };
 
