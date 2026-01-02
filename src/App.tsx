@@ -181,10 +181,17 @@ const App = () => (
           <Route path="/financeiro/cheques-emitidos" element={<ChequesEmitidos />} />
           <Route path="/financeiro/cheques-emitidos/novo" element={<NovoChequeEmitido />} />
           <Route path="/financeiro/cheques-emitidos/:id" element={<ChequeEmitidoDetalhe />} />
-          <Route path="/financeiro/caixas" element={<SaudeFinanceiro />} />
-          <Route path="/financeiro/contas-correntes" element={<SaudeFinanceiro />} />
-          <Route path="/financeiro/transferencias-caixas" element={<SaudeFinanceiro />} />
-          <Route path="/financeiro/transferencias-bancarias" element={<SaudeFinanceiro />} />
+          {/* Fluxos Monetários */}
+          <Route path="/financeiro/caixas" element={<Caixas />} />
+          <Route path="/financeiro/caixas/:id" element={<CaixaDetalhe />} />
+          <Route path="/financeiro/contas-correntes" element={<ContasCorrentes />} />
+          <Route path="/financeiro/contas-correntes/:id" element={<ContaCorrenteDetalhe />} />
+          <Route path="/financeiro/transferencias-caixas" element={<TransferenciasCaixas />} />
+          <Route path="/financeiro/transferencias-caixas/nova" element={<NovaTransferenciaCaixa />} />
+          <Route path="/financeiro/transferencias-caixas/:id" element={<TransferenciaCaixaDetalhe />} />
+          <Route path="/financeiro/transferencias-bancarias" element={<TransferenciasBancarias />} />
+          <Route path="/financeiro/transferencias-bancarias/nova" element={<NovaTransferenciaBancaria />} />
+          <Route path="/financeiro/transferencias-bancarias/:id" element={<TransferenciaBancariaDetalhe />} />
           <Route path="/financeiro/configuracoes" element={<SaudeFinanceiro />} />
           <Route path="/workspace" element={<WorkspaceVisaoGeral />} />
           <Route path="/workspace/atendimento" element={<WorkspaceAtendimento />} />
