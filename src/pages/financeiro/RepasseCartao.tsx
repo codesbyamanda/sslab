@@ -25,9 +25,7 @@ import {
 import {
   Collapsible,
   CollapsibleContent,
-  CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import RepasseCartaoModal from "@/components/financeiro/RepasseCartaoModal";
 
 const mockRepasses = [
   {
@@ -129,8 +127,6 @@ const RepasseCartao = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [showFilters, setShowFilters] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedRepasse, setSelectedRepasse] = useState<typeof mockRepasses[0] | null>(null);
   const [sortField, setSortField] = useState<SortField>("dataPrevista");
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
 
@@ -198,9 +194,8 @@ const RepasseCartao = () => {
   const formatDate = (dateStr: string | null) => dateStr ? new Date(dateStr).toLocaleDateString("pt-BR") : "-";
   const formatCurrency = (value: number) => value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
-  const handleViewRepasse = (repasse: typeof mockRepasses[0]) => {
-    setSelectedRepasse(repasse);
-    setIsModalOpen(true);
+  const handleViewRepasse = (repasseId: number) => {
+    navigate(`/financeiro/repasse-cartao/${repasseId}`);
   };
 
   const clearFilters = () => {
@@ -422,8 +417,14 @@ const RepasseCartao = () => {
                           <TableCell className="text-right font-medium text-green-600">{formatCurrency(repasse.valorLiquido)}</TableCell>
                           <TableCell>{getSituacaoBadge(repasse.situacao)}</TableCell>
                           <TableCell>
-                            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleViewRepasse(repasse)}>
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              className="gap-2"
+                              onClick={() => handleViewRepasse(repasse.id)}
+                            >
                               <Eye className="h-4 w-4" />
+                              Detalhes
                             </Button>
                           </TableCell>
                         </TableRow>
@@ -439,12 +440,6 @@ const RepasseCartao = () => {
           </div>
         </main>
       </div>
-
-      <RepasseCartaoModal 
-        open={isModalOpen} 
-        onOpenChange={setIsModalOpen}
-        repasse={selectedRepasse}
-      />
     </div>
   );
 };
