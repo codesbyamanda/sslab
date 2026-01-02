@@ -114,6 +114,17 @@ import NotFound from "./pages/NotFound";
 import ModuloEmConfiguracao from "./pages/ModuloEmConfiguracao";
 import GrupoControleAcesso from "./pages/seguranca/GrupoControleAcesso";
 import PerfilAcesso from "./pages/seguranca/PerfilAcesso";
+import { InterfaciamentoLayout } from "./components/interfaciamento/InterfaciamentoLayout";
+import InterfaciamentoDashboard from "./pages/interfaciamento/InterfaciamentoDashboard";
+import InterfaciamentoEquipamentos from "./pages/interfaciamento/InterfaciamentoEquipamentos";
+import InterfaciamentoEquipamentoDetalhe from "./pages/interfaciamento/InterfaciamentoEquipamentoDetalhe";
+import InterfaciamentoProtocolos from "./pages/interfaciamento/InterfaciamentoProtocolos";
+import InterfaciamentoProtocoloDetalhe from "./pages/interfaciamento/InterfaciamentoProtocoloDetalhe";
+import InterfaciamentoMapeamento from "./pages/interfaciamento/InterfaciamentoMapeamento";
+import InterfaciamentoMonitoramento from "./pages/interfaciamento/InterfaciamentoMonitoramento";
+import InterfaciamentoLogs from "./pages/interfaciamento/InterfaciamentoLogs";
+import InterfaciamentoLogDetalhe from "./pages/interfaciamento/InterfaciamentoLogDetalhe";
+import InterfaciamentoConfiguracoes from "./pages/interfaciamento/InterfaciamentoConfiguracoes";
 
 const queryClient = new QueryClient();
 
@@ -248,6 +259,19 @@ const App = () => (
           <Route path="/transferencia/historico" element={<TransferenciaHistorico />} />
           <Route path="/transferencia/relatorios" element={<TransferenciaRelatorios />} />
           <Route path="/transferencia/configuracoes" element={<TransferenciaConfiguracoes />} />
+          {/* Interfaciamento */}
+          <Route path="/interfaciamento" element={<InterfaciamentoLayout />}>
+            <Route index element={<InterfaciamentoDashboard />} />
+            <Route path="equipamentos" element={<InterfaciamentoEquipamentos />} />
+            <Route path="equipamentos/:id" element={<InterfaciamentoEquipamentoDetalhe />} />
+            <Route path="protocolos" element={<InterfaciamentoProtocolos />} />
+            <Route path="protocolos/:id" element={<InterfaciamentoProtocoloDetalhe />} />
+            <Route path="mapeamento" element={<InterfaciamentoMapeamento />} />
+            <Route path="monitoramento" element={<InterfaciamentoMonitoramento />} />
+            <Route path="logs" element={<InterfaciamentoLogs />} />
+            <Route path="logs/:id" element={<InterfaciamentoLogDetalhe />} />
+            <Route path="configuracoes" element={<InterfaciamentoConfiguracoes />} />
+          </Route>
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
