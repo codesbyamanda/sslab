@@ -125,6 +125,24 @@ import InterfaciamentoMonitoramento from "./pages/interfaciamento/Interfaciament
 import InterfaciamentoLogs from "./pages/interfaciamento/InterfaciamentoLogs";
 import InterfaciamentoLogDetalhe from "./pages/interfaciamento/InterfaciamentoLogDetalhe";
 import InterfaciamentoConfiguracoes from "./pages/interfaciamento/InterfaciamentoConfiguracoes";
+import { CadastroLayout } from "./components/cadastro/CadastroLayout";
+import CadastroDashboard from "./pages/cadastro/CadastroDashboard";
+import Empresas from "./pages/cadastro/Empresas";
+import EmpresaDetalhe from "./pages/cadastro/EmpresaDetalhe";
+import Unidades from "./pages/cadastro/Unidades";
+import UnidadeDetalhe from "./pages/cadastro/UnidadeDetalhe";
+import Setores from "./pages/cadastro/Setores";
+import SetorDetalhe from "./pages/cadastro/SetorDetalhe";
+import Pessoas from "./pages/cadastro/Pessoas";
+import PessoaDetalhe from "./pages/cadastro/PessoaDetalhe";
+import ProfissoesCad from "./pages/cadastro/Profissoes";
+import Feriados from "./pages/cadastro/Feriados";
+import DestinoLaudo from "./pages/cadastro/DestinoLaudo";
+import Terceiros from "./pages/cadastro/Terceiros";
+import UnidadeMonetaria from "./pages/cadastro/UnidadeMonetaria";
+import TabelasPreco from "./pages/cadastro/TabelasPreco";
+import TabelaPrecoItens from "./pages/cadastro/TabelaPrecoItens";
+import Convenios from "./pages/cadastro/Convenios";
 
 const queryClient = new QueryClient();
 
@@ -259,7 +277,33 @@ const App = () => (
           <Route path="/transferencia/historico" element={<TransferenciaHistorico />} />
           <Route path="/transferencia/relatorios" element={<TransferenciaRelatorios />} />
           <Route path="/transferencia/configuracoes" element={<TransferenciaConfiguracoes />} />
-          {/* Interfaciamento */}
+          {/* Cadastro */}
+          <Route path="/cadastro" element={<CadastroLayout />}>
+            <Route index element={<CadastroDashboard />} />
+            <Route path="empresas" element={<Empresas />} />
+            <Route path="empresas/:id" element={<EmpresaDetalhe />} />
+            <Route path="unidades" element={<Unidades />} />
+            <Route path="unidades/:id" element={<UnidadeDetalhe />} />
+            <Route path="setores" element={<Setores />} />
+            <Route path="setores/:id" element={<SetorDetalhe />} />
+            <Route path="pessoas" element={<Pessoas />} />
+            <Route path="pessoas/:id" element={<PessoaDetalhe />} />
+            <Route path="profissoes" element={<ProfissoesCad />} />
+            <Route path="profissoes/:id" element={<ProfissoesCad />} />
+            <Route path="feriados" element={<Feriados />} />
+            <Route path="feriados/:id" element={<Feriados />} />
+            <Route path="destino-laudo" element={<DestinoLaudo />} />
+            <Route path="destino-laudo/:id" element={<DestinoLaudo />} />
+            <Route path="terceiros" element={<Terceiros />} />
+            <Route path="terceiros/:id" element={<Terceiros />} />
+            <Route path="unidade-monetaria" element={<UnidadeMonetaria />} />
+            <Route path="unidade-monetaria/:id" element={<UnidadeMonetaria />} />
+            <Route path="tabelas-preco" element={<TabelasPreco />} />
+            <Route path="tabelas-preco/:id" element={<TabelasPreco />} />
+            <Route path="tabelas-preco/:id/itens" element={<TabelaPrecoItens />} />
+            <Route path="convenios" element={<Convenios />} />
+            <Route path="convenios/:id" element={<Convenios />} />
+          </Route>
           <Route path="/interfaciamento" element={<InterfaciamentoLayout />}>
             <Route index element={<InterfaciamentoDashboard />} />
             <Route path="equipamentos" element={<InterfaciamentoEquipamentos />} />
