@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowLeft, Search, Filter, Edit, Trash2, Eye, Plus, ChevronDown, ChevronUp, Landmark, Download } from "lucide-react";
+import { ArrowLeft, Search, Filter, Eye, ChevronDown, ChevronUp, Landmark, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import FinanceiroSidebar from "@/components/financeiro/FinanceiroSidebar";
 import FinanceiroNavbar from "@/components/financeiro/FinanceiroNavbar";
@@ -25,9 +25,7 @@ import {
 import {
   Collapsible,
   CollapsibleContent,
-  CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import DepositoModal from "@/components/financeiro/DepositoModal";
 
 const mockDepositos = [
   {
@@ -80,8 +78,6 @@ const Depositos = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [showFilters, setShowFilters] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedDeposito, setSelectedDeposito] = useState<typeof mockDepositos[0] | null>(null);
   const [sortField, setSortField] = useState<SortField>("data");
   const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
 
@@ -142,14 +138,12 @@ const Depositos = () => {
   const formatDate = (dateStr: string) => new Date(dateStr).toLocaleDateString("pt-BR");
   const formatCurrency = (value: number) => value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
-  const handleEditDeposito = (deposito: typeof mockDepositos[0]) => {
-    setSelectedDeposito(deposito);
-    setIsModalOpen(true);
+  const handleViewDeposito = (depositoId: number) => {
+    navigate(`/financeiro/depositos/${depositoId}`);
   };
 
   const handleNovoDeposito = () => {
-    setSelectedDeposito(null);
-    setIsModalOpen(true);
+    navigate("/financeiro/depositos/novo");
   };
 
   const clearFilters = () => {
@@ -325,15 +319,15 @@ const Depositos = () => {
                           <TableCell className="text-right font-medium">{formatCurrency(deposito.valor)}</TableCell>
                           <TableCell>{getSituacaoBadge(deposito.situacao)}</TableCell>
                           <TableCell>
-                            <div className="flex items-center justify-center gap-1">
-                              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleEditDeposito(deposito)}>
+                            <div className="flex items-center justify-center">
+                              <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                className="gap-2"
+                                onClick={() => handleViewDeposito(deposito.id)}
+                              >
                                 <Eye className="h-4 w-4" />
-                              </Button>
-                              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleEditDeposito(deposito)}>
-                                <Edit className="h-4 w-4" />
-                              </Button>
-                              <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive">
-                                <Trash2 className="h-4 w-4" />
+                                Visualizar
                               </Button>
                             </div>
                           </TableCell>
@@ -350,12 +344,6 @@ const Depositos = () => {
           </div>
         </main>
       </div>
-
-      <DepositoModal 
-        open={isModalOpen} 
-        onOpenChange={setIsModalOpen}
-        deposito={selectedDeposito}
-      />
     </div>
   );
 };
