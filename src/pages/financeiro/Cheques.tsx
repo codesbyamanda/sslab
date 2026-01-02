@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowLeft, Search, Filter, Edit, History, ChevronDown, ChevronUp, AlertCircle, FileCheck, Download } from "lucide-react";
+import { ArrowLeft, Search, Filter, Eye, ChevronDown, ChevronUp, AlertCircle, FileCheck, Download } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import FinanceiroSidebar from "@/components/financeiro/FinanceiroSidebar";
 import FinanceiroNavbar from "@/components/financeiro/FinanceiroNavbar";
@@ -27,7 +27,6 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import ChequeModal from "@/components/financeiro/ChequeModal";
 
 // Mock data for cheques
 const mockCheques = [
@@ -136,8 +135,6 @@ const Cheques = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [showFilters, setShowFilters] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedCheque, setSelectedCheque] = useState<typeof mockCheques[0] | null>(null);
   const [sortField, setSortField] = useState<SortField>("dataVencimento");
   const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
 
@@ -235,9 +232,8 @@ const Cheques = () => {
     return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
   };
 
-  const handleEditCheque = (cheque: typeof mockCheques[0]) => {
-    setSelectedCheque(cheque);
-    setIsModalOpen(true);
+  const handleViewCheque = (chequeId: number) => {
+    navigate(`/financeiro/cheques/${chequeId}`);
   };
 
   const clearFilters = () => {
@@ -539,24 +535,15 @@ const Cheques = () => {
                             {getSituacaoBadge(cheque.situacao)}
                           </TableCell>
                           <TableCell>
-                            <div className="flex items-center justify-center gap-1">
+                            <div className="flex items-center justify-center">
                               <Button
                                 variant="ghost"
-                                size="icon"
-                                className="h-8 w-8"
-                                onClick={() => handleEditCheque(cheque)}
-                                title="Editar"
+                                size="sm"
+                                className="h-8 gap-2"
+                                onClick={() => handleViewCheque(cheque.id)}
                               >
-                                <Edit className="h-4 w-4" />
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-8 w-8"
-                                onClick={() => handleEditCheque(cheque)}
-                                title="Ver Histórico"
-                              >
-                                <History className="h-4 w-4" />
+                                <Eye className="h-4 w-4" />
+                                Visualizar
                               </Button>
                             </div>
                           </TableCell>
@@ -611,12 +598,6 @@ const Cheques = () => {
           </div>
         </main>
       </div>
-
-      <ChequeModal 
-        open={isModalOpen} 
-        onOpenChange={setIsModalOpen}
-        cheque={selectedCheque}
-      />
     </div>
   );
 };
