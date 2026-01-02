@@ -49,6 +49,9 @@ import RelatorioRendimentosSolicitantes from "./pages/faturamento/RelatorioRendi
 import RelatorioExamesServicos from "./pages/faturamento/RelatorioExamesServicos";
 import SaudeFinanceiro from "./pages/SaudeFinanceiro";
 import ReceitasReceber from "./pages/financeiro/ReceitasReceber";
+import ReceitaDetalhe from "./pages/financeiro/ReceitaDetalhe";
+import ReceitaRecebimento from "./pages/financeiro/ReceitaRecebimento";
+import ReceitaExtorno from "./pages/financeiro/ReceitaExtorno";
 import Cheques from "./pages/financeiro/Cheques";
 import TransacoesCartao from "./pages/financeiro/TransacoesCartao";
 import Depositos from "./pages/financeiro/Depositos";
@@ -137,6 +140,9 @@ const App = () => (
           <Route path="/faturamento/relatorios/exames-servicos" element={<RelatorioExamesServicos />} />
           <Route path="/financeiro" element={<SaudeFinanceiro />} />
           <Route path="/financeiro/receitas" element={<ReceitasReceber />} />
+          <Route path="/financeiro/receitas/:id" element={<ReceitaDetalhe />} />
+          <Route path="/financeiro/receitas/:id/recebimento" element={<ReceitaRecebimento />} />
+          <Route path="/financeiro/receitas/:id/extorno" element={<ReceitaExtorno />} />
           <Route path="/financeiro/cheques" element={<Cheques />} />
           <Route path="/financeiro/transacoes-cartao" element={<TransacoesCartao />} />
           <Route path="/financeiro/depositos" element={<Depositos />} />
