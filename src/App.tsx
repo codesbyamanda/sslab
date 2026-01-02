@@ -42,6 +42,11 @@ import GuiasFaturamento from "./pages/faturamento/Guias";
 import RecalculoGuias from "./pages/faturamento/RecalculoGuias";
 import ListagemFaturamentoGuias from "./pages/faturamento/ListagemFaturamentoGuias";
 import FaturaVisualizacao from "./pages/faturamento/FaturaVisualizacao";
+import RelatoriosLanding from "./pages/faturamento/RelatoriosLanding";
+import RelatorioClinicaSintetico from "./pages/faturamento/RelatorioClinicaSintetico";
+import RelatorioClinicaAnalitico from "./pages/faturamento/RelatorioClinicaAnalitico";
+import RelatorioRendimentosSolicitantes from "./pages/faturamento/RelatorioRendimentosSolicitantes";
+import RelatorioExamesServicos from "./pages/faturamento/RelatorioExamesServicos";
 import SaudeFinanceiro from "./pages/SaudeFinanceiro";
 import ReceitasReceber from "./pages/financeiro/ReceitasReceber";
 import Cheques from "./pages/financeiro/Cheques";
@@ -123,6 +128,12 @@ const App = () => (
           <Route path="/faturamento/guias" element={<GuiasFaturamento />} />
           <Route path="/faturamento/listagem-faturamento" element={<ListagemFaturamentoGuias />} />
           <Route path="/faturamento/listagem-faturamento/:id" element={<FaturaVisualizacao />} />
+          {/* Relatórios Faturamento */}
+          <Route path="/faturamento/relatorios" element={<RelatoriosLanding />} />
+          <Route path="/faturamento/relatorios/clinica-sintetico" element={<RelatorioClinicaSintetico />} />
+          <Route path="/faturamento/relatorios/clinica-analitico" element={<RelatorioClinicaAnalitico />} />
+          <Route path="/faturamento/relatorios/rendimentos-solicitantes" element={<RelatorioRendimentosSolicitantes />} />
+          <Route path="/faturamento/relatorios/exames-servicos" element={<RelatorioExamesServicos />} />
           <Route path="/financeiro" element={<SaudeFinanceiro />} />
           <Route path="/financeiro/receitas" element={<ReceitasReceber />} />
           <Route path="/financeiro/cheques" element={<Cheques />} />
