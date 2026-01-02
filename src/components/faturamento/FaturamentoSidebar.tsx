@@ -50,10 +50,10 @@ const faturamentoItems = [
     tooltip: "Consulta e gestão de guias"
   },
   { 
-    title: "Recalcula Guias", 
-    url: "/faturamento/recalcula-guias", 
-    icon: RefreshCcw,
-    tooltip: "Recálculo de valores das guias"
+    title: "Listagem Faturamento", 
+    url: "/faturamento/listagem-faturamento", 
+    icon: ClipboardList,
+    tooltip: "Listagem e acompanhamento de lotes faturados"
   },
 ];
 
