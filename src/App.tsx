@@ -103,6 +103,13 @@ import LaboratorioConfigGeral from "./pages/laboratorio/LaboratorioConfigGeral";
 import LaboratorioConfigImpressao from "./pages/laboratorio/LaboratorioConfigImpressao";
 import LaboratorioConfigLaudoInternet from "./pages/laboratorio/LaboratorioConfigLaudoInternet";
 import LaboratorioRelatorios from "./pages/laboratorio/LaboratorioRelatorios";
+import TransferenciaDashboard from "./pages/transferencia/TransferenciaDashboard";
+import TransferenciaLista from "./pages/transferencia/TransferenciaLista";
+import TransferenciaDetalhe from "./pages/transferencia/TransferenciaDetalhe";
+import NovaTransferencia from "./pages/transferencia/NovaTransferencia";
+import TransferenciaHistorico from "./pages/transferencia/TransferenciaHistorico";
+import TransferenciaRelatorios from "./pages/transferencia/TransferenciaRelatorios";
+import TransferenciaConfiguracoes from "./pages/transferencia/TransferenciaConfiguracoes";
 import NotFound from "./pages/NotFound";
 import ModuloEmConfiguracao from "./pages/ModuloEmConfiguracao";
 
@@ -225,7 +232,15 @@ const App = () => (
           <Route path="/cadastro" element={<ModuloEmConfiguracao />} />
           <Route path="/informatica" element={<ModuloEmConfiguracao />} />
           <Route path="/seguranca" element={<ModuloEmConfiguracao />} />
-          <Route path="/transferencia" element={<ModuloEmConfiguracao />} />
+          {/* Transferência */}
+          <Route path="/transferencia" element={<TransferenciaDashboard />} />
+          <Route path="/transferencia/lista" element={<TransferenciaLista />} />
+          <Route path="/transferencia/nova" element={<NovaTransferencia />} />
+          <Route path="/transferencia/:id" element={<TransferenciaDetalhe />} />
+          <Route path="/transferencia/:id/editar" element={<NovaTransferencia />} />
+          <Route path="/transferencia/historico" element={<TransferenciaHistorico />} />
+          <Route path="/transferencia/relatorios" element={<TransferenciaRelatorios />} />
+          <Route path="/transferencia/configuracoes" element={<TransferenciaConfiguracoes />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
