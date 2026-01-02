@@ -55,6 +55,7 @@ import ReceitaExtorno from "./pages/financeiro/ReceitaExtorno";
 import Cheques from "./pages/financeiro/Cheques";
 import ChequeDetalhe from "./pages/financeiro/ChequeDetalhe";
 import TransacoesCartao from "./pages/financeiro/TransacoesCartao";
+import TransacaoCartaoDetalhe from "./pages/financeiro/TransacaoCartaoDetalhe";
 import Depositos from "./pages/financeiro/Depositos";
 import RepasseCartao from "./pages/financeiro/RepasseCartao";
 import WorkspaceVisaoGeral from "./pages/workspace/WorkspaceVisaoGeral";
@@ -147,6 +148,7 @@ const App = () => (
           <Route path="/financeiro/cheques" element={<Cheques />} />
           <Route path="/financeiro/cheques/:id" element={<ChequeDetalhe />} />
           <Route path="/financeiro/transacoes-cartao" element={<TransacoesCartao />} />
+          <Route path="/financeiro/transacoes-cartao/:id" element={<TransacaoCartaoDetalhe />} />
           <Route path="/financeiro/depositos" element={<Depositos />} />
           <Route path="/financeiro/repasse-cartao" element={<RepasseCartao />} />
           <Route path="/financeiro/contas-pagar" element={<SaudeFinanceiro />} />

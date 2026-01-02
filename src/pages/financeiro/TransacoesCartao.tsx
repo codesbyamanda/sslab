@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowLeft, Search, Filter, Edit, Trash2, Eye, ChevronDown, ChevronUp, CreditCard, Download } from "lucide-react";
+import { ArrowLeft, Search, Filter, Eye, ChevronDown, ChevronUp, CreditCard, Download } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import FinanceiroSidebar from "@/components/financeiro/FinanceiroSidebar";
 import FinanceiroNavbar from "@/components/financeiro/FinanceiroNavbar";
@@ -27,7 +27,6 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import TransacaoCartaoModal from "@/components/financeiro/TransacaoCartaoModal";
 
 const mockTransacoes = [
   {
@@ -99,8 +98,6 @@ const TransacoesCartao = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [showFilters, setShowFilters] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedTransacao, setSelectedTransacao] = useState<typeof mockTransacoes[0] | null>(null);
   const [sortField, setSortField] = useState<SortField>("data");
   const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
 
@@ -181,9 +178,8 @@ const TransacoesCartao = () => {
   const formatDate = (dateStr: string) => new Date(dateStr).toLocaleDateString("pt-BR");
   const formatCurrency = (value: number) => value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
-  const handleEditTransacao = (transacao: typeof mockTransacoes[0]) => {
-    setSelectedTransacao(transacao);
-    setIsModalOpen(true);
+  const handleViewTransacao = (transacaoId: number) => {
+    navigate(`/financeiro/transacoes-cartao/${transacaoId}`);
   };
 
   const clearFilters = () => {
@@ -398,15 +394,15 @@ const TransacoesCartao = () => {
                           <TableCell>{formatDate(transacao.previsaoRepasse)}</TableCell>
                           <TableCell>{getSituacaoBadge(transacao.situacao)}</TableCell>
                           <TableCell>
-                            <div className="flex items-center justify-center gap-1">
-                              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleEditTransacao(transacao)}>
+                            <div className="flex items-center justify-center">
+                              <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                className="gap-2"
+                                onClick={() => handleViewTransacao(transacao.id)}
+                              >
                                 <Eye className="h-4 w-4" />
-                              </Button>
-                              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleEditTransacao(transacao)}>
-                                <Edit className="h-4 w-4" />
-                              </Button>
-                              <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive">
-                                <Trash2 className="h-4 w-4" />
+                                Visualizar
                               </Button>
                             </div>
                           </TableCell>
@@ -428,12 +424,6 @@ const TransacoesCartao = () => {
           </div>
         </main>
       </div>
-
-      <TransacaoCartaoModal 
-        open={isModalOpen} 
-        onOpenChange={setIsModalOpen}
-        transacao={selectedTransacao}
-      />
     </div>
   );
 };
