@@ -112,6 +112,8 @@ import TransferenciaRelatorios from "./pages/transferencia/TransferenciaRelatori
 import TransferenciaConfiguracoes from "./pages/transferencia/TransferenciaConfiguracoes";
 import NotFound from "./pages/NotFound";
 import ModuloEmConfiguracao from "./pages/ModuloEmConfiguracao";
+import GrupoControleAcesso from "./pages/seguranca/GrupoControleAcesso";
+import PerfilAcesso from "./pages/seguranca/PerfilAcesso";
 
 const queryClient = new QueryClient();
 
@@ -231,6 +233,11 @@ const App = () => (
           {/* Módulos em configuração */}
           <Route path="/cadastro" element={<ModuloEmConfiguracao />} />
           <Route path="/informatica" element={<ModuloEmConfiguracao />} />
+          {/* Segurança */}
+          <Route path="/seguranca" element={<GrupoControleAcesso />} />
+          <Route path="/seguranca/grupo-controle-acesso" element={<GrupoControleAcesso />} />
+          <Route path="/seguranca/perfil/novo" element={<PerfilAcesso />} />
+          <Route path="/seguranca/perfil/:id" element={<PerfilAcesso />} />
           <Route path="/seguranca" element={<ModuloEmConfiguracao />} />
           {/* Transferência */}
           <Route path="/transferencia" element={<TransferenciaDashboard />} />
