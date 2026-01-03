@@ -153,6 +153,20 @@ import ProfissionaisSaude from "./pages/cadastro/ProfissionaisSaude";
 import ProfissionalSaudeDetalhe from "./pages/cadastro/ProfissionalSaudeDetalhe";
 import Clinicas from "./pages/cadastro/Clinicas";
 import ClinicaDetalhe from "./pages/cadastro/ClinicaDetalhe";
+import Conservantes from "./pages/cadastro/Conservantes";
+import ConservanteDetalhe from "./pages/cadastro/ConservanteDetalhe";
+import MateriaisBiologicos from "./pages/cadastro/MateriaisBiologicos";
+import MaterialBiologicoDetalhe from "./pages/cadastro/MaterialBiologicoDetalhe";
+import Recipientes from "./pages/cadastro/Recipientes";
+import RecipienteDetalhe from "./pages/cadastro/RecipienteDetalhe";
+import PrazosEntrega from "./pages/cadastro/PrazosEntrega";
+import PrazoEntregaDetalhe from "./pages/cadastro/PrazoEntregaDetalhe";
+import Bancadas from "./pages/cadastro/Bancadas";
+import BancadaDetalhe from "./pages/cadastro/BancadaDetalhe";
+import ServicosCad from "./pages/cadastro/Servicos";
+import ServicoDetalhe from "./pages/cadastro/ServicoDetalhe";
+import KitsServico from "./pages/cadastro/KitsServico";
+import KitServicoDetalhe from "./pages/cadastro/KitServicoDetalhe";
 
 const queryClient = new QueryClient();
 
@@ -324,6 +338,21 @@ const App = () => (
             <Route path="profissionais-saude/:id" element={<ProfissionalSaudeDetalhe />} />
             <Route path="clinicas" element={<Clinicas />} />
             <Route path="clinicas/:id" element={<ClinicaDetalhe />} />
+            {/* Laboratório */}
+            <Route path="conservantes" element={<Conservantes />} />
+            <Route path="conservantes/:id" element={<ConservanteDetalhe />} />
+            <Route path="materiais-biologicos" element={<MateriaisBiologicos />} />
+            <Route path="materiais-biologicos/:id" element={<MaterialBiologicoDetalhe />} />
+            <Route path="recipientes" element={<Recipientes />} />
+            <Route path="recipientes/:id" element={<RecipienteDetalhe />} />
+            <Route path="prazos-entrega" element={<PrazosEntrega />} />
+            <Route path="prazos-entrega/:id" element={<PrazoEntregaDetalhe />} />
+            <Route path="bancadas" element={<Bancadas />} />
+            <Route path="bancadas/:id" element={<BancadaDetalhe />} />
+            <Route path="servicos" element={<ServicosCad />} />
+            <Route path="servicos/:id" element={<ServicoDetalhe />} />
+            <Route path="kits-servico" element={<KitsServico />} />
+            <Route path="kits-servico/:id" element={<KitServicoDetalhe />} />
           </Route>
           <Route path="/interfaciamento" element={<InterfaciamentoLayout />}>
             <Route index element={<InterfaciamentoDashboard />} />
