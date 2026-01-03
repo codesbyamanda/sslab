@@ -177,6 +177,12 @@ import ModelosLaudo from "./pages/cadastro/ModelosLaudo";
 import ModeloLaudoDetalhe from "./pages/cadastro/ModeloLaudoDetalhe";
 import ModelosFolha from "./pages/cadastro/ModelosFolha";
 import ModeloFolhaDetalhe from "./pages/cadastro/ModeloFolhaDetalhe";
+import TiposReceita from "./pages/cadastro/TiposReceita";
+import TipoReceitaDetalhe from "./pages/cadastro/TipoReceitaDetalhe";
+import TiposContaPagar from "./pages/cadastro/TiposContaPagar";
+import TipoContaPagarDetalhe from "./pages/cadastro/TipoContaPagarDetalhe";
+import AdquirentesCartao from "./pages/cadastro/AdquirentesCartao";
+import AdquirenteCartaoDetalhe from "./pages/cadastro/AdquirenteCartaoDetalhe";
 
 const queryClient = new QueryClient();
 
@@ -337,6 +343,12 @@ const App = () => (
             <Route path="tabelas-preco/:id/itens" element={<TabelaPrecoItens />} />
             <Route path="convenios" element={<Convenios />} />
             <Route path="convenios/:id" element={<Convenios />} />
+            <Route path="tipos-receita" element={<TiposReceita />} />
+            <Route path="tipos-receita/:id" element={<TipoReceitaDetalhe />} />
+            <Route path="tipos-conta-pagar" element={<TiposContaPagar />} />
+            <Route path="tipos-conta-pagar/:id" element={<TipoContaPagarDetalhe />} />
+            <Route path="adquirentes-cartao" element={<AdquirentesCartao />} />
+            <Route path="adquirentes-cartao/:id" element={<AdquirenteCartaoDetalhe />} />
             {/* Médico */}
             <Route path="cid" element={<CID />} />
             <Route path="cid/:id" element={<CIDDetalhe />} />
