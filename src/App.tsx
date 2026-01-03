@@ -167,6 +167,16 @@ import ServicosCad from "./pages/cadastro/Servicos";
 import ServicoDetalhe from "./pages/cadastro/ServicoDetalhe";
 import KitsServico from "./pages/cadastro/KitsServico";
 import KitServicoDetalhe from "./pages/cadastro/KitServicoDetalhe";
+import Parametros from "./pages/cadastro/Parametros";
+import ParametroDetalhe from "./pages/cadastro/ParametroDetalhe";
+import Metodos from "./pages/cadastro/Metodos";
+import MetodoDetalhe from "./pages/cadastro/MetodoDetalhe";
+import Rotinas from "./pages/cadastro/Rotinas";
+import RotinaDetalhe from "./pages/cadastro/RotinaDetalhe";
+import ModelosLaudo from "./pages/cadastro/ModelosLaudo";
+import ModeloLaudoDetalhe from "./pages/cadastro/ModeloLaudoDetalhe";
+import ModelosFolha from "./pages/cadastro/ModelosFolha";
+import ModeloFolhaDetalhe from "./pages/cadastro/ModeloFolhaDetalhe";
 
 const queryClient = new QueryClient();
 
@@ -353,6 +363,17 @@ const App = () => (
             <Route path="servicos/:id" element={<ServicoDetalhe />} />
             <Route path="kits-servico" element={<KitsServico />} />
             <Route path="kits-servico/:id" element={<KitServicoDetalhe />} />
+            {/* Laudos */}
+            <Route path="parametros" element={<Parametros />} />
+            <Route path="parametros/:id" element={<ParametroDetalhe />} />
+            <Route path="metodos" element={<Metodos />} />
+            <Route path="metodos/:id" element={<MetodoDetalhe />} />
+            <Route path="rotinas" element={<Rotinas />} />
+            <Route path="rotinas/:id" element={<RotinaDetalhe />} />
+            <Route path="modelos-laudo" element={<ModelosLaudo />} />
+            <Route path="modelos-laudo/:id" element={<ModeloLaudoDetalhe />} />
+            <Route path="modelos-folha" element={<ModelosFolha />} />
+            <Route path="modelos-folha/:id" element={<ModeloFolhaDetalhe />} />
           </Route>
           <Route path="/interfaciamento" element={<InterfaciamentoLayout />}>
             <Route index element={<InterfaciamentoDashboard />} />
