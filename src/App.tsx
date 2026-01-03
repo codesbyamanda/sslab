@@ -143,6 +143,16 @@ import UnidadeMonetaria from "./pages/cadastro/UnidadeMonetaria";
 import TabelasPreco from "./pages/cadastro/TabelasPreco";
 import TabelaPrecoItens from "./pages/cadastro/TabelaPrecoItens";
 import Convenios from "./pages/cadastro/Convenios";
+import CID from "./pages/cadastro/CID";
+import CIDDetalhe from "./pages/cadastro/CIDDetalhe";
+import EspecialidadesMedicas from "./pages/cadastro/EspecialidadesMedicas";
+import EspecialidadeDetalhe from "./pages/cadastro/EspecialidadeDetalhe";
+import ConselhosProfissionais from "./pages/cadastro/ConselhosProfissionais";
+import ConselhoDetalhe from "./pages/cadastro/ConselhoDetalhe";
+import ProfissionaisSaude from "./pages/cadastro/ProfissionaisSaude";
+import ProfissionalSaudeDetalhe from "./pages/cadastro/ProfissionalSaudeDetalhe";
+import Clinicas from "./pages/cadastro/Clinicas";
+import ClinicaDetalhe from "./pages/cadastro/ClinicaDetalhe";
 
 const queryClient = new QueryClient();
 
@@ -303,6 +313,17 @@ const App = () => (
             <Route path="tabelas-preco/:id/itens" element={<TabelaPrecoItens />} />
             <Route path="convenios" element={<Convenios />} />
             <Route path="convenios/:id" element={<Convenios />} />
+            {/* Médico */}
+            <Route path="cid" element={<CID />} />
+            <Route path="cid/:id" element={<CIDDetalhe />} />
+            <Route path="especialidades" element={<EspecialidadesMedicas />} />
+            <Route path="especialidades/:id" element={<EspecialidadeDetalhe />} />
+            <Route path="conselhos" element={<ConselhosProfissionais />} />
+            <Route path="conselhos/:id" element={<ConselhoDetalhe />} />
+            <Route path="profissionais-saude" element={<ProfissionaisSaude />} />
+            <Route path="profissionais-saude/:id" element={<ProfissionalSaudeDetalhe />} />
+            <Route path="clinicas" element={<Clinicas />} />
+            <Route path="clinicas/:id" element={<ClinicaDetalhe />} />
           </Route>
           <Route path="/interfaciamento" element={<InterfaciamentoLayout />}>
             <Route index element={<InterfaciamentoDashboard />} />
