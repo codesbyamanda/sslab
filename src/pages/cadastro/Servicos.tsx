@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -19,8 +19,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Search, Plus, Eye, Edit, ChevronLeft, ChevronRight, FlaskConical, ToggleLeft, ToggleRight } from "lucide-react";
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
+import { Search, Plus, ChevronLeft, ChevronRight, FlaskConical } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { StatusBadge, TableActions, StatCard } from "@/components/shared";
 
 const mockServicos = [
   { id: 1, codigo: "HMG", nome: "Hemograma Completo", bancada: "Hematologia", material: "Sangue", prazo: "24h", preco: 25.00, status: "ativo" },
@@ -61,21 +63,28 @@ export default function Servicos() {
     });
   };
 
+  const totalAtivos = mockServicos.filter((s) => s.status === "ativo").length;
+  const totalInativos = mockServicos.filter((s) => s.status === "inativo").length;
+  const bioquimica = mockServicos.filter((s) => s.bancada === "Bioquímica").length;
+
   return (
     <div className="p-6 space-y-6">
-      {/* Breadcrumb */}
-      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-        <span>Saúde Cadastro</span>
-        <span>/</span>
-        <span>Laboratório</span>
-        <span>/</span>
-        <span className="text-foreground font-medium">Serviços</span>
-      </div>
+      <Breadcrumb>
+        <BreadcrumbList>
+          <BreadcrumbItem><BreadcrumbLink href="/cadastro">Cadastro</BreadcrumbLink></BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem><BreadcrumbLink href="/cadastro">Laboratório</BreadcrumbLink></BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem><BreadcrumbPage>Serviços</BreadcrumbPage></BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
 
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Serviços / Exames</h1>
+          <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
+            <FlaskConical className="h-6 w-6 text-primary" />
+            Serviços / Exames
+          </h1>
           <p className="text-muted-foreground">Gerenciamento de exames e serviços laboratoriais</p>
         </div>
         <Button onClick={() => navigate("/cadastro/servicos/novo")}>
@@ -84,52 +93,30 @@ export default function Servicos() {
         </Button>
       </div>
 
-      {/* Cards de Resumo */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Total</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center gap-2">
-              <FlaskConical className="h-5 w-5 text-primary" />
-              <span className="text-2xl font-bold">{mockServicos.length}</span>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Bioquímica</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <span className="text-2xl font-bold">
-              {mockServicos.filter((s) => s.bancada === "Bioquímica").length}
-            </span>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Ativos</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <span className="text-2xl font-bold text-green-600">
-              {mockServicos.filter((s) => s.status === "ativo").length}
-            </span>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Inativos</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <span className="text-2xl font-bold text-muted-foreground">
-              {mockServicos.filter((s) => s.status === "inativo").length}
-            </span>
-          </CardContent>
-        </Card>
+        <StatCard
+          title="Total de Serviços"
+          value={mockServicos.length}
+          icon={FlaskConical}
+          variant="primary"
+        />
+        <StatCard
+          title="Bioquímica"
+          value={bioquimica}
+          variant="primary"
+        />
+        <StatCard
+          title="Serviços Ativos"
+          value={totalAtivos}
+          variant="success"
+        />
+        <StatCard
+          title="Serviços Inativos"
+          value={totalInativos}
+          variant="default"
+        />
       </div>
 
-      {/* Filtros */}
       <Card>
         <CardContent className="pt-6">
           <div className="flex flex-col md:flex-row gap-4">
@@ -171,9 +158,8 @@ export default function Servicos() {
         </CardContent>
       </Card>
 
-      {/* Tabela */}
       <Card>
-        <CardContent className="pt-6">
+        <CardContent className="p-0">
           <Table>
             <TableHeader>
               <TableRow>
@@ -183,7 +169,7 @@ export default function Servicos() {
                 <TableHead>Material</TableHead>
                 <TableHead>Prazo</TableHead>
                 <TableHead>Preço</TableHead>
-                <TableHead>Status</TableHead>
+                <TableHead className="text-center">Status</TableHead>
                 <TableHead className="text-right">Ações</TableHead>
               </TableRow>
             </TableHeader>
@@ -198,50 +184,23 @@ export default function Servicos() {
                   <TableCell>{serv.material}</TableCell>
                   <TableCell>{serv.prazo}</TableCell>
                   <TableCell>R$ {serv.preco.toFixed(2)}</TableCell>
-                  <TableCell>
-                    <Badge variant={serv.status === "ativo" ? "default" : "secondary"}>
-                      {serv.status === "ativo" ? "Ativo" : "Inativo"}
-                    </Badge>
+                  <TableCell className="text-center">
+                    <StatusBadge status={serv.status} />
                   </TableCell>
                   <TableCell className="text-right">
-                    <div className="flex justify-end gap-2">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => navigate(`/cadastro/servicos/${serv.id}`)}
-                        title="Visualizar"
-                      >
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => navigate(`/cadastro/servicos/${serv.id}/editar`)}
-                        title="Editar"
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleToggleStatus(serv.id, serv.status)}
-                        title={serv.status === "ativo" ? "Inativar" : "Ativar"}
-                      >
-                        {serv.status === "ativo" ? (
-                          <ToggleRight className="h-4 w-4 text-green-600" />
-                        ) : (
-                          <ToggleLeft className="h-4 w-4 text-muted-foreground" />
-                        )}
-                      </Button>
-                    </div>
+                    <TableActions
+                      onView={() => navigate(`/cadastro/servicos/${serv.id}`)}
+                      onEdit={() => navigate(`/cadastro/servicos/${serv.id}/editar`)}
+                      onToggleStatus={() => handleToggleStatus(serv.id, serv.status)}
+                      isActive={serv.status === "ativo"}
+                    />
                   </TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
 
-          {/* Paginação */}
-          <div className="flex items-center justify-between mt-4">
+          <div className="flex items-center justify-between p-4 border-t">
             <p className="text-sm text-muted-foreground">
               Mostrando 1-{filteredServicos.length} de {mockServicos.length} registros
             </p>

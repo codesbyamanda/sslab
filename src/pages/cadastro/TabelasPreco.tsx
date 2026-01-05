@@ -3,10 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
-import { TableProperties, Search, Plus, Eye, Trash2, List } from "lucide-react";
+import { TableProperties, Search, Plus, List } from "lucide-react";
+import { StatusBadge, TableActions, StatCard } from "@/components/shared";
 
 const mockTabelas = [
   { id: 1, codigo: "TAB001", descricao: "Tabela Particular", moeda: "BRL", itens: 320, status: "ativo" },
@@ -23,6 +23,9 @@ export default function TabelasPreco() {
     t.descricao.toLowerCase().includes(searchTerm.toLowerCase()) ||
     t.codigo.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const totalAtivas = mockTabelas.filter((t) => t.status === "ativo").length;
+  const totalItens = mockTabelas.reduce((acc, t) => acc + t.itens, 0);
 
   return (
     <div className="p-6 space-y-6">
@@ -49,9 +52,22 @@ export default function TabelasPreco() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card><CardContent className="p-4"><p className="text-sm text-muted-foreground">Total de Tabelas</p><p className="text-2xl font-bold">{mockTabelas.length}</p></CardContent></Card>
-        <Card><CardContent className="p-4"><p className="text-sm text-muted-foreground">Tabelas Ativas</p><p className="text-2xl font-bold text-green-600">{mockTabelas.filter((t) => t.status === "ativo").length}</p></CardContent></Card>
-        <Card><CardContent className="p-4"><p className="text-sm text-muted-foreground">Total de Itens</p><p className="text-2xl font-bold text-blue-600">{mockTabelas.reduce((acc, t) => acc + t.itens, 0)}</p></CardContent></Card>
+        <StatCard
+          title="Total de Tabelas"
+          value={mockTabelas.length}
+          icon={TableProperties}
+          variant="primary"
+        />
+        <StatCard
+          title="Tabelas Ativas"
+          value={totalAtivas}
+          variant="success"
+        />
+        <StatCard
+          title="Total de Itens"
+          value={totalItens}
+          variant="primary"
+        />
       </div>
 
       <Card>
@@ -88,16 +104,21 @@ export default function TabelasPreco() {
                   <TableCell>{item.moeda}</TableCell>
                   <TableCell className="text-center">{item.itens}</TableCell>
                   <TableCell className="text-center">
-                    <Badge variant={item.status === "ativo" ? "default" : "secondary"}>{item.status === "ativo" ? "Ativo" : "Inativo"}</Badge>
+                    <StatusBadge status={item.status} />
                   </TableCell>
                   <TableCell className="text-right">
-                    <div className="flex justify-end gap-2">
-                      <Button variant="ghost" size="icon" onClick={() => navigate(`/cadastro/tabelas-preco/${item.id}/itens`)} title="Itens da Tabela">
-                        <List className="h-4 w-4" />
-                      </Button>
-                      <Button variant="ghost" size="icon" onClick={() => navigate(`/cadastro/tabelas-preco/${item.id}`)}><Eye className="h-4 w-4" /></Button>
-                      <Button variant="ghost" size="icon" className="text-destructive" disabled={item.status === "ativo"}><Trash2 className="h-4 w-4" /></Button>
-                    </div>
+                    <TableActions
+                      onView={() => navigate(`/cadastro/tabelas-preco/${item.id}`)}
+                      onDelete={item.status === "inativo" ? () => {} : undefined}
+                      isActive={item.status === "ativo"}
+                      additionalActions={[
+                        {
+                          icon: List,
+                          label: "Itens da Tabela",
+                          onClick: () => navigate(`/cadastro/tabelas-preco/${item.id}/itens`),
+                        },
+                      ]}
+                    />
                   </TableCell>
                 </TableRow>
               ))}

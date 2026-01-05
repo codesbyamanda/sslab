@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import {
   Table,
   TableBody,
@@ -27,7 +26,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { MapPin, Search, Plus, Eye, Trash2, Filter, X } from "lucide-react";
+import { MapPin, Search, Plus, Filter, X } from "lucide-react";
+import { StatusBadge, TableActions, StatCard } from "@/components/shared";
 
 const mockUnidades = [
   { id: 1, codigo: "UND001", nome: "Unidade Centro", empresa: "Laboratório Central Ltda", cnes: "1234567", cidade: "São Paulo", status: "ativo", setores: 5 },
@@ -48,6 +48,10 @@ export default function Unidades() {
     const matchEmpresa = empresaFilter === "all" || unidade.empresa.includes(empresaFilter);
     return matchSearch && matchEmpresa;
   });
+
+  const totalAtivas = mockUnidades.filter((u) => u.status === "ativo").length;
+  const totalSetores = mockUnidades.reduce((acc, u) => acc + u.setores, 0);
+  const cidadesAtendidas = new Set(mockUnidades.map((u) => u.cidade)).size;
 
   return (
     <div className="p-6 space-y-6">
@@ -80,36 +84,27 @@ export default function Unidades() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="p-4">
-            <p className="text-sm text-muted-foreground">Total de Unidades</p>
-            <p className="text-2xl font-bold">{mockUnidades.length}</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4">
-            <p className="text-sm text-muted-foreground">Unidades Ativas</p>
-            <p className="text-2xl font-bold text-green-600">
-              {mockUnidades.filter((u) => u.status === "ativo").length}
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4">
-            <p className="text-sm text-muted-foreground">Total de Setores</p>
-            <p className="text-2xl font-bold text-blue-600">
-              {mockUnidades.reduce((acc, u) => acc + u.setores, 0)}
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4">
-            <p className="text-sm text-muted-foreground">Cidades Atendidas</p>
-            <p className="text-2xl font-bold text-purple-600">
-              {new Set(mockUnidades.map((u) => u.cidade)).size}
-            </p>
-          </CardContent>
-        </Card>
+        <StatCard
+          title="Total de Unidades"
+          value={mockUnidades.length}
+          icon={MapPin}
+          variant="primary"
+        />
+        <StatCard
+          title="Unidades Ativas"
+          value={totalAtivas}
+          variant="success"
+        />
+        <StatCard
+          title="Total de Setores"
+          value={totalSetores}
+          variant="primary"
+        />
+        <StatCard
+          title="Cidades Atendidas"
+          value={cidadesAtendidas}
+          variant="warning"
+        />
       </div>
 
       <Card>
@@ -177,28 +172,14 @@ export default function Unidades() {
                   <TableCell>{unidade.cidade}</TableCell>
                   <TableCell className="text-center">{unidade.setores}</TableCell>
                   <TableCell className="text-center">
-                    <Badge variant={unidade.status === "ativo" ? "default" : "secondary"}>
-                      {unidade.status === "ativo" ? "Ativo" : "Inativo"}
-                    </Badge>
+                    <StatusBadge status={unidade.status} />
                   </TableCell>
                   <TableCell className="text-right">
-                    <div className="flex justify-end gap-2">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => navigate(`/cadastro/unidades/${unidade.id}`)}
-                      >
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="text-destructive hover:text-destructive"
-                        disabled={unidade.status === "ativo"}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
+                    <TableActions
+                      onView={() => navigate(`/cadastro/unidades/${unidade.id}`)}
+                      onDelete={unidade.status === "inativo" ? () => {} : undefined}
+                      isActive={unidade.status === "ativo"}
+                    />
                   </TableCell>
                 </TableRow>
               ))}

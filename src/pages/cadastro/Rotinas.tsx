@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -27,14 +27,15 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { Plus, Search, Eye, Edit, LayoutList, Settings2 } from "lucide-react";
+import { Plus, Search, LayoutList } from "lucide-react";
+import { StatusBadge, TableActions, StatCard } from "@/components/shared";
 
 const rotinasMock = [
-  { id: 1, codigo: "ROT001", nome: "Hemograma Completo", parametros: 12, setor: "Hematologia", status: "Ativo" },
-  { id: 2, codigo: "ROT002", nome: "Glicemia", parametros: 3, setor: "Bioquímica", status: "Ativo" },
-  { id: 3, codigo: "ROT003", nome: "Perfil Lipídico", parametros: 6, setor: "Bioquímica", status: "Ativo" },
-  { id: 4, codigo: "ROT004", nome: "Urina Tipo I", parametros: 15, setor: "Uroanálise", status: "Ativo" },
-  { id: 5, codigo: "ROT005", nome: "TSH", parametros: 2, setor: "Hormônios", status: "Inativo" },
+  { id: 1, codigo: "ROT001", nome: "Hemograma Completo", parametros: 12, setor: "Hematologia", status: "ativo" },
+  { id: 2, codigo: "ROT002", nome: "Glicemia", parametros: 3, setor: "Bioquímica", status: "ativo" },
+  { id: 3, codigo: "ROT003", nome: "Perfil Lipídico", parametros: 6, setor: "Bioquímica", status: "ativo" },
+  { id: 4, codigo: "ROT004", nome: "Urina Tipo I", parametros: 15, setor: "Uroanálise", status: "ativo" },
+  { id: 5, codigo: "ROT005", nome: "TSH", parametros: 2, setor: "Hormônios", status: "inativo" },
 ];
 
 export default function Rotinas() {
@@ -46,13 +47,17 @@ export default function Rotinas() {
   const filteredRotinas = rotinasMock.filter((item) => {
     const matchesSearch = item.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
       item.codigo.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = statusFilter === "todos" || item.status.toLowerCase() === statusFilter;
+    const matchesStatus = statusFilter === "todos" || item.status === statusFilter;
     const matchesSetor = setorFilter === "todos" || item.setor === setorFilter;
     return matchesSearch && matchesStatus && matchesSetor;
   });
 
+  const totalAtivas = rotinasMock.filter(r => r.status === "ativo").length;
+  const totalParametros = rotinasMock.reduce((acc, r) => acc + r.parametros, 0);
+  const totalSetores = new Set(rotinasMock.map(r => r.setor)).size;
+
   return (
-    <div className="space-y-6">
+    <div className="p-6 space-y-6">
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
@@ -67,7 +72,10 @@ export default function Rotinas() {
 
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Rotinas</h1>
+          <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
+            <LayoutList className="h-6 w-6 text-primary" />
+            Rotinas
+          </h1>
           <p className="text-muted-foreground">Gerencie as rotinas de exames</p>
         </div>
         <Button onClick={() => navigate("/cadastro/rotinas/novo")}>
@@ -77,65 +85,31 @@ export default function Rotinas() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-blue-100 rounded-lg">
-                <LayoutList className="h-6 w-6 text-blue-600" />
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Total</p>
-                <p className="text-2xl font-bold">{rotinasMock.length}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-green-100 rounded-lg">
-                <LayoutList className="h-6 w-6 text-green-600" />
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Ativas</p>
-                <p className="text-2xl font-bold">{rotinasMock.filter(r => r.status === "Ativo").length}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-purple-100 rounded-lg">
-                <Settings2 className="h-6 w-6 text-purple-600" />
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Total Parâmetros</p>
-                <p className="text-2xl font-bold">{rotinasMock.reduce((acc, r) => acc + r.parametros, 0)}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-orange-100 rounded-lg">
-                <LayoutList className="h-6 w-6 text-orange-600" />
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Setores</p>
-                <p className="text-2xl font-bold">{new Set(rotinasMock.map(r => r.setor)).size}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        <StatCard
+          title="Total de Rotinas"
+          value={rotinasMock.length}
+          icon={LayoutList}
+          variant="primary"
+        />
+        <StatCard
+          title="Rotinas Ativas"
+          value={totalAtivas}
+          variant="success"
+        />
+        <StatCard
+          title="Total Parâmetros"
+          value={totalParametros}
+          variant="primary"
+        />
+        <StatCard
+          title="Setores"
+          value={totalSetores}
+          variant="warning"
+        />
       </div>
 
       <Card>
-        <CardHeader>
-          <CardTitle>Filtros</CardTitle>
-        </CardHeader>
-        <CardContent>
+        <CardContent className="p-4">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="relative md:col-span-2">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -181,41 +155,28 @@ export default function Rotinas() {
                 <TableHead>Nome</TableHead>
                 <TableHead>Setor</TableHead>
                 <TableHead className="text-center">Parâmetros</TableHead>
-                <TableHead>Status</TableHead>
+                <TableHead className="text-center">Status</TableHead>
                 <TableHead className="text-right">Ações</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredRotinas.map((item) => (
                 <TableRow key={item.id}>
-                  <TableCell className="font-medium">{item.codigo}</TableCell>
+                  <TableCell className="font-medium font-mono">{item.codigo}</TableCell>
                   <TableCell>{item.nome}</TableCell>
                   <TableCell>{item.setor}</TableCell>
                   <TableCell className="text-center">
                     <Badge variant="outline">{item.parametros}</Badge>
                   </TableCell>
-                  <TableCell>
-                    <Badge variant={item.status === "Ativo" ? "default" : "secondary"}>
-                      {item.status}
-                    </Badge>
+                  <TableCell className="text-center">
+                    <StatusBadge status={item.status} />
                   </TableCell>
                   <TableCell className="text-right">
-                    <div className="flex justify-end gap-2">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => navigate(`/cadastro/rotinas/${item.id}`)}
-                      >
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => navigate(`/cadastro/rotinas/${item.id}?edit=true`)}
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                    </div>
+                    <TableActions
+                      onView={() => navigate(`/cadastro/rotinas/${item.id}`)}
+                      onEdit={() => navigate(`/cadastro/rotinas/${item.id}?edit=true`)}
+                      isActive={item.status === "ativo"}
+                    />
                   </TableCell>
                 </TableRow>
               ))}

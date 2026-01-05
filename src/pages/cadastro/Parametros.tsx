@@ -1,9 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import {
   Table,
   TableBody,
@@ -27,15 +26,16 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { Plus, Search, Eye, Edit, Settings2, Type, Hash, Calendar, Calculator } from "lucide-react";
+import { Plus, Search, Settings2, Type, Hash, Calendar, Calculator } from "lucide-react";
+import { StatusBadge, TableActions, StatCard } from "@/components/shared";
 
 const parametrosMock = [
-  { id: 1, codigo: "PRM001", nome: "Hemoglobina", tipo: "Numérico", unidade: "g/dL", status: "Ativo" },
-  { id: 2, codigo: "PRM002", nome: "Hematócrito", tipo: "Numérico", unidade: "%", status: "Ativo" },
-  { id: 3, codigo: "PRM003", nome: "Leucócitos", tipo: "Numérico", unidade: "/mm³", status: "Ativo" },
-  { id: 4, codigo: "PRM004", nome: "Observações", tipo: "Texto", unidade: "-", status: "Ativo" },
-  { id: 5, codigo: "PRM005", nome: "Data Coleta", tipo: "Data", unidade: "-", status: "Ativo" },
-  { id: 6, codigo: "PRM006", nome: "IMC Calculado", tipo: "Fórmula", unidade: "kg/m²", status: "Inativo" },
+  { id: 1, codigo: "PRM001", nome: "Hemoglobina", tipo: "Numérico", unidade: "g/dL", status: "ativo" },
+  { id: 2, codigo: "PRM002", nome: "Hematócrito", tipo: "Numérico", unidade: "%", status: "ativo" },
+  { id: 3, codigo: "PRM003", nome: "Leucócitos", tipo: "Numérico", unidade: "/mm³", status: "ativo" },
+  { id: 4, codigo: "PRM004", nome: "Observações", tipo: "Texto", unidade: "-", status: "ativo" },
+  { id: 5, codigo: "PRM005", nome: "Data Coleta", tipo: "Data", unidade: "-", status: "ativo" },
+  { id: 6, codigo: "PRM006", nome: "IMC Calculado", tipo: "Fórmula", unidade: "kg/m²", status: "inativo" },
 ];
 
 const getTipoIcon = (tipo: string) => {
@@ -57,13 +57,17 @@ export default function Parametros() {
   const filteredParametros = parametrosMock.filter((item) => {
     const matchesSearch = item.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
       item.codigo.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = statusFilter === "todos" || item.status.toLowerCase() === statusFilter;
+    const matchesStatus = statusFilter === "todos" || item.status === statusFilter;
     const matchesTipo = tipoFilter === "todos" || item.tipo === tipoFilter;
     return matchesSearch && matchesStatus && matchesTipo;
   });
 
+  const numericos = parametrosMock.filter(p => p.tipo === "Numérico").length;
+  const textos = parametrosMock.filter(p => p.tipo === "Texto").length;
+  const formulas = parametrosMock.filter(p => p.tipo === "Fórmula").length;
+
   return (
-    <div className="space-y-6">
+    <div className="p-6 space-y-6">
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
@@ -78,7 +82,10 @@ export default function Parametros() {
 
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Parâmetros</h1>
+          <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
+            <Settings2 className="h-6 w-6 text-primary" />
+            Parâmetros
+          </h1>
           <p className="text-muted-foreground">Gerencie os parâmetros de laudos</p>
         </div>
         <Button onClick={() => navigate("/cadastro/parametros/novo")}>
@@ -88,65 +95,31 @@ export default function Parametros() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-blue-100 rounded-lg">
-                <Settings2 className="h-6 w-6 text-blue-600" />
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Total</p>
-                <p className="text-2xl font-bold">{parametrosMock.length}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-purple-100 rounded-lg">
-                <Hash className="h-6 w-6 text-purple-600" />
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Numéricos</p>
-                <p className="text-2xl font-bold">{parametrosMock.filter(p => p.tipo === "Numérico").length}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-orange-100 rounded-lg">
-                <Type className="h-6 w-6 text-orange-600" />
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Texto</p>
-                <p className="text-2xl font-bold">{parametrosMock.filter(p => p.tipo === "Texto").length}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-green-100 rounded-lg">
-                <Calculator className="h-6 w-6 text-green-600" />
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Fórmulas</p>
-                <p className="text-2xl font-bold">{parametrosMock.filter(p => p.tipo === "Fórmula").length}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        <StatCard
+          title="Total de Parâmetros"
+          value={parametrosMock.length}
+          icon={Settings2}
+          variant="primary"
+        />
+        <StatCard
+          title="Numéricos"
+          value={numericos}
+          variant="primary"
+        />
+        <StatCard
+          title="Texto"
+          value={textos}
+          variant="warning"
+        />
+        <StatCard
+          title="Fórmulas"
+          value={formulas}
+          variant="success"
+        />
       </div>
 
       <Card>
-        <CardHeader>
-          <CardTitle>Filtros</CardTitle>
-        </CardHeader>
-        <CardContent>
+        <CardContent className="p-4">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="relative md:col-span-2">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -192,14 +165,14 @@ export default function Parametros() {
                 <TableHead>Nome</TableHead>
                 <TableHead>Tipo</TableHead>
                 <TableHead>Unidade</TableHead>
-                <TableHead>Status</TableHead>
+                <TableHead className="text-center">Status</TableHead>
                 <TableHead className="text-right">Ações</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredParametros.map((item) => (
                 <TableRow key={item.id}>
-                  <TableCell className="font-medium">{item.codigo}</TableCell>
+                  <TableCell className="font-medium font-mono">{item.codigo}</TableCell>
                   <TableCell>{item.nome}</TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
@@ -208,28 +181,15 @@ export default function Parametros() {
                     </div>
                   </TableCell>
                   <TableCell>{item.unidade}</TableCell>
-                  <TableCell>
-                    <Badge variant={item.status === "Ativo" ? "default" : "secondary"}>
-                      {item.status}
-                    </Badge>
+                  <TableCell className="text-center">
+                    <StatusBadge status={item.status} />
                   </TableCell>
                   <TableCell className="text-right">
-                    <div className="flex justify-end gap-2">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => navigate(`/cadastro/parametros/${item.id}`)}
-                      >
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => navigate(`/cadastro/parametros/${item.id}?edit=true`)}
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                    </div>
+                    <TableActions
+                      onView={() => navigate(`/cadastro/parametros/${item.id}`)}
+                      onEdit={() => navigate(`/cadastro/parametros/${item.id}?edit=true`)}
+                      isActive={item.status === "ativo"}
+                    />
                   </TableCell>
                 </TableRow>
               ))}

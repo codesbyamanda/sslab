@@ -6,7 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
-import { Coins, Search, Plus, Eye, Trash2 } from "lucide-react";
+import { Coins, Search, Plus } from "lucide-react";
+import { StatusBadge, TableActions, StatCard } from "@/components/shared";
 
 const mockMoedas = [
   { id: 1, codigo: "BRL", descricao: "Real Brasileiro", simbolo: "R$", padrao: true, status: "ativo" },
@@ -22,6 +23,8 @@ export default function UnidadeMonetaria() {
     m.descricao.toLowerCase().includes(searchTerm.toLowerCase()) ||
     m.codigo.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const totalAtivas = mockMoedas.filter((m) => m.status === "ativo").length;
 
   return (
     <div className="p-6 space-y-6">
@@ -45,6 +48,25 @@ export default function UnidadeMonetaria() {
           <Plus className="h-4 w-4 mr-2" />
           Nova Moeda
         </Button>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <StatCard
+          title="Total de Moedas"
+          value={mockMoedas.length}
+          icon={Coins}
+          variant="primary"
+        />
+        <StatCard
+          title="Moedas Ativas"
+          value={totalAtivas}
+          variant="success"
+        />
+        <StatCard
+          title="Moeda Padrão"
+          value="BRL"
+          variant="primary"
+        />
       </div>
 
       <Card>
@@ -80,16 +102,17 @@ export default function UnidadeMonetaria() {
                   <TableCell className="font-medium">{item.descricao}</TableCell>
                   <TableCell className="text-lg font-semibold">{item.simbolo}</TableCell>
                   <TableCell className="text-center">
-                    {item.padrao && <Badge className="bg-green-100 text-green-700">Padrão</Badge>}
+                    {item.padrao && <Badge variant="success">Padrão</Badge>}
                   </TableCell>
                   <TableCell className="text-center">
-                    <Badge variant={item.status === "ativo" ? "default" : "secondary"}>{item.status === "ativo" ? "Ativo" : "Inativo"}</Badge>
+                    <StatusBadge status={item.status} />
                   </TableCell>
                   <TableCell className="text-right">
-                    <div className="flex justify-end gap-2">
-                      <Button variant="ghost" size="icon" onClick={() => navigate(`/cadastro/unidade-monetaria/${item.id}`)}><Eye className="h-4 w-4" /></Button>
-                      <Button variant="ghost" size="icon" className="text-destructive" disabled={item.padrao}><Trash2 className="h-4 w-4" /></Button>
-                    </div>
+                    <TableActions
+                      onView={() => navigate(`/cadastro/unidade-monetaria/${item.id}`)}
+                      onDelete={!item.padrao ? () => {} : undefined}
+                      isActive={item.status === "ativo"}
+                    />
                   </TableCell>
                 </TableRow>
               ))}
