@@ -14,14 +14,8 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { ArrowLeft, Save, TrendingUp } from "lucide-react";
+import { ArrowLeft, Save, DollarSign } from "lucide-react";
+import { toast } from "sonner";
 
 export default function TipoReceitaDetalhe() {
   const navigate = useNavigate();
@@ -29,22 +23,24 @@ export default function TipoReceitaDetalhe() {
   const [searchParams] = useSearchParams();
   const isEditing = id !== "novo" && searchParams.get("edit") === "true";
   const isNew = id === "novo";
+  const isViewMode = !isNew && !isEditing;
 
   const [formData, setFormData] = useState({
     codigo: isNew ? "" : "REC001",
-    nome: isNew ? "" : "Exames Laboratoriais",
-    categoria: isNew ? "" : "Serviços",
-    contaContabil: isNew ? "" : "3.1.1.01",
-    centroCusto: isNew ? "" : "CC001",
-    aliquotaImposto: isNew ? "" : "5.00",
-    descricao: isNew ? "" : "Receitas provenientes de exames laboratoriais",
+    descricao: isNew ? "" : "Exames Laboratoriais",
+    observacoes: isNew ? "" : "Receitas provenientes de exames laboratoriais realizados no laboratório",
     ativo: true,
-    geraNotaFiscal: true,
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Salvando tipo de receita:", formData);
+    
+    if (!formData.codigo.trim() || !formData.descricao.trim()) {
+      toast.error("Preencha todos os campos obrigatórios");
+      return;
+    }
+    
+    toast.success(isNew ? "Tipo de receita criado com sucesso" : "Tipo de receita atualizado com sucesso");
     navigate("/cadastro/tipos-receita");
   };
 
@@ -62,7 +58,7 @@ export default function TipoReceitaDetalhe() {
           <BreadcrumbSeparator />
           <BreadcrumbItem>
             <BreadcrumbPage>
-              {isNew ? "Novo Tipo" : isEditing ? "Editar Tipo" : "Visualizar Tipo"}
+              {isNew ? "Novo Tipo de Receita" : isEditing ? "Editar Tipo de Receita" : "Visualizar Tipo de Receita"}
             </BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
@@ -75,14 +71,14 @@ export default function TipoReceitaDetalhe() {
           </Button>
           <div>
             <h1 className="text-2xl font-bold text-foreground">
-              {isNew ? "Novo Tipo de Receita" : isEditing ? "Editar Tipo" : formData.nome}
+              {isNew ? "Novo Tipo de Receita" : isEditing ? "Editar Tipo de Receita" : formData.descricao}
             </h1>
             <p className="text-muted-foreground">
-              {isNew ? "Preencha os dados do novo tipo" : `Código: ${formData.codigo}`}
+              {isNew ? "Preencha os dados do novo tipo de receita" : `Código: ${formData.codigo}`}
             </p>
           </div>
         </div>
-        {!isNew && !isEditing && (
+        {isViewMode && (
           <Button onClick={() => navigate(`/cadastro/tipos-receita/${id}?edit=true`)}>
             Editar
           </Button>
@@ -93,123 +89,61 @@ export default function TipoReceitaDetalhe() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <TrendingUp className="h-5 w-5" />
-              Informações do Tipo de Receita
+              <DollarSign className="h-5 w-5" />
+              Dados do Tipo de Receita
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="codigo">Código *</Label>
                 <Input
                   id="codigo"
                   value={formData.codigo}
                   onChange={(e) => setFormData({ ...formData, codigo: e.target.value })}
-                  disabled={!isNew && !isEditing}
+                  disabled={isViewMode}
                   required
+                  placeholder="Ex: REC001"
                 />
               </div>
-              <div className="space-y-2 md:col-span-2">
-                <Label htmlFor="nome">Nome *</Label>
+              <div className="space-y-2 md:col-span-3">
+                <Label htmlFor="descricao">Descrição *</Label>
                 <Input
-                  id="nome"
-                  value={formData.nome}
-                  onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
-                  disabled={!isNew && !isEditing}
+                  id="descricao"
+                  value={formData.descricao}
+                  onChange={(e) => setFormData({ ...formData, descricao: e.target.value })}
+                  disabled={isViewMode}
                   required
+                  placeholder="Digite a descrição do tipo de receita"
                 />
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="categoria">Categoria *</Label>
-                <Select
-                  value={formData.categoria}
-                  onValueChange={(value) => setFormData({ ...formData, categoria: value })}
-                  disabled={!isNew && !isEditing}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecione a categoria" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Serviços">Serviços</SelectItem>
-                    <SelectItem value="Produtos">Produtos</SelectItem>
-                    <SelectItem value="Taxas">Taxas</SelectItem>
-                    <SelectItem value="Outros">Outros</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="contaContabil">Conta Contábil</Label>
-                <Input
-                  id="contaContabil"
-                  value={formData.contaContabil}
-                  onChange={(e) => setFormData({ ...formData, contaContabil: e.target.value })}
-                  disabled={!isNew && !isEditing}
-                  placeholder="Ex: 3.1.1.01"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="centroCusto">Centro de Custo</Label>
-                <Input
-                  id="centroCusto"
-                  value={formData.centroCusto}
-                  onChange={(e) => setFormData({ ...formData, centroCusto: e.target.value })}
-                  disabled={!isNew && !isEditing}
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="aliquotaImposto">Alíquota de Imposto (%)</Label>
-                <Input
-                  id="aliquotaImposto"
-                  type="number"
-                  step="0.01"
-                  value={formData.aliquotaImposto}
-                  onChange={(e) => setFormData({ ...formData, aliquotaImposto: e.target.value })}
-                  disabled={!isNew && !isEditing}
-                />
-              </div>
+            <div className="flex items-center gap-2">
+              <Switch
+                id="ativo"
+                checked={formData.ativo}
+                onCheckedChange={(checked) => setFormData({ ...formData, ativo: checked })}
+                disabled={isViewMode}
+              />
+              <Label htmlFor="ativo">Status Ativo</Label>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="descricao">Descrição</Label>
+              <Label htmlFor="observacoes">Observações</Label>
               <Textarea
-                id="descricao"
-                value={formData.descricao}
-                onChange={(e) => setFormData({ ...formData, descricao: e.target.value })}
-                disabled={!isNew && !isEditing}
-                rows={3}
+                id="observacoes"
+                value={formData.observacoes}
+                onChange={(e) => setFormData({ ...formData, observacoes: e.target.value })}
+                disabled={isViewMode}
+                rows={4}
+                placeholder="Observações adicionais sobre este tipo de receita"
               />
-            </div>
-
-            <div className="flex items-center gap-8">
-              <div className="flex items-center gap-2">
-                <Switch
-                  id="ativo"
-                  checked={formData.ativo}
-                  onCheckedChange={(checked) => setFormData({ ...formData, ativo: checked })}
-                  disabled={!isNew && !isEditing}
-                />
-                <Label htmlFor="ativo">Ativo</Label>
-              </div>
-              <div className="flex items-center gap-2">
-                <Switch
-                  id="geraNotaFiscal"
-                  checked={formData.geraNotaFiscal}
-                  onCheckedChange={(checked) => setFormData({ ...formData, geraNotaFiscal: checked })}
-                  disabled={!isNew && !isEditing}
-                />
-                <Label htmlFor="geraNotaFiscal">Gera Nota Fiscal</Label>
-              </div>
             </div>
           </CardContent>
         </Card>
 
-        {(isNew || isEditing) && (
+        {!isViewMode && (
           <div className="flex justify-end gap-4 mt-6">
             <Button type="button" variant="outline" onClick={() => navigate("/cadastro/tipos-receita")}>
               Cancelar
