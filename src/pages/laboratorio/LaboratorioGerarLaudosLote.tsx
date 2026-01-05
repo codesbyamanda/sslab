@@ -435,15 +435,15 @@ const LaboratorioGerarLaudosLote = () => {
 
       {/* Modal de Acompanhamento */}
       <Dialog open={isModalOpen} onOpenChange={(open) => !isProcessing && setIsModalOpen(open)}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
+        <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col">
+          <DialogHeader className="flex-shrink-0">
             <DialogTitle className="flex items-center justify-between">
               <span>Geração de Laudos em Lote</span>
               {isCompleted && getResultadoBadge()}
             </DialogTitle>
           </DialogHeader>
 
-          <div className="space-y-6">
+          <div className="space-y-6 flex-1 overflow-y-auto pr-2">
             {/* Resumo do Lote */}
             <div className="bg-muted/50 rounded-lg p-4 space-y-3">
               <h4 className="font-medium text-sm text-foreground">Resumo do Lote</h4>
@@ -562,7 +562,7 @@ const LaboratorioGerarLaudosLote = () => {
             </div>
           </div>
 
-          <DialogFooter className="gap-2 sm:gap-2">
+          <DialogFooter className="gap-2 sm:gap-2 flex-shrink-0 border-t pt-4">
             <Button variant="outline" onClick={handleCloseModal} disabled={isProcessing}>
               Fechar
             </Button>
