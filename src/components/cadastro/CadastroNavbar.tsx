@@ -1,87 +1,11 @@
-import { useNavigate } from "react-router-dom";
-import { Activity, LogOut, User, Bell, Home, ArrowLeft } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { GlobalNavbar } from "@/components/shared/GlobalNavbar";
 
 interface CadastroNavbarProps {
   userName?: string;
 }
 
 export function CadastroNavbar({ userName = "Ednaldo" }: CadastroNavbarProps) {
-  const navigate = useNavigate();
-
-  return (
-    <header className="h-14 bg-card border-b border-border/50 flex items-center justify-between px-6 shadow-navbar flex-shrink-0">
-      {/* Logo */}
-      <div className="flex items-center gap-4">
-        <div className="flex items-center gap-2.5">
-          <Activity className="h-5 w-5 text-primary" strokeWidth={2.5} />
-          <span className="text-lg font-bold text-primary italic">
-            Saúde Systems
-          </span>
-        </div>
-        
-        <div className="h-6 w-px bg-border" />
-        
-        <div className="flex items-center gap-1">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => navigate("/services")}
-            className="text-muted-foreground hover:text-foreground h-8 w-8"
-          >
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => navigate("/cadastro")}
-            className="text-muted-foreground hover:text-foreground h-8 w-8"
-          >
-            <Home className="h-4 w-4" />
-          </Button>
-        </div>
-      </div>
-
-      {/* User Actions */}
-      <div className="flex items-center gap-3">
-        <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground h-8 w-8">
-          <Bell className="h-4 w-4" />
-        </Button>
-
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <button className="flex items-center gap-2.5 hover:opacity-80 transition-opacity">
-              <span className="text-sm font-medium text-foreground">Olá, {userName}</span>
-              <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center border border-border">
-                <User className="h-4 w-4 text-muted-foreground" />
-              </div>
-            </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-48">
-            <DropdownMenuItem onClick={() => navigate("/perfil")}>
-              <User className="h-4 w-4 mr-2" />
-              Meu Perfil
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem 
-              onClick={() => navigate("/")}
-              className="text-vermelho-moderno focus:text-vermelho-moderno"
-            >
-              <LogOut className="h-4 w-4 mr-2" />
-              Sair do Sistema
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
-    </header>
-  );
+  return <GlobalNavbar userName={userName} />;
 }
 
 export default CadastroNavbar;

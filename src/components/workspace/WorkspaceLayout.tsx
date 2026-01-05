@@ -8,12 +8,12 @@ interface WorkspaceLayoutProps {
   showExport?: boolean;
 }
 
-const WorkspaceLayout = ({ children, title, showExport = true }: WorkspaceLayoutProps) => {
+const WorkspaceLayout = ({ children }: WorkspaceLayoutProps) => {
   return (
-    <div className="flex min-h-screen bg-background">
+    <div className="flex min-h-screen w-full bg-background">
       <WorkspaceSidebar />
-      <div className="flex-1 flex flex-col">
-        <WorkspaceNavbar title={title} showExport={showExport} />
+      <div className="flex-1 flex flex-col min-w-0">
+        <WorkspaceNavbar />
         <main className="flex-1 p-6 overflow-auto">
           {children}
         </main>

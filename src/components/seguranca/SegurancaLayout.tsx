@@ -8,9 +8,9 @@ interface SegurancaLayoutProps {
 
 export function SegurancaLayout({ children }: SegurancaLayoutProps) {
   return (
-    <div className="min-h-screen flex w-full bg-muted/30">
+    <div className="flex min-h-screen w-full bg-background">
       <SegurancaSidebar />
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col min-w-0">
         <SegurancaNavbar />
         <main className="flex-1 p-6 overflow-auto">
           {children}
