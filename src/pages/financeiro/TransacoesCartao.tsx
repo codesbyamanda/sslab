@@ -7,107 +7,80 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
-
-const mockTransacoes = [
-  {
-    id: 1,
-    data: "2024-01-15",
-    bandeira: "Visa",
-    adquirente: "Cielo",
-    tipo: "Crédito",
-    parcelas: 1,
-    valorBruto: 500.00,
-    taxa: 2.5,
-    valorLiquido: 487.50,
-    previsaoRepasse: "2024-02-15",
-    situacao: "Pendente",
-    portador: "João Silva",
-    observacoes: ""
-  },
-  {
-    id: 2,
-    data: "2024-01-14",
-    bandeira: "Mastercard",
-    adquirente: "Rede",
-    tipo: "Débito",
-    parcelas: 1,
-    valorBruto: 250.00,
-    taxa: 1.8,
-    valorLiquido: 245.50,
-    previsaoRepasse: "2024-01-16",
-    situacao: "Compensado",
-    portador: "Maria Santos",
-    observacoes: ""
-  },
-  {
-    id: 3,
-    data: "2024-01-13",
-    bandeira: "Elo",
-    adquirente: "Stone",
-    tipo: "Parcelado Loja",
-    parcelas: 3,
-    valorBruto: 900.00,
-    taxa: 3.2,
-    valorLiquido: 871.20,
-    previsaoRepasse: "2024-02-13",
-    situacao: "Pendente",
-    portador: "Carlos Oliveira",
-    observacoes: "Parcelado em 3x"
-  },
-  {
-    id: 4,
-    data: "2024-01-12",
-    bandeira: "American Express",
-    adquirente: "Cielo",
-    tipo: "Crédito",
-    parcelas: 1,
-    valorBruto: 1200.00,
-    taxa: 3.5,
-    valorLiquido: 1158.00,
-    previsaoRepasse: "2024-02-12",
-    situacao: "Contestado",
-    portador: "Ana Pereira",
-    observacoes: "Cliente contestou a compra"
-  },
-];
-
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+const mockTransacoes = [{
+  id: 1,
+  data: "2024-01-15",
+  bandeira: "Visa",
+  adquirente: "Cielo",
+  tipo: "Crédito",
+  parcelas: 1,
+  valorBruto: 500.00,
+  taxa: 2.5,
+  valorLiquido: 487.50,
+  previsaoRepasse: "2024-02-15",
+  situacao: "Pendente",
+  portador: "João Silva",
+  observacoes: ""
+}, {
+  id: 2,
+  data: "2024-01-14",
+  bandeira: "Mastercard",
+  adquirente: "Rede",
+  tipo: "Débito",
+  parcelas: 1,
+  valorBruto: 250.00,
+  taxa: 1.8,
+  valorLiquido: 245.50,
+  previsaoRepasse: "2024-01-16",
+  situacao: "Compensado",
+  portador: "Maria Santos",
+  observacoes: ""
+}, {
+  id: 3,
+  data: "2024-01-13",
+  bandeira: "Elo",
+  adquirente: "Stone",
+  tipo: "Parcelado Loja",
+  parcelas: 3,
+  valorBruto: 900.00,
+  taxa: 3.2,
+  valorLiquido: 871.20,
+  previsaoRepasse: "2024-02-13",
+  situacao: "Pendente",
+  portador: "Carlos Oliveira",
+  observacoes: "Parcelado em 3x"
+}, {
+  id: 4,
+  data: "2024-01-12",
+  bandeira: "American Express",
+  adquirente: "Cielo",
+  tipo: "Crédito",
+  parcelas: 1,
+  valorBruto: 1200.00,
+  taxa: 3.5,
+  valorLiquido: 1158.00,
+  previsaoRepasse: "2024-02-12",
+  situacao: "Contestado",
+  portador: "Ana Pereira",
+  observacoes: "Cliente contestou a compra"
+}];
 type SortField = "data" | "bandeira" | "adquirente" | "tipo" | "valorBruto" | "situacao";
 type SortDirection = "asc" | "desc";
-
 const TransacoesCartao = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [showFilters, setShowFilters] = useState(false);
   const [sortField, setSortField] = useState<SortField>("data");
   const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
-
   const [filterBandeira, setFilterBandeira] = useState("");
   const [filterAdquirente, setFilterAdquirente] = useState("");
   const [filterTipo, setFilterTipo] = useState("");
   const [filterSituacao, setFilterSituacao] = useState("");
   const [filterDataInicio, setFilterDataInicio] = useState("");
   const [filterDataFim, setFilterDataFim] = useState("");
-
   const handleSort = (field: SortField) => {
     if (sortField === field) {
       setSortDirection(sortDirection === "asc" ? "desc" : "asc");
@@ -116,35 +89,26 @@ const TransacoesCartao = () => {
       setSortDirection("asc");
     }
   };
-
   const getSortIcon = (field: SortField) => {
     if (sortField !== field) return null;
-    return sortDirection === "asc" ? 
-      <ChevronUp className="h-4 w-4 ml-1" /> : 
-      <ChevronDown className="h-4 w-4 ml-1" />;
+    return sortDirection === "asc" ? <ChevronUp className="h-4 w-4 ml-1" /> : <ChevronDown className="h-4 w-4 ml-1" />;
   };
-
-  const filteredTransacoes = mockTransacoes
-    .filter(t => {
-      const matchesSearch = 
-        t.portador.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        t.bandeira.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesBandeira = !filterBandeira || t.bandeira === filterBandeira;
-      const matchesAdquirente = !filterAdquirente || t.adquirente === filterAdquirente;
-      const matchesTipo = !filterTipo || t.tipo === filterTipo;
-      const matchesSituacao = !filterSituacao || t.situacao === filterSituacao;
-      return matchesSearch && matchesBandeira && matchesAdquirente && matchesTipo && matchesSituacao;
-    })
-    .sort((a, b) => {
-      const aValue = a[sortField];
-      const bValue = b[sortField];
-      const modifier = sortDirection === "asc" ? 1 : -1;
-      if (typeof aValue === "number" && typeof bValue === "number") {
-        return (aValue - bValue) * modifier;
-      }
-      return String(aValue).localeCompare(String(bValue)) * modifier;
-    });
-
+  const filteredTransacoes = mockTransacoes.filter(t => {
+    const matchesSearch = t.portador.toLowerCase().includes(searchTerm.toLowerCase()) || t.bandeira.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesBandeira = !filterBandeira || t.bandeira === filterBandeira;
+    const matchesAdquirente = !filterAdquirente || t.adquirente === filterAdquirente;
+    const matchesTipo = !filterTipo || t.tipo === filterTipo;
+    const matchesSituacao = !filterSituacao || t.situacao === filterSituacao;
+    return matchesSearch && matchesBandeira && matchesAdquirente && matchesTipo && matchesSituacao;
+  }).sort((a, b) => {
+    const aValue = a[sortField];
+    const bValue = b[sortField];
+    const modifier = sortDirection === "asc" ? 1 : -1;
+    if (typeof aValue === "number" && typeof bValue === "number") {
+      return (aValue - bValue) * modifier;
+    }
+    return String(aValue).localeCompare(String(bValue)) * modifier;
+  });
   const getSituacaoBadge = (situacao: string) => {
     switch (situacao) {
       case "Pendente":
@@ -159,7 +123,6 @@ const TransacoesCartao = () => {
         return <Badge variant="outline">{situacao}</Badge>;
     }
   };
-
   const getTipoBadge = (tipo: string) => {
     switch (tipo) {
       case "Débito":
@@ -174,14 +137,14 @@ const TransacoesCartao = () => {
         return <Badge variant="secondary">{tipo}</Badge>;
     }
   };
-
   const formatDate = (dateStr: string) => new Date(dateStr).toLocaleDateString("pt-BR");
-  const formatCurrency = (value: number) => value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-
+  const formatCurrency = (value: number) => value.toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL"
+  });
   const handleViewTransacao = (transacaoId: number) => {
     navigate(`/financeiro/transacoes-cartao/${transacaoId}`);
   };
-
   const clearFilters = () => {
     setFilterBandeira("");
     setFilterAdquirente("");
@@ -191,13 +154,10 @@ const TransacoesCartao = () => {
     setFilterDataFim("");
     setSearchTerm("");
   };
-
   const totalBruto = filteredTransacoes.reduce((acc, t) => acc + t.valorBruto, 0);
   const totalLiquido = filteredTransacoes.reduce((acc, t) => acc + t.valorLiquido, 0);
   const totalTaxas = totalBruto - totalLiquido;
-
-  return (
-    <div className="min-h-screen flex w-full bg-background">
+  return <div className="min-h-screen flex w-full bg-background">
       <FinanceiroSidebar />
       
       <div className="flex-1 flex flex-col min-h-screen overflow-hidden">
@@ -205,13 +165,7 @@ const TransacoesCartao = () => {
         
         <main className="flex-1 overflow-auto">
           <div className="p-6 space-y-6">
-            <button
-              onClick={() => navigate("/financeiro")}
-              className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Voltar para Financeiro
-            </button>
+            
 
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
               <div>
@@ -273,11 +227,11 @@ const TransacoesCartao = () => {
                     <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
                       <div className="space-y-2">
                         <label className="text-sm font-medium">Data Início</label>
-                        <Input type="date" value={filterDataInicio} onChange={(e) => setFilterDataInicio(e.target.value)} />
+                        <Input type="date" value={filterDataInicio} onChange={e => setFilterDataInicio(e.target.value)} />
                       </div>
                       <div className="space-y-2">
                         <label className="text-sm font-medium">Data Fim</label>
-                        <Input type="date" value={filterDataFim} onChange={(e) => setFilterDataFim(e.target.value)} />
+                        <Input type="date" value={filterDataFim} onChange={e => setFilterDataFim(e.target.value)} />
                       </div>
                       <div className="space-y-2">
                         <label className="text-sm font-medium">Bandeira</label>
@@ -343,12 +297,7 @@ const TransacoesCartao = () => {
                   <CardTitle className="text-lg font-semibold">Lista de Transações</CardTitle>
                   <div className="relative w-full md:w-80">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      placeholder="Buscar por portador ou bandeira..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-10"
-                    />
+                    <Input placeholder="Buscar por portador ou bandeira..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="pl-10" />
                   </div>
                 </div>
               </CardHeader>
@@ -381,8 +330,7 @@ const TransacoesCartao = () => {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {filteredTransacoes.map((transacao) => (
-                        <TableRow key={transacao.id} className="hover:bg-muted/50">
+                      {filteredTransacoes.map(transacao => <TableRow key={transacao.id} className="hover:bg-muted/50">
                           <TableCell className="font-medium">{formatDate(transacao.data)}</TableCell>
                           <TableCell>{transacao.bandeira}</TableCell>
                           <TableCell>{transacao.adquirente}</TableCell>
@@ -395,19 +343,13 @@ const TransacoesCartao = () => {
                           <TableCell>{getSituacaoBadge(transacao.situacao)}</TableCell>
                           <TableCell>
                             <div className="flex items-center justify-center">
-                              <Button 
-                                variant="ghost" 
-                                size="sm" 
-                                className="gap-2"
-                                onClick={() => handleViewTransacao(transacao.id)}
-                              >
+                              <Button variant="ghost" size="sm" className="gap-2" onClick={() => handleViewTransacao(transacao.id)}>
                                 <Eye className="h-4 w-4" />
                                 Visualizar
                               </Button>
                             </div>
                           </TableCell>
-                        </TableRow>
-                      ))}
+                        </TableRow>)}
                     </TableBody>
                   </Table>
                 </div>
@@ -424,8 +366,6 @@ const TransacoesCartao = () => {
           </div>
         </main>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default TransacoesCartao;
