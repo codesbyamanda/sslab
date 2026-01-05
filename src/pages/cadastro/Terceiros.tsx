@@ -3,10 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
-import { UserCheck, Search, Plus, Eye, Trash2 } from "lucide-react";
+import { UserCheck, Search, Plus } from "lucide-react";
+import { StatusBadge, TableActions, StatCard } from "@/components/shared";
 
 const mockTerceiros = [
   { id: 1, codigo: "TER001", nome: "Laboratório Apoio SP", cnpj: "12.345.678/0001-00", retencaoIR: 1.5, retencaoISS: 5, status: "ativo" },
@@ -22,6 +22,9 @@ export default function Terceiros() {
     t.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
     t.cnpj.includes(searchTerm)
   );
+
+  const totalAtivos = mockTerceiros.filter((t) => t.status === "ativo").length;
+  const totalInativos = mockTerceiros.filter((t) => t.status === "inativo").length;
 
   return (
     <div className="p-6 space-y-6">
@@ -45,6 +48,25 @@ export default function Terceiros() {
           <Plus className="h-4 w-4 mr-2" />
           Novo Terceiro
         </Button>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <StatCard
+          title="Total de Terceiros"
+          value={mockTerceiros.length}
+          icon={UserCheck}
+          variant="primary"
+        />
+        <StatCard
+          title="Terceiros Ativos"
+          value={totalAtivos}
+          variant="success"
+        />
+        <StatCard
+          title="Terceiros Inativos"
+          value={totalInativos}
+          variant="default"
+        />
       </div>
 
       <Card>
@@ -83,13 +105,14 @@ export default function Terceiros() {
                   <TableCell className="text-center">{item.retencaoIR}%</TableCell>
                   <TableCell className="text-center">{item.retencaoISS}%</TableCell>
                   <TableCell className="text-center">
-                    <Badge variant={item.status === "ativo" ? "default" : "secondary"}>{item.status === "ativo" ? "Ativo" : "Inativo"}</Badge>
+                    <StatusBadge status={item.status} />
                   </TableCell>
                   <TableCell className="text-right">
-                    <div className="flex justify-end gap-2">
-                      <Button variant="ghost" size="icon" onClick={() => navigate(`/cadastro/terceiros/${item.id}`)}><Eye className="h-4 w-4" /></Button>
-                      <Button variant="ghost" size="icon" className="text-destructive" disabled={item.status === "ativo"}><Trash2 className="h-4 w-4" /></Button>
-                    </div>
+                    <TableActions
+                      onView={() => navigate(`/cadastro/terceiros/${item.id}`)}
+                      onDelete={item.status === "inativo" ? () => {} : undefined}
+                      isActive={item.status === "ativo"}
+                    />
                   </TableCell>
                 </TableRow>
               ))}

@@ -6,7 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
-import { Calendar, Search, Plus, Eye, Trash2 } from "lucide-react";
+import { Calendar, Search, Plus } from "lucide-react";
+import { StatusBadge, TableActions, StatCard } from "@/components/shared";
 
 const mockFeriados = [
   { id: 1, data: "2024-01-01", descricao: "Confraternização Universal", tipo: "Nacional", impactaPrazo: true },
@@ -22,6 +23,9 @@ export default function Feriados() {
   const filtered = mockFeriados.filter((f) =>
     f.descricao.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const nacionais = mockFeriados.filter((f) => f.tipo === "Nacional").length;
+  const municipais = mockFeriados.filter((f) => f.tipo === "Municipal").length;
 
   return (
     <div className="p-6 space-y-6">
@@ -45,6 +49,25 @@ export default function Feriados() {
           <Plus className="h-4 w-4 mr-2" />
           Novo Feriado
         </Button>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <StatCard
+          title="Total de Feriados"
+          value={mockFeriados.length}
+          icon={Calendar}
+          variant="primary"
+        />
+        <StatCard
+          title="Feriados Nacionais"
+          value={nacionais}
+          variant="success"
+        />
+        <StatCard
+          title="Feriados Municipais"
+          value={municipais}
+          variant="warning"
+        />
       </div>
 
       <Card>
@@ -78,18 +101,18 @@ export default function Feriados() {
                   <TableCell className="font-mono">{new Date(item.data).toLocaleDateString("pt-BR")}</TableCell>
                   <TableCell className="font-medium">{item.descricao}</TableCell>
                   <TableCell>
-                    <Badge variant="outline" className={item.tipo === "Nacional" ? "bg-blue-100 text-blue-700" : "bg-green-100 text-green-700"}>
+                    <Badge variant="outline" className={item.tipo === "Nacional" ? "border-primary/30 bg-primary/5 text-primary" : "border-verde-clinico/30 bg-verde-clinico/5 text-verde-clinico"}>
                       {item.tipo}
                     </Badge>
                   </TableCell>
                   <TableCell className="text-center">
-                    <Badge variant={item.impactaPrazo ? "default" : "secondary"}>{item.impactaPrazo ? "Sim" : "Não"}</Badge>
+                    <StatusBadge status={item.impactaPrazo ? "success" : "inactive"} label={item.impactaPrazo ? "Sim" : "Não"} />
                   </TableCell>
                   <TableCell className="text-right">
-                    <div className="flex justify-end gap-2">
-                      <Button variant="ghost" size="icon" onClick={() => navigate(`/cadastro/feriados/${item.id}`)}><Eye className="h-4 w-4" /></Button>
-                      <Button variant="ghost" size="icon" className="text-destructive"><Trash2 className="h-4 w-4" /></Button>
-                    </div>
+                    <TableActions
+                      onView={() => navigate(`/cadastro/feriados/${item.id}`)}
+                      onDelete={() => {}}
+                    />
                   </TableCell>
                 </TableRow>
               ))}

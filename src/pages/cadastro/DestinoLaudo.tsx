@@ -6,7 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
-import { FileOutput, Search, Plus, Eye, Trash2 } from "lucide-react";
+import { FileOutput, Search, Plus } from "lucide-react";
+import { StatusBadge, TableActions, StatCard } from "@/components/shared";
 
 const mockDestinos = [
   { id: 1, codigo: "DES001", descricao: "Impressão Local", tipo: "Impressão", status: "ativo" },
@@ -22,6 +23,9 @@ export default function DestinoLaudo() {
   const filtered = mockDestinos.filter((d) =>
     d.descricao.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const totalAtivos = mockDestinos.filter((d) => d.status === "ativo").length;
+  const totalInativos = mockDestinos.filter((d) => d.status === "inativo").length;
 
   return (
     <div className="p-6 space-y-6">
@@ -45,6 +49,25 @@ export default function DestinoLaudo() {
           <Plus className="h-4 w-4 mr-2" />
           Novo Destino
         </Button>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <StatCard
+          title="Total de Destinos"
+          value={mockDestinos.length}
+          icon={FileOutput}
+          variant="primary"
+        />
+        <StatCard
+          title="Destinos Ativos"
+          value={totalAtivos}
+          variant="success"
+        />
+        <StatCard
+          title="Destinos Inativos"
+          value={totalInativos}
+          variant="default"
+        />
       </div>
 
       <Card>
@@ -79,13 +102,14 @@ export default function DestinoLaudo() {
                   <TableCell className="font-medium">{item.descricao}</TableCell>
                   <TableCell><Badge variant="outline">{item.tipo}</Badge></TableCell>
                   <TableCell className="text-center">
-                    <Badge variant={item.status === "ativo" ? "default" : "secondary"}>{item.status === "ativo" ? "Ativo" : "Inativo"}</Badge>
+                    <StatusBadge status={item.status} />
                   </TableCell>
                   <TableCell className="text-right">
-                    <div className="flex justify-end gap-2">
-                      <Button variant="ghost" size="icon" onClick={() => navigate(`/cadastro/destino-laudo/${item.id}`)}><Eye className="h-4 w-4" /></Button>
-                      <Button variant="ghost" size="icon" className="text-destructive" disabled={item.status === "ativo"}><Trash2 className="h-4 w-4" /></Button>
-                    </div>
+                    <TableActions
+                      onView={() => navigate(`/cadastro/destino-laudo/${item.id}`)}
+                      onDelete={item.status === "inativo" ? () => {} : undefined}
+                      isActive={item.status === "ativo"}
+                    />
                   </TableCell>
                 </TableRow>
               ))}

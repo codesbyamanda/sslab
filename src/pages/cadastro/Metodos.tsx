@@ -1,9 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import {
   Table,
   TableBody,
@@ -27,14 +26,15 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { Plus, Search, Eye, Edit, FlaskConical } from "lucide-react";
+import { Plus, Search, FlaskConical } from "lucide-react";
+import { StatusBadge, TableActions, StatCard } from "@/components/shared";
 
 const metodosMock = [
-  { id: 1, codigo: "MTD001", nome: "Espectrofotometria", descricao: "Método por absorção de luz", status: "Ativo" },
-  { id: 2, codigo: "MTD002", nome: "Cromatografia Líquida", descricao: "HPLC de alta performance", status: "Ativo" },
-  { id: 3, codigo: "MTD003", nome: "Imunoensaio", descricao: "Método imunológico automatizado", status: "Ativo" },
-  { id: 4, codigo: "MTD004", nome: "Eletroforese", descricao: "Separação por carga elétrica", status: "Ativo" },
-  { id: 5, codigo: "MTD005", nome: "Turbidimetria", descricao: "Medição de turvação", status: "Inativo" },
+  { id: 1, codigo: "MTD001", nome: "Espectrofotometria", descricao: "Método por absorção de luz", status: "ativo" },
+  { id: 2, codigo: "MTD002", nome: "Cromatografia Líquida", descricao: "HPLC de alta performance", status: "ativo" },
+  { id: 3, codigo: "MTD003", nome: "Imunoensaio", descricao: "Método imunológico automatizado", status: "ativo" },
+  { id: 4, codigo: "MTD004", nome: "Eletroforese", descricao: "Separação por carga elétrica", status: "ativo" },
+  { id: 5, codigo: "MTD005", nome: "Turbidimetria", descricao: "Medição de turvação", status: "inativo" },
 ];
 
 export default function Metodos() {
@@ -45,12 +45,15 @@ export default function Metodos() {
   const filteredMetodos = metodosMock.filter((item) => {
     const matchesSearch = item.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
       item.codigo.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = statusFilter === "todos" || item.status.toLowerCase() === statusFilter;
+    const matchesStatus = statusFilter === "todos" || item.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
 
+  const totalAtivos = metodosMock.filter(m => m.status === "ativo").length;
+  const totalInativos = metodosMock.filter(m => m.status === "inativo").length;
+
   return (
-    <div className="space-y-6">
+    <div className="p-6 space-y-6">
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
@@ -65,7 +68,10 @@ export default function Metodos() {
 
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Métodos</h1>
+          <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
+            <FlaskConical className="h-6 w-6 text-primary" />
+            Métodos
+          </h1>
           <p className="text-muted-foreground">Gerencie os métodos analíticos</p>
         </div>
         <Button onClick={() => navigate("/cadastro/metodos/novo")}>
@@ -75,52 +81,26 @@ export default function Metodos() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-blue-100 rounded-lg">
-                <FlaskConical className="h-6 w-6 text-blue-600" />
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Total</p>
-                <p className="text-2xl font-bold">{metodosMock.length}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-green-100 rounded-lg">
-                <FlaskConical className="h-6 w-6 text-green-600" />
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Ativos</p>
-                <p className="text-2xl font-bold">{metodosMock.filter(m => m.status === "Ativo").length}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-gray-100 rounded-lg">
-                <FlaskConical className="h-6 w-6 text-gray-600" />
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Inativos</p>
-                <p className="text-2xl font-bold">{metodosMock.filter(m => m.status === "Inativo").length}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        <StatCard
+          title="Total de Métodos"
+          value={metodosMock.length}
+          icon={FlaskConical}
+          variant="primary"
+        />
+        <StatCard
+          title="Métodos Ativos"
+          value={totalAtivos}
+          variant="success"
+        />
+        <StatCard
+          title="Métodos Inativos"
+          value={totalInativos}
+          variant="default"
+        />
       </div>
 
       <Card>
-        <CardHeader>
-          <CardTitle>Filtros</CardTitle>
-        </CardHeader>
-        <CardContent>
+        <CardContent className="p-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="relative md:col-span-2">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -153,38 +133,25 @@ export default function Metodos() {
                 <TableHead>Código</TableHead>
                 <TableHead>Nome</TableHead>
                 <TableHead>Descrição</TableHead>
-                <TableHead>Status</TableHead>
+                <TableHead className="text-center">Status</TableHead>
                 <TableHead className="text-right">Ações</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredMetodos.map((item) => (
                 <TableRow key={item.id}>
-                  <TableCell className="font-medium">{item.codigo}</TableCell>
+                  <TableCell className="font-medium font-mono">{item.codigo}</TableCell>
                   <TableCell>{item.nome}</TableCell>
                   <TableCell className="text-muted-foreground">{item.descricao}</TableCell>
-                  <TableCell>
-                    <Badge variant={item.status === "Ativo" ? "default" : "secondary"}>
-                      {item.status}
-                    </Badge>
+                  <TableCell className="text-center">
+                    <StatusBadge status={item.status} />
                   </TableCell>
                   <TableCell className="text-right">
-                    <div className="flex justify-end gap-2">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => navigate(`/cadastro/metodos/${item.id}`)}
-                      >
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => navigate(`/cadastro/metodos/${item.id}?edit=true`)}
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                    </div>
+                    <TableActions
+                      onView={() => navigate(`/cadastro/metodos/${item.id}`)}
+                      onEdit={() => navigate(`/cadastro/metodos/${item.id}?edit=true`)}
+                      isActive={item.status === "ativo"}
+                    />
                   </TableCell>
                 </TableRow>
               ))}

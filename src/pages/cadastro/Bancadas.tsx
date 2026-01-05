@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -19,8 +19,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Search, Plus, Eye, Edit, ChevronLeft, ChevronRight, LayoutGrid, ToggleLeft, ToggleRight } from "lucide-react";
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
+import { Search, Plus, ChevronLeft, ChevronRight, LayoutGrid } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { StatusBadge, TableActions, StatCard } from "@/components/shared";
 
 const mockBancadas = [
   { id: 1, codigo: "HEM", nome: "Hematologia", setor: "Laboratório Central", equipamento: "ABX Pentra", exames: 15, status: "ativo" },
@@ -61,21 +63,28 @@ export default function Bancadas() {
     });
   };
 
+  const totalAtivas = mockBancadas.filter((b) => b.status === "ativo").length;
+  const totalInativos = mockBancadas.filter((b) => b.status === "inativo").length;
+  const totalExames = mockBancadas.reduce((sum, b) => sum + b.exames, 0);
+
   return (
     <div className="p-6 space-y-6">
-      {/* Breadcrumb */}
-      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-        <span>Saúde Cadastro</span>
-        <span>/</span>
-        <span>Laboratório</span>
-        <span>/</span>
-        <span className="text-foreground font-medium">Bancadas</span>
-      </div>
+      <Breadcrumb>
+        <BreadcrumbList>
+          <BreadcrumbItem><BreadcrumbLink href="/cadastro">Cadastro</BreadcrumbLink></BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem><BreadcrumbLink href="/cadastro">Laboratório</BreadcrumbLink></BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem><BreadcrumbPage>Bancadas</BreadcrumbPage></BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
 
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Bancadas</h1>
+          <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
+            <LayoutGrid className="h-6 w-6 text-primary" />
+            Bancadas
+          </h1>
           <p className="text-muted-foreground">Gerenciamento de bancadas e áreas de trabalho do laboratório</p>
         </div>
         <Button onClick={() => navigate("/cadastro/bancadas/novo")}>
@@ -84,52 +93,30 @@ export default function Bancadas() {
         </Button>
       </div>
 
-      {/* Cards de Resumo */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Total</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center gap-2">
-              <LayoutGrid className="h-5 w-5 text-primary" />
-              <span className="text-2xl font-bold">{mockBancadas.length}</span>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Total de Exames</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <span className="text-2xl font-bold">
-              {mockBancadas.reduce((sum, b) => sum + b.exames, 0)}
-            </span>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Ativas</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <span className="text-2xl font-bold text-green-600">
-              {mockBancadas.filter((b) => b.status === "ativo").length}
-            </span>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Inativas</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <span className="text-2xl font-bold text-muted-foreground">
-              {mockBancadas.filter((b) => b.status === "inativo").length}
-            </span>
-          </CardContent>
-        </Card>
+        <StatCard
+          title="Total de Bancadas"
+          value={mockBancadas.length}
+          icon={LayoutGrid}
+          variant="primary"
+        />
+        <StatCard
+          title="Total de Exames"
+          value={totalExames}
+          variant="primary"
+        />
+        <StatCard
+          title="Bancadas Ativas"
+          value={totalAtivas}
+          variant="success"
+        />
+        <StatCard
+          title="Bancadas Inativas"
+          value={totalInativos}
+          variant="default"
+        />
       </div>
 
-      {/* Filtros */}
       <Card>
         <CardContent className="pt-6">
           <div className="flex flex-col md:flex-row gap-4">
@@ -171,9 +158,8 @@ export default function Bancadas() {
         </CardContent>
       </Card>
 
-      {/* Tabela */}
       <Card>
-        <CardContent className="pt-6">
+        <CardContent className="p-0">
           <Table>
             <TableHeader>
               <TableRow>
@@ -181,8 +167,8 @@ export default function Bancadas() {
                 <TableHead>Nome</TableHead>
                 <TableHead>Setor</TableHead>
                 <TableHead>Equipamento</TableHead>
-                <TableHead>Exames</TableHead>
-                <TableHead>Status</TableHead>
+                <TableHead className="text-center">Exames</TableHead>
+                <TableHead className="text-center">Status</TableHead>
                 <TableHead className="text-right">Ações</TableHead>
               </TableRow>
             </TableHeader>
@@ -195,51 +181,24 @@ export default function Bancadas() {
                   <TableCell>
                     <Badge variant="outline">{banc.equipamento}</Badge>
                   </TableCell>
-                  <TableCell>{banc.exames}</TableCell>
-                  <TableCell>
-                    <Badge variant={banc.status === "ativo" ? "default" : "secondary"}>
-                      {banc.status === "ativo" ? "Ativa" : "Inativa"}
-                    </Badge>
+                  <TableCell className="text-center">{banc.exames}</TableCell>
+                  <TableCell className="text-center">
+                    <StatusBadge status={banc.status} />
                   </TableCell>
                   <TableCell className="text-right">
-                    <div className="flex justify-end gap-2">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => navigate(`/cadastro/bancadas/${banc.id}`)}
-                        title="Visualizar"
-                      >
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => navigate(`/cadastro/bancadas/${banc.id}/editar`)}
-                        title="Editar"
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleToggleStatus(banc.id, banc.status)}
-                        title={banc.status === "ativo" ? "Inativar" : "Ativar"}
-                      >
-                        {banc.status === "ativo" ? (
-                          <ToggleRight className="h-4 w-4 text-green-600" />
-                        ) : (
-                          <ToggleLeft className="h-4 w-4 text-muted-foreground" />
-                        )}
-                      </Button>
-                    </div>
+                    <TableActions
+                      onView={() => navigate(`/cadastro/bancadas/${banc.id}`)}
+                      onEdit={() => navigate(`/cadastro/bancadas/${banc.id}/editar`)}
+                      onToggleStatus={() => handleToggleStatus(banc.id, banc.status)}
+                      isActive={banc.status === "ativo"}
+                    />
                   </TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
 
-          {/* Paginação */}
-          <div className="flex items-center justify-between mt-4">
+          <div className="flex items-center justify-between p-4 border-t">
             <p className="text-sm text-muted-foreground">
               Mostrando 1-{filteredBancadas.length} de {mockBancadas.length} registros
             </p>

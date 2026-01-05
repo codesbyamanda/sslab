@@ -3,10 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
-import { Handshake, Search, Plus, Eye, Trash2, FileText } from "lucide-react";
+import { Handshake, Search, Plus, FileText } from "lucide-react";
+import { StatusBadge, TableActions, StatCard } from "@/components/shared";
 
 const mockConvenios = [
   { id: 1, codigo: "CON001", nome: "Unimed", registroANS: "123456", tabelaBase: "Tabela Convênios", planos: 3, status: "ativo" },
@@ -24,6 +24,10 @@ export default function Convenios() {
     c.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
     c.codigo.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const totalAtivos = mockConvenios.filter((c) => c.status === "ativo").length;
+  const totalPlanos = mockConvenios.reduce((acc, c) => acc + c.planos, 0);
+  const comANS = mockConvenios.filter((c) => c.registroANS !== "-").length;
 
   return (
     <div className="p-6 space-y-6">
@@ -50,10 +54,27 @@ export default function Convenios() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card><CardContent className="p-4"><p className="text-sm text-muted-foreground">Total de Convênios</p><p className="text-2xl font-bold">{mockConvenios.length}</p></CardContent></Card>
-        <Card><CardContent className="p-4"><p className="text-sm text-muted-foreground">Convênios Ativos</p><p className="text-2xl font-bold text-green-600">{mockConvenios.filter((c) => c.status === "ativo").length}</p></CardContent></Card>
-        <Card><CardContent className="p-4"><p className="text-sm text-muted-foreground">Total de Planos</p><p className="text-2xl font-bold text-blue-600">{mockConvenios.reduce((acc, c) => acc + c.planos, 0)}</p></CardContent></Card>
-        <Card><CardContent className="p-4"><p className="text-sm text-muted-foreground">Com Registro ANS</p><p className="text-2xl font-bold text-purple-600">{mockConvenios.filter((c) => c.registroANS !== "-").length}</p></CardContent></Card>
+        <StatCard
+          title="Total de Convênios"
+          value={mockConvenios.length}
+          icon={Handshake}
+          variant="primary"
+        />
+        <StatCard
+          title="Convênios Ativos"
+          value={totalAtivos}
+          variant="success"
+        />
+        <StatCard
+          title="Total de Planos"
+          value={totalPlanos}
+          variant="primary"
+        />
+        <StatCard
+          title="Com Registro ANS"
+          value={comANS}
+          variant="warning"
+        />
       </div>
 
       <Card>
@@ -92,16 +113,21 @@ export default function Convenios() {
                   <TableCell className="text-muted-foreground">{item.tabelaBase}</TableCell>
                   <TableCell className="text-center">{item.planos}</TableCell>
                   <TableCell className="text-center">
-                    <Badge variant={item.status === "ativo" ? "default" : "secondary"}>{item.status === "ativo" ? "Ativo" : "Inativo"}</Badge>
+                    <StatusBadge status={item.status} />
                   </TableCell>
                   <TableCell className="text-right">
-                    <div className="flex justify-end gap-2">
-                      <Button variant="ghost" size="icon" onClick={() => navigate(`/cadastro/convenios/${item.id}/planos`)} title="Planos">
-                        <FileText className="h-4 w-4" />
-                      </Button>
-                      <Button variant="ghost" size="icon" onClick={() => navigate(`/cadastro/convenios/${item.id}`)}><Eye className="h-4 w-4" /></Button>
-                      <Button variant="ghost" size="icon" className="text-destructive" disabled={item.status === "ativo"}><Trash2 className="h-4 w-4" /></Button>
-                    </div>
+                    <TableActions
+                      onView={() => navigate(`/cadastro/convenios/${item.id}`)}
+                      onDelete={item.status === "inativo" ? () => {} : undefined}
+                      isActive={item.status === "ativo"}
+                      additionalActions={[
+                        {
+                          icon: FileText,
+                          label: "Planos",
+                          onClick: () => navigate(`/cadastro/convenios/${item.id}/planos`),
+                        },
+                      ]}
+                    />
                   </TableCell>
                 </TableRow>
               ))}

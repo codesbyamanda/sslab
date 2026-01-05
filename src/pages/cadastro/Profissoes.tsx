@@ -3,10 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
-import { Briefcase, Search, Plus, Eye, Trash2 } from "lucide-react";
+import { Briefcase, Search, Plus } from "lucide-react";
+import { StatusBadge, TableActions, StatCard } from "@/components/shared";
 
 const mockProfissoes = [
   { id: 1, codigo: "PRO001", descricao: "Engenheiro Civil", cbo: "2142-05", status: "ativo" },
@@ -23,6 +23,9 @@ export default function Profissoes() {
     p.descricao.toLowerCase().includes(searchTerm.toLowerCase()) ||
     p.codigo.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const totalAtivos = mockProfissoes.filter((p) => p.status === "ativo").length;
+  const totalInativos = mockProfissoes.filter((p) => p.status === "inativo").length;
 
   return (
     <div className="p-6 space-y-6">
@@ -46,6 +49,25 @@ export default function Profissoes() {
           <Plus className="h-4 w-4 mr-2" />
           Nova Profissão
         </Button>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <StatCard
+          title="Total de Profissões"
+          value={mockProfissoes.length}
+          icon={Briefcase}
+          variant="primary"
+        />
+        <StatCard
+          title="Profissões Ativas"
+          value={totalAtivos}
+          variant="success"
+        />
+        <StatCard
+          title="Profissões Inativas"
+          value={totalInativos}
+          variant="default"
+        />
       </div>
 
       <Card>
@@ -80,13 +102,14 @@ export default function Profissoes() {
                   <TableCell className="font-medium">{item.descricao}</TableCell>
                   <TableCell>{item.cbo}</TableCell>
                   <TableCell className="text-center">
-                    <Badge variant={item.status === "ativo" ? "default" : "secondary"}>{item.status === "ativo" ? "Ativo" : "Inativo"}</Badge>
+                    <StatusBadge status={item.status} />
                   </TableCell>
                   <TableCell className="text-right">
-                    <div className="flex justify-end gap-2">
-                      <Button variant="ghost" size="icon" onClick={() => navigate(`/cadastro/profissoes/${item.id}`)}><Eye className="h-4 w-4" /></Button>
-                      <Button variant="ghost" size="icon" className="text-destructive" disabled={item.status === "ativo"}><Trash2 className="h-4 w-4" /></Button>
-                    </div>
+                    <TableActions
+                      onView={() => navigate(`/cadastro/profissoes/${item.id}`)}
+                      onDelete={item.status === "inativo" ? () => {} : undefined}
+                      isActive={item.status === "ativo"}
+                    />
                   </TableCell>
                 </TableRow>
               ))}

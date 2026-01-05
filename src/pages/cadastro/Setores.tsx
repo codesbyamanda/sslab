@@ -6,7 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
-import { Layers, Search, Plus, Eye, Trash2, Filter, X } from "lucide-react";
+import { Layers, Search, Plus, Filter, X } from "lucide-react";
+import { StatusBadge, TableActions, StatCard } from "@/components/shared";
 
 const mockSetores = [
   { id: 1, codigo: "SET001", nome: "Recepção", unidade: "Unidade Centro", tipo: "Administrativo", status: "ativo" },
@@ -24,6 +25,9 @@ export default function Setores() {
     s.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
     s.codigo.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const tecnicos = mockSetores.filter((s) => s.tipo === "Técnico").length;
+  const administrativos = mockSetores.filter((s) => s.tipo === "Administrativo").length;
 
   return (
     <div className="p-6 space-y-6">
@@ -50,9 +54,22 @@ export default function Setores() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card><CardContent className="p-4"><p className="text-sm text-muted-foreground">Total</p><p className="text-2xl font-bold">{mockSetores.length}</p></CardContent></Card>
-        <Card><CardContent className="p-4"><p className="text-sm text-muted-foreground">Técnicos</p><p className="text-2xl font-bold text-blue-600">{mockSetores.filter((s) => s.tipo === "Técnico").length}</p></CardContent></Card>
-        <Card><CardContent className="p-4"><p className="text-sm text-muted-foreground">Administrativos</p><p className="text-2xl font-bold text-green-600">{mockSetores.filter((s) => s.tipo === "Administrativo").length}</p></CardContent></Card>
+        <StatCard
+          title="Total de Setores"
+          value={mockSetores.length}
+          icon={Layers}
+          variant="primary"
+        />
+        <StatCard
+          title="Setores Técnicos"
+          value={tecnicos}
+          variant="primary"
+        />
+        <StatCard
+          title="Setores Administrativos"
+          value={administrativos}
+          variant="success"
+        />
       </div>
 
       <Card>
@@ -91,18 +108,19 @@ export default function Setores() {
                   <TableCell className="font-medium">{setor.nome}</TableCell>
                   <TableCell className="text-muted-foreground">{setor.unidade}</TableCell>
                   <TableCell>
-                    <Badge variant="outline" className={setor.tipo === "Técnico" ? "bg-blue-100 text-blue-700" : "bg-green-100 text-green-700"}>
+                    <Badge variant="outline" className={setor.tipo === "Técnico" ? "border-primary/30 bg-primary/5 text-primary" : "border-verde-clinico/30 bg-verde-clinico/5 text-verde-clinico"}>
                       {setor.tipo}
                     </Badge>
                   </TableCell>
                   <TableCell className="text-center">
-                    <Badge variant={setor.status === "ativo" ? "default" : "secondary"}>{setor.status === "ativo" ? "Ativo" : "Inativo"}</Badge>
+                    <StatusBadge status={setor.status} />
                   </TableCell>
                   <TableCell className="text-right">
-                    <div className="flex justify-end gap-2">
-                      <Button variant="ghost" size="icon" onClick={() => navigate(`/cadastro/setores/${setor.id}`)}><Eye className="h-4 w-4" /></Button>
-                      <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive" disabled={setor.status === "ativo"}><Trash2 className="h-4 w-4" /></Button>
-                    </div>
+                    <TableActions
+                      onView={() => navigate(`/cadastro/setores/${setor.id}`)}
+                      onDelete={setor.status === "inativo" ? () => {} : undefined}
+                      isActive={setor.status === "ativo"}
+                    />
                   </TableCell>
                 </TableRow>
               ))}
