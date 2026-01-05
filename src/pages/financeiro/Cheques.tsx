@@ -7,130 +7,166 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 // Mock data for cheques
-const mockCheques = [
-  {
+const mockCheques = [{
+  id: 1,
+  numeroCheque: "000123",
+  banco: "001 - Banco do Brasil",
+  agencia: "1234",
+  conta: "12345-6",
+  emitente: "João Silva",
+  cpfCnpj: "123.456.789-00",
+  valor: 1500.00,
+  dataEmissao: "2024-01-10",
+  dataVencimento: "2024-02-10",
+  localizacao: "Em caixa",
+  situacao: "Aberto",
+  observacoes: "",
+  historico: [{
     id: 1,
-    numeroCheque: "000123",
-    banco: "001 - Banco do Brasil",
-    agencia: "1234",
-    conta: "12345-6",
-    emitente: "João Silva",
-    cpfCnpj: "123.456.789-00",
-    valor: 1500.00,
-    dataEmissao: "2024-01-10",
-    dataVencimento: "2024-02-10",
-    localizacao: "Em caixa",
-    situacao: "Aberto",
-    observacoes: "",
-    historico: [
-      { id: 1, data: "2024-01-10 10:30", situacaoAnterior: "-", situacaoNova: "Aberto", usuario: "Ednaldo", observacao: "Cheque recebido" }
-    ]
-  },
-  {
+    data: "2024-01-10 10:30",
+    situacaoAnterior: "-",
+    situacaoNova: "Aberto",
+    usuario: "Ednaldo",
+    observacao: "Cheque recebido"
+  }]
+}, {
+  id: 2,
+  numeroCheque: "000456",
+  banco: "237 - Bradesco",
+  agencia: "5678",
+  conta: "67890-1",
+  emitente: "Maria Santos",
+  cpfCnpj: "987.654.321-00",
+  valor: 2500.00,
+  dataEmissao: "2024-01-05",
+  dataVencimento: "2024-01-15",
+  localizacao: "Em banco",
+  situacao: "Depositado",
+  observacoes: "Depósito realizado",
+  historico: [{
+    id: 1,
+    data: "2024-01-05 14:00",
+    situacaoAnterior: "-",
+    situacaoNova: "Aberto",
+    usuario: "Ednaldo",
+    observacao: "Cheque recebido"
+  }, {
     id: 2,
-    numeroCheque: "000456",
-    banco: "237 - Bradesco",
-    agencia: "5678",
-    conta: "67890-1",
-    emitente: "Maria Santos",
-    cpfCnpj: "987.654.321-00",
-    valor: 2500.00,
-    dataEmissao: "2024-01-05",
-    dataVencimento: "2024-01-15",
-    localizacao: "Em banco",
-    situacao: "Depositado",
-    observacoes: "Depósito realizado",
-    historico: [
-      { id: 1, data: "2024-01-05 14:00", situacaoAnterior: "-", situacaoNova: "Aberto", usuario: "Ednaldo", observacao: "Cheque recebido" },
-      { id: 2, data: "2024-01-08 09:15", situacaoAnterior: "Aberto", situacaoNova: "Depositado", usuario: "Ednaldo", observacao: "Enviado para compensação" }
-    ]
-  },
-  {
+    data: "2024-01-08 09:15",
+    situacaoAnterior: "Aberto",
+    situacaoNova: "Depositado",
+    usuario: "Ednaldo",
+    observacao: "Enviado para compensação"
+  }]
+}, {
+  id: 3,
+  numeroCheque: "000789",
+  banco: "341 - Itaú Unibanco",
+  agencia: "9012",
+  conta: "34567-8",
+  emitente: "Carlos Oliveira",
+  cpfCnpj: "456.789.123-00",
+  valor: 800.00,
+  dataEmissao: "2024-01-02",
+  dataVencimento: "2024-01-10",
+  localizacao: "Devolvido",
+  situacao: "Devolvido",
+  observacoes: "Sem fundos",
+  historico: [{
+    id: 1,
+    data: "2024-01-02 11:00",
+    situacaoAnterior: "-",
+    situacaoNova: "Aberto",
+    usuario: "Ednaldo",
+    observacao: "Cheque recebido"
+  }, {
+    id: 2,
+    data: "2024-01-05 10:00",
+    situacaoAnterior: "Aberto",
+    situacaoNova: "Depositado",
+    usuario: "Ednaldo",
+    observacao: ""
+  }, {
     id: 3,
-    numeroCheque: "000789",
-    banco: "341 - Itaú Unibanco",
-    agencia: "9012",
-    conta: "34567-8",
-    emitente: "Carlos Oliveira",
-    cpfCnpj: "456.789.123-00",
-    valor: 800.00,
-    dataEmissao: "2024-01-02",
-    dataVencimento: "2024-01-10",
-    localizacao: "Devolvido",
-    situacao: "Devolvido",
-    observacoes: "Sem fundos",
-    historico: [
-      { id: 1, data: "2024-01-02 11:00", situacaoAnterior: "-", situacaoNova: "Aberto", usuario: "Ednaldo", observacao: "Cheque recebido" },
-      { id: 2, data: "2024-01-05 10:00", situacaoAnterior: "Aberto", situacaoNova: "Depositado", usuario: "Ednaldo", observacao: "" },
-      { id: 3, data: "2024-01-08 16:30", situacaoAnterior: "Depositado", situacaoNova: "Devolvido", usuario: "Sistema", observacao: "Motivo: Sem fundos" }
-    ]
-  },
-  {
-    id: 4,
-    numeroCheque: "001234",
-    banco: "033 - Santander",
-    agencia: "3456",
-    conta: "78901-2",
-    emitente: "Ana Pereira",
-    cpfCnpj: "321.654.987-00",
-    valor: 3200.00,
-    dataEmissao: "2023-12-20",
-    dataVencimento: "2024-01-20",
-    localizacao: "Compensado",
-    situacao: "Compensado",
-    observacoes: "",
-    historico: [
-      { id: 1, data: "2023-12-20 15:00", situacaoAnterior: "-", situacaoNova: "Aberto", usuario: "Ednaldo", observacao: "Cheque recebido" },
-      { id: 2, data: "2024-01-02 08:30", situacaoAnterior: "Aberto", situacaoNova: "Depositado", usuario: "Ednaldo", observacao: "" },
-      { id: 3, data: "2024-01-05 12:00", situacaoAnterior: "Depositado", situacaoNova: "Compensado", usuario: "Sistema", observacao: "Compensação confirmada" }
-    ]
-  },
-  {
-    id: 5,
-    numeroCheque: "005678",
-    banco: "104 - Caixa Econômica Federal",
-    agencia: "7890",
-    conta: "23456-7",
-    emitente: "Pedro Souza",
-    cpfCnpj: "789.123.456-00",
-    valor: 1800.00,
-    dataEmissao: "2024-01-12",
-    dataVencimento: "2024-02-12",
-    localizacao: "Com terceiro",
-    situacao: "Aberto",
-    observacoes: "Repassado para fornecedor",
-    historico: [
-      { id: 1, data: "2024-01-12 09:00", situacaoAnterior: "-", situacaoNova: "Aberto", usuario: "Ednaldo", observacao: "Cheque recebido" },
-      { id: 2, data: "2024-01-14 11:30", situacaoAnterior: "Em caixa", situacaoNova: "Com terceiro", usuario: "Ednaldo", observacao: "Repassado para Fornecedor ABC" }
-    ]
-  },
-];
-
+    data: "2024-01-08 16:30",
+    situacaoAnterior: "Depositado",
+    situacaoNova: "Devolvido",
+    usuario: "Sistema",
+    observacao: "Motivo: Sem fundos"
+  }]
+}, {
+  id: 4,
+  numeroCheque: "001234",
+  banco: "033 - Santander",
+  agencia: "3456",
+  conta: "78901-2",
+  emitente: "Ana Pereira",
+  cpfCnpj: "321.654.987-00",
+  valor: 3200.00,
+  dataEmissao: "2023-12-20",
+  dataVencimento: "2024-01-20",
+  localizacao: "Compensado",
+  situacao: "Compensado",
+  observacoes: "",
+  historico: [{
+    id: 1,
+    data: "2023-12-20 15:00",
+    situacaoAnterior: "-",
+    situacaoNova: "Aberto",
+    usuario: "Ednaldo",
+    observacao: "Cheque recebido"
+  }, {
+    id: 2,
+    data: "2024-01-02 08:30",
+    situacaoAnterior: "Aberto",
+    situacaoNova: "Depositado",
+    usuario: "Ednaldo",
+    observacao: ""
+  }, {
+    id: 3,
+    data: "2024-01-05 12:00",
+    situacaoAnterior: "Depositado",
+    situacaoNova: "Compensado",
+    usuario: "Sistema",
+    observacao: "Compensação confirmada"
+  }]
+}, {
+  id: 5,
+  numeroCheque: "005678",
+  banco: "104 - Caixa Econômica Federal",
+  agencia: "7890",
+  conta: "23456-7",
+  emitente: "Pedro Souza",
+  cpfCnpj: "789.123.456-00",
+  valor: 1800.00,
+  dataEmissao: "2024-01-12",
+  dataVencimento: "2024-02-12",
+  localizacao: "Com terceiro",
+  situacao: "Aberto",
+  observacoes: "Repassado para fornecedor",
+  historico: [{
+    id: 1,
+    data: "2024-01-12 09:00",
+    situacaoAnterior: "-",
+    situacaoNova: "Aberto",
+    usuario: "Ednaldo",
+    observacao: "Cheque recebido"
+  }, {
+    id: 2,
+    data: "2024-01-14 11:30",
+    situacaoAnterior: "Em caixa",
+    situacaoNova: "Com terceiro",
+    usuario: "Ednaldo",
+    observacao: "Repassado para Fornecedor ABC"
+  }]
+}];
 type SortField = "numeroCheque" | "banco" | "emitente" | "valor" | "dataVencimento" | "situacao";
 type SortDirection = "asc" | "desc";
-
 const Cheques = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
@@ -143,7 +179,6 @@ const Cheques = () => {
   const [filterSituacao, setFilterSituacao] = useState("");
   const [filterDataInicio, setFilterDataInicio] = useState("");
   const [filterDataFim, setFilterDataFim] = useState("");
-
   const handleSort = (field: SortField) => {
     if (sortField === field) {
       setSortDirection(sortDirection === "asc" ? "desc" : "asc");
@@ -152,35 +187,24 @@ const Cheques = () => {
       setSortDirection("asc");
     }
   };
-
   const getSortIcon = (field: SortField) => {
     if (sortField !== field) return null;
-    return sortDirection === "asc" ? 
-      <ChevronUp className="h-4 w-4 ml-1" /> : 
-      <ChevronDown className="h-4 w-4 ml-1" />;
+    return sortDirection === "asc" ? <ChevronUp className="h-4 w-4 ml-1" /> : <ChevronDown className="h-4 w-4 ml-1" />;
   };
-
-  const filteredCheques = mockCheques
-    .filter(c => {
-      const matchesSearch = 
-        c.emitente.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        c.numeroCheque.includes(searchTerm) ||
-        c.banco.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesBanco = !filterBanco || c.banco.includes(filterBanco);
-      const matchesSituacao = !filterSituacao || c.situacao === filterSituacao;
-      return matchesSearch && matchesBanco && matchesSituacao;
-    })
-    .sort((a, b) => {
-      const aValue = a[sortField];
-      const bValue = b[sortField];
-      const modifier = sortDirection === "asc" ? 1 : -1;
-      
-      if (typeof aValue === "number" && typeof bValue === "number") {
-        return (aValue - bValue) * modifier;
-      }
-      return String(aValue).localeCompare(String(bValue)) * modifier;
-    });
-
+  const filteredCheques = mockCheques.filter(c => {
+    const matchesSearch = c.emitente.toLowerCase().includes(searchTerm.toLowerCase()) || c.numeroCheque.includes(searchTerm) || c.banco.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesBanco = !filterBanco || c.banco.includes(filterBanco);
+    const matchesSituacao = !filterSituacao || c.situacao === filterSituacao;
+    return matchesSearch && matchesBanco && matchesSituacao;
+  }).sort((a, b) => {
+    const aValue = a[sortField];
+    const bValue = b[sortField];
+    const modifier = sortDirection === "asc" ? 1 : -1;
+    if (typeof aValue === "number" && typeof bValue === "number") {
+      return (aValue - bValue) * modifier;
+    }
+    return String(aValue).localeCompare(String(bValue)) * modifier;
+  });
   const getSituacaoBadge = (situacao: string) => {
     switch (situacao) {
       case "Aberto":
@@ -197,7 +221,6 @@ const Cheques = () => {
         return <Badge variant="outline">{situacao}</Badge>;
     }
   };
-
   const getLocalizacaoBadge = (localizacao: string) => {
     switch (localizacao) {
       case "Em caixa":
@@ -216,26 +239,24 @@ const Cheques = () => {
         return <Badge variant="secondary">{localizacao}</Badge>;
     }
   };
-
   const isVencido = (dataVencimento: string, situacao: string) => {
     if (situacao === "Compensado") return false;
     const hoje = new Date();
     const vencimento = new Date(dataVencimento);
     return vencimento < hoje;
   };
-
   const formatDate = (dateStr: string) => {
     return new Date(dateStr).toLocaleDateString("pt-BR");
   };
-
   const formatCurrency = (value: number) => {
-    return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+    return value.toLocaleString("pt-BR", {
+      style: "currency",
+      currency: "BRL"
+    });
   };
-
   const handleViewCheque = (chequeId: number) => {
     navigate(`/financeiro/cheques/${chequeId}`);
   };
-
   const clearFilters = () => {
     setFilterBanco("");
     setFilterSituacao("");
@@ -249,9 +270,7 @@ const Cheques = () => {
   const totalDepositado = mockCheques.filter(c => c.situacao === "Depositado").reduce((acc, c) => acc + c.valor, 0);
   const totalDevolvido = mockCheques.filter(c => c.situacao === "Devolvido").reduce((acc, c) => acc + c.valor, 0);
   const totalCompensado = mockCheques.filter(c => c.situacao === "Compensado").reduce((acc, c) => acc + c.valor, 0);
-
-  return (
-    <div className="min-h-screen flex w-full bg-background">
+  return <div className="min-h-screen flex w-full bg-background">
       <FinanceiroSidebar />
       
       <div className="flex-1 flex flex-col min-h-screen overflow-hidden">
@@ -260,13 +279,7 @@ const Cheques = () => {
         <main className="flex-1 overflow-auto">
           <div className="p-6 space-y-6">
             {/* Breadcrumb */}
-            <button
-              onClick={() => navigate("/financeiro")}
-              className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Voltar para Financeiro
-            </button>
+            
 
             {/* Page Header */}
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -280,11 +293,7 @@ const Cheques = () => {
                 </p>
               </div>
               <div className="flex items-center gap-3">
-                <Button 
-                  variant="outline" 
-                  onClick={() => setShowFilters(!showFilters)}
-                  className="gap-2"
-                >
+                <Button variant="outline" onClick={() => setShowFilters(!showFilters)} className="gap-2">
                   <Filter className="h-4 w-4" />
                   Filtrar
                 </Button>
@@ -392,19 +401,11 @@ const Cheques = () => {
                       </div>
                       <div className="space-y-2">
                         <label className="text-sm font-medium text-foreground">Data Início</label>
-                        <Input
-                          type="date"
-                          value={filterDataInicio}
-                          onChange={(e) => setFilterDataInicio(e.target.value)}
-                        />
+                        <Input type="date" value={filterDataInicio} onChange={e => setFilterDataInicio(e.target.value)} />
                       </div>
                       <div className="space-y-2">
                         <label className="text-sm font-medium text-foreground">Data Fim</label>
-                        <Input
-                          type="date"
-                          value={filterDataFim}
-                          onChange={(e) => setFilterDataFim(e.target.value)}
-                        />
+                        <Input type="date" value={filterDataFim} onChange={e => setFilterDataFim(e.target.value)} />
                       </div>
                     </div>
                     <div className="flex justify-end gap-3 mt-4">
@@ -423,12 +424,7 @@ const Cheques = () => {
                   <CardTitle className="text-lg font-semibold">Lista de Cheques</CardTitle>
                   <div className="relative w-full md:w-80">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      placeholder="Buscar por emitente, número ou banco..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-10"
-                    />
+                    <Input placeholder="Buscar por emitente, número ou banco..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="pl-10" />
                   </div>
                 </div>
               </CardHeader>
@@ -437,52 +433,34 @@ const Cheques = () => {
                   <Table>
                     <TableHeader>
                       <TableRow className="bg-muted/50">
-                        <TableHead 
-                          className="cursor-pointer hover:bg-muted/80 transition-colors"
-                          onClick={() => handleSort("numeroCheque")}
-                        >
+                        <TableHead className="cursor-pointer hover:bg-muted/80 transition-colors" onClick={() => handleSort("numeroCheque")}>
                           <div className="flex items-center">
                             Nº Cheque {getSortIcon("numeroCheque")}
                           </div>
                         </TableHead>
-                        <TableHead 
-                          className="cursor-pointer hover:bg-muted/80 transition-colors"
-                          onClick={() => handleSort("banco")}
-                        >
+                        <TableHead className="cursor-pointer hover:bg-muted/80 transition-colors" onClick={() => handleSort("banco")}>
                           <div className="flex items-center">
                             Banco {getSortIcon("banco")}
                           </div>
                         </TableHead>
                         <TableHead>Agência/Conta</TableHead>
-                        <TableHead 
-                          className="cursor-pointer hover:bg-muted/80 transition-colors"
-                          onClick={() => handleSort("emitente")}
-                        >
+                        <TableHead className="cursor-pointer hover:bg-muted/80 transition-colors" onClick={() => handleSort("emitente")}>
                           <div className="flex items-center">
                             Emitente {getSortIcon("emitente")}
                           </div>
                         </TableHead>
-                        <TableHead 
-                          className="cursor-pointer hover:bg-muted/80 transition-colors text-right"
-                          onClick={() => handleSort("valor")}
-                        >
+                        <TableHead className="cursor-pointer hover:bg-muted/80 transition-colors text-right" onClick={() => handleSort("valor")}>
                           <div className="flex items-center justify-end">
                             Valor {getSortIcon("valor")}
                           </div>
                         </TableHead>
-                        <TableHead 
-                          className="cursor-pointer hover:bg-muted/80 transition-colors"
-                          onClick={() => handleSort("dataVencimento")}
-                        >
+                        <TableHead className="cursor-pointer hover:bg-muted/80 transition-colors" onClick={() => handleSort("dataVencimento")}>
                           <div className="flex items-center">
                             Vencimento {getSortIcon("dataVencimento")}
                           </div>
                         </TableHead>
                         <TableHead>Localização</TableHead>
-                        <TableHead 
-                          className="cursor-pointer hover:bg-muted/80 transition-colors"
-                          onClick={() => handleSort("situacao")}
-                        >
+                        <TableHead className="cursor-pointer hover:bg-muted/80 transition-colors" onClick={() => handleSort("situacao")}>
                           <div className="flex items-center">
                             Situação {getSortIcon("situacao")}
                           </div>
@@ -491,17 +469,7 @@ const Cheques = () => {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {filteredCheques.map((cheque) => (
-                        <TableRow 
-                          key={cheque.id}
-                          className={
-                            cheque.situacao === "Devolvido" 
-                              ? "bg-red-500/5 hover:bg-red-500/10" 
-                              : isVencido(cheque.dataVencimento, cheque.situacao)
-                              ? "bg-orange-500/5 hover:bg-orange-500/10"
-                              : "hover:bg-muted/50"
-                          }
-                        >
+                      {filteredCheques.map(cheque => <TableRow key={cheque.id} className={cheque.situacao === "Devolvido" ? "bg-red-500/5 hover:bg-red-500/10" : isVencido(cheque.dataVencimento, cheque.situacao) ? "bg-orange-500/5 hover:bg-orange-500/10" : "hover:bg-muted/50"}>
                           <TableCell className="font-mono font-medium">
                             {cheque.numeroCheque}
                           </TableCell>
@@ -523,9 +491,7 @@ const Cheques = () => {
                           <TableCell>
                             <div className="flex items-center gap-2">
                               {formatDate(cheque.dataVencimento)}
-                              {isVencido(cheque.dataVencimento, cheque.situacao) && (
-                                <AlertCircle className="h-4 w-4 text-orange-500" />
-                              )}
+                              {isVencido(cheque.dataVencimento, cheque.situacao) && <AlertCircle className="h-4 w-4 text-orange-500" />}
                             </div>
                           </TableCell>
                           <TableCell>
@@ -536,19 +502,13 @@ const Cheques = () => {
                           </TableCell>
                           <TableCell>
                             <div className="flex items-center justify-center">
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="h-8 gap-2"
-                                onClick={() => handleViewCheque(cheque.id)}
-                              >
+                              <Button variant="ghost" size="sm" className="h-8 gap-2" onClick={() => handleViewCheque(cheque.id)}>
                                 <Eye className="h-4 w-4" />
                                 Visualizar
                               </Button>
                             </div>
                           </TableCell>
-                        </TableRow>
-                      ))}
+                        </TableRow>)}
                     </TableBody>
                   </Table>
                 </div>
@@ -598,8 +558,6 @@ const Cheques = () => {
           </div>
         </main>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default Cheques;
