@@ -3,14 +3,11 @@ import { useNavigate, useLocation } from "react-router-dom";
 import FinanceiroSidebar from "@/components/financeiro/FinanceiroSidebar";
 import FinanceiroNavbar from "@/components/financeiro/FinanceiroNavbar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
 const SaudeFinanceiro = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const isMainRoute = location.pathname === "/financeiro";
-
-  return (
-    <div className="min-h-screen flex w-full bg-background">
+  return <div className="min-h-screen flex w-full bg-background">
       <FinanceiroSidebar />
       
       <div className="flex-1 flex flex-col min-h-screen overflow-hidden">
@@ -19,16 +16,9 @@ const SaudeFinanceiro = () => {
         <main className="flex-1 overflow-auto">
           <div className="p-6 space-y-6">
             {/* Breadcrumb */}
-            <button
-              onClick={() => navigate("/services")}
-              className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Voltar para Serviços
-            </button>
+            
 
-            {isMainRoute ? (
-              <>
+            {isMainRoute ? <>
                 {/* Page Header */}
                 <div>
                   <h1 className="text-2xl font-bold text-foreground">
@@ -158,10 +148,8 @@ const SaudeFinanceiro = () => {
                     </div>
                   </CardContent>
                 </Card>
-              </>
-            ) : (
-              /* Placeholder for sub-routes */
-              <div className="flex-1 flex items-center justify-center">
+              </> : (/* Placeholder for sub-routes */
+          <div className="flex-1 flex items-center justify-center">
                 <div className="text-center">
                   <Wallet className="h-16 w-16 text-muted-foreground/30 mx-auto mb-4" />
                   <h2 className="text-xl font-semibold text-foreground mb-2">
@@ -171,13 +159,10 @@ const SaudeFinanceiro = () => {
                     Escolha uma das opções do menu lateral para acessar as funcionalidades financeiras.
                   </p>
                 </div>
-              </div>
-            )}
+              </div>)}
           </div>
         </main>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default SaudeFinanceiro;
