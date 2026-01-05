@@ -1,4 +1,5 @@
-import { Bell, Settings, User, LogOut } from "lucide-react";
+import { Activity, LogOut, User, Bell } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -7,68 +8,83 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useNavigate } from "react-router-dom";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 
-export function SegurancaNavbar() {
+interface SegurancaNavbarProps {
+  userName?: string;
+}
+
+export function SegurancaNavbar({ userName = "Ednaldo" }: SegurancaNavbarProps) {
   const navigate = useNavigate();
 
   return (
-    <header className="h-16 bg-white border-b border-border flex items-center justify-between px-6">
-      <div className="flex items-center gap-4">
-        <nav className="flex items-center gap-2 text-sm text-muted-foreground">
-          <span 
-            className="hover:text-foreground cursor-pointer"
-            onClick={() => navigate("/services")}
-          >
-            Início
+    <header className="h-14 bg-card border-b border-border/50 flex items-center justify-between px-6 shadow-navbar flex-shrink-0">
+      {/* Logo and Breadcrumb */}
+      <div className="flex items-center gap-6">
+        <div className="flex items-center gap-2.5">
+          <Activity className="h-5 w-5 text-primary" strokeWidth={2.5} />
+          <span className="text-lg font-bold text-primary italic">
+            Saúde Systems
           </span>
-          <span>/</span>
-          <span className="text-foreground font-medium">Saúde Segurança</span>
-        </nav>
+        </div>
+
+        <div className="h-6 w-px bg-border" />
+
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink
+                onClick={() => navigate("/services")}
+                className="cursor-pointer text-muted-foreground hover:text-foreground text-sm"
+              >
+                Módulos
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage className="text-sm">Segurança</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
       </div>
 
-      <div className="flex items-center gap-2">
-        <Button variant="ghost" size="icon" className="relative">
-          <Bell className="w-5 h-5" />
-          <span className="absolute -top-1 -right-1 w-4 h-4 bg-destructive text-destructive-foreground text-xs rounded-full flex items-center justify-center">
+      {/* User Actions */}
+      <div className="flex items-center gap-3">
+        <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground h-8 w-8 relative">
+          <Bell className="h-4 w-4" />
+          <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-destructive text-destructive-foreground text-[10px] rounded-full flex items-center justify-center">
             3
           </span>
         </Button>
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon">
-              <Settings className="w-5 h-5" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => navigate("/configuracoes")}>
-              Configurações
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="gap-2">
-              <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
-                <User className="w-4 h-4 text-primary" />
+            <button className="flex items-center gap-2.5 hover:opacity-80 transition-opacity">
+              <span className="text-sm font-medium text-foreground">Olá, {userName}</span>
+              <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center border border-border">
+                <User className="h-4 w-4 text-muted-foreground" />
               </div>
-              <span className="text-sm font-medium">Admin</span>
-            </Button>
+            </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem>
-              <User className="w-4 h-4 mr-2" />
+          <DropdownMenuContent align="end" className="w-48">
+            <DropdownMenuItem onClick={() => navigate("/perfil")}>
+              <User className="h-4 w-4 mr-2" />
               Meu Perfil
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem 
-              className="text-destructive"
-              onClick={() => navigate("/login")}
+              onClick={() => navigate("/")}
+              className="text-vermelho-moderno focus:text-vermelho-moderno"
             >
-              <LogOut className="w-4 h-4 mr-2" />
-              Sair
+              <LogOut className="h-4 w-4 mr-2" />
+              Sair do Sistema
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -76,3 +92,5 @@ export function SegurancaNavbar() {
     </header>
   );
 }
+
+export default SegurancaNavbar;

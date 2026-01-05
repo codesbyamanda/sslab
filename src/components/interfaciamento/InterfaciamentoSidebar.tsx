@@ -1,4 +1,5 @@
-import { Link, useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { 
   LayoutDashboard, 
@@ -8,71 +9,150 @@ import {
   Activity, 
   FileText, 
   Settings,
-  Cpu
+  Cpu,
+  ChevronLeft,
+  ChevronRight
 } from "lucide-react";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 const menuItems = [
-  { icon: LayoutDashboard, label: "Dashboard", path: "/interfaciamento" },
-  { icon: Monitor, label: "Equipamentos", path: "/interfaciamento/equipamentos" },
-  { icon: Cable, label: "Protocolos", path: "/interfaciamento/protocolos" },
-  { icon: Link2, label: "Mapeamento de Exames", path: "/interfaciamento/mapeamento" },
-  { icon: Activity, label: "Monitoramento", path: "/interfaciamento/monitoramento" },
-  { icon: FileText, label: "Logs de Comunicação", path: "/interfaciamento/logs" },
-  { icon: Settings, label: "Configurações", path: "/interfaciamento/configuracoes" },
+  { icon: LayoutDashboard, title: "Dashboard", path: "/interfaciamento", tooltip: "Visão geral do interfaciamento" },
+  { icon: Monitor, title: "Equipamentos", path: "/interfaciamento/equipamentos", tooltip: "Gerenciar equipamentos" },
+  { icon: Cable, title: "Protocolos", path: "/interfaciamento/protocolos", tooltip: "Configurar protocolos" },
+  { icon: Link2, title: "Mapeamento de Exames", path: "/interfaciamento/mapeamento", tooltip: "Mapear exames" },
+  { icon: Activity, title: "Monitoramento", path: "/interfaciamento/monitoramento", tooltip: "Monitorar conexões" },
+  { icon: FileText, title: "Logs de Comunicação", path: "/interfaciamento/logs", tooltip: "Visualizar logs" },
+  { icon: Settings, title: "Configurações", path: "/interfaciamento/configuracoes", tooltip: "Configurações gerais" },
 ];
 
 export function InterfaciamentoSidebar() {
   const location = useLocation();
+  const navigate = useNavigate();
+  const [collapsed, setCollapsed] = useState(false);
+
+  const isActive = (path: string) => {
+    if (path === "/interfaciamento") {
+      return location.pathname === "/interfaciamento";
+    }
+    return location.pathname.startsWith(path);
+  };
 
   return (
-    <aside className="w-64 bg-primary min-h-screen flex flex-col">
-      <div className="p-6 border-b border-primary-foreground/10">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-primary-foreground/20 rounded-lg flex items-center justify-center">
-            <Cpu className="w-6 h-6 text-primary-foreground" />
-          </div>
-          <div>
-            <h1 className="text-primary-foreground font-bold text-lg">Saúde</h1>
-            <p className="text-primary-foreground/70 text-sm">Interfaciamento</p>
+    <TooltipProvider delayDuration={0}>
+      <aside
+        className={cn(
+          "h-screen gradient-navy flex flex-col transition-all duration-200 relative flex-shrink-0 sticky top-0",
+          collapsed ? "w-20" : "w-64"
+        )}
+      >
+        {/* Module Title */}
+        <div className="p-5 border-b border-sidebar-border flex-shrink-0">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-lg bg-petroleo flex items-center justify-center flex-shrink-0">
+              <Cpu className="h-5 w-5 text-primary-foreground" strokeWidth={2.5} />
+            </div>
+            {!collapsed && (
+              <div className="animate-fade-in">
+                <span className="text-base font-semibold text-sidebar-foreground block">
+                  Saúde Interfaciamento
+                </span>
+                <span className="text-xs text-sidebar-foreground/60">Integração de Equipamentos</span>
+              </div>
+            )}
           </div>
         </div>
-      </div>
 
-      <nav className="flex-1 p-4">
-        <ul className="space-y-1">
-          {menuItems.map((item) => {
-            const isActive = location.pathname === item.path || 
-              (item.path !== "/interfaciamento" && location.pathname.startsWith(item.path));
-            
-            return (
-              <li key={item.path}>
-                <Link
-                  to={item.path}
-                  className={cn(
-                    "flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200",
-                    isActive
-                      ? "bg-primary-foreground/20 text-primary-foreground"
-                      : "text-primary-foreground/70 hover:bg-primary-foreground/10 hover:text-primary-foreground"
-                  )}
-                >
-                  <item.icon className="w-5 h-5" />
-                  <span className="text-sm font-medium">{item.label}</span>
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
-      </nav>
-
-      <div className="p-4 border-t border-primary-foreground/10">
-        <Link
-          to="/services"
-          className="flex items-center gap-3 px-4 py-3 text-primary-foreground/70 hover:text-primary-foreground transition-colors"
+        {/* Toggle Button */}
+        <button
+          onClick={() => setCollapsed(!collapsed)}
+          className="absolute -right-3 top-16 w-6 h-6 rounded-full bg-card border border-border shadow-sm flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors z-10"
         >
-          <LayoutDashboard className="w-5 h-5" />
-          <span className="text-sm">Voltar aos Módulos</span>
-        </Link>
-      </div>
-    </aside>
+          {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+        </button>
+
+        {/* Navigation */}
+        <ScrollArea className="flex-1">
+          <nav className="py-4">
+            {!collapsed && (
+              <p className="px-6 mb-2 text-xs font-semibold uppercase tracking-wider text-sidebar-foreground/40">
+                Menu
+              </p>
+            )}
+            <ul className="space-y-1">
+              {menuItems.map((item) => {
+                const active = isActive(item.path);
+                
+                const content = (
+                  <button
+                    onClick={() => navigate(item.path)}
+                    className={cn(
+                      "flex items-center gap-3 py-2.5 font-medium transition-all duration-150 mx-2 rounded-lg text-sm w-[calc(100%-16px)]",
+                      collapsed ? "px-3 justify-center" : "px-4",
+                      active
+                        ? "bg-sidebar-accent text-sidebar-foreground border-l-2 border-dourado-sutil"
+                        : "text-sidebar-foreground/60 hover:bg-sidebar-accent hover:text-sidebar-foreground"
+                    )}
+                  >
+                    <item.icon className="h-5 w-5 flex-shrink-0" />
+                    {!collapsed && <span>{item.title}</span>}
+                  </button>
+                );
+
+                return (
+                  <li key={item.path}>
+                    {collapsed ? (
+                      <Tooltip>
+                        <TooltipTrigger asChild>{content}</TooltipTrigger>
+                        <TooltipContent side="right" className="bg-card text-card-foreground border-border">
+                          <p className="font-medium">{item.title}</p>
+                          {item.tooltip && <p className="text-xs text-muted-foreground">{item.tooltip}</p>}
+                        </TooltipContent>
+                      </Tooltip>
+                    ) : (
+                      content
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+          </nav>
+        </ScrollArea>
+
+        {/* Footer */}
+        <div className="p-4 border-t border-sidebar-border">
+          {collapsed ? (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  onClick={() => navigate("/services")}
+                  className="flex items-center justify-center py-2.5 mx-2 rounded-lg text-sidebar-foreground/60 hover:text-vermelho-moderno transition-colors w-[calc(100%-16px)]"
+                >
+                  <ChevronLeft className="h-5 w-5" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="right" className="bg-card text-card-foreground border-border">
+                Voltar aos Módulos
+              </TooltipContent>
+            </Tooltip>
+          ) : (
+            <button
+              onClick={() => navigate("/services")}
+              className="flex items-center gap-2 text-sidebar-foreground/60 hover:text-vermelho-moderno transition-colors text-sm w-full px-4 py-2.5 rounded-lg hover:bg-sidebar-accent/30"
+            >
+              <ChevronLeft className="h-4 w-4" />
+              Voltar aos Módulos
+            </button>
+          )}
+        </div>
+      </aside>
+    </TooltipProvider>
   );
 }
+
+export default InterfaciamentoSidebar;

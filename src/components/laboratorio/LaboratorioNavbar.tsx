@@ -1,7 +1,14 @@
+import { Activity, LogOut, User, Bell, Search } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { LogOut, Search, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -14,6 +21,7 @@ import {
 interface LaboratorioNavbarProps {
   title?: string;
   showSearch?: boolean;
+  userName?: string;
 }
 
 const routeTitles: Record<string, string> = {
@@ -32,22 +40,32 @@ const routeTitles: Record<string, string> = {
   "/laboratorio/config-laudo-internet": "Laudo de Internet",
 };
 
-const LaboratorioNavbar = ({ title, showSearch = false }: LaboratorioNavbarProps) => {
+const LaboratorioNavbar = ({ title, showSearch = false, userName = "Ednaldo" }: LaboratorioNavbarProps) => {
   const navigate = useNavigate();
   const location = useLocation();
 
   const currentTitle = title || routeTitles[location.pathname] || "Saúde Laboratório";
 
   return (
-    <header className="navbar-premium">
+    <header className="h-14 bg-card border-b border-border/50 flex items-center justify-between px-6 shadow-navbar flex-shrink-0">
+      {/* Left side - Logo and Breadcrumb */}
       <div className="flex items-center gap-6">
+        <div className="flex items-center gap-2.5">
+          <Activity className="h-5 w-5 text-primary" strokeWidth={2.5} />
+          <span className="text-lg font-bold text-primary italic">
+            Saúde Systems
+          </span>
+        </div>
+
+        <div className="h-6 w-px bg-border" />
+
         {/* Breadcrumb */}
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>
               <BreadcrumbLink
                 onClick={() => navigate("/services")}
-                className="cursor-pointer text-muted-foreground hover:text-foreground"
+                className="cursor-pointer text-muted-foreground hover:text-foreground text-sm"
               >
                 Módulos
               </BreadcrumbLink>
@@ -56,16 +74,16 @@ const LaboratorioNavbar = ({ title, showSearch = false }: LaboratorioNavbarProps
             <BreadcrumbItem>
               <BreadcrumbLink
                 onClick={() => navigate("/laboratorio")}
-                className="cursor-pointer text-muted-foreground hover:text-foreground"
+                className="cursor-pointer text-muted-foreground hover:text-foreground text-sm"
               >
-                Saúde Laboratório
+                Laboratório
               </BreadcrumbLink>
             </BreadcrumbItem>
             {location.pathname !== "/laboratorio" && (
               <>
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>
-                  <BreadcrumbPage>{currentTitle}</BreadcrumbPage>
+                  <BreadcrumbPage className="text-sm">{currentTitle}</BreadcrumbPage>
                 </BreadcrumbItem>
               </>
             )}
@@ -84,28 +102,37 @@ const LaboratorioNavbar = ({ title, showSearch = false }: LaboratorioNavbarProps
         )}
       </div>
 
-      <div className="flex items-center gap-4">
-        {/* Notifications */}
-        <Button variant="ghost" size="icon" className="relative">
-          <Bell className="h-5 w-5 text-muted-foreground" />
+      {/* Right side - User Actions */}
+      <div className="flex items-center gap-3">
+        <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground h-8 w-8 relative">
+          <Bell className="h-4 w-4" />
           <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-destructive rounded-full" />
         </Button>
 
-        {/* User */}
-        <div className="flex items-center gap-3 pl-4 border-l border-border">
-          <div className="text-right">
-            <p className="text-sm font-medium text-foreground">Olá, Ednaldo</p>
-            <p className="text-xs text-muted-foreground">Laboratório</p>
-          </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => navigate("/login")}
-            className="text-muted-foreground hover:text-foreground"
-          >
-            <LogOut className="h-5 w-5" />
-          </Button>
-        </div>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button className="flex items-center gap-2.5 hover:opacity-80 transition-opacity">
+              <span className="text-sm font-medium text-foreground">Olá, {userName}</span>
+              <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center border border-border">
+                <User className="h-4 w-4 text-muted-foreground" />
+              </div>
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-48">
+            <DropdownMenuItem onClick={() => navigate("/perfil")}>
+              <User className="h-4 w-4 mr-2" />
+              Meu Perfil
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem 
+              onClick={() => navigate("/")}
+              className="text-vermelho-moderno focus:text-vermelho-moderno"
+            >
+              <LogOut className="h-4 w-4 mr-2" />
+              Sair do Sistema
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </header>
   );
