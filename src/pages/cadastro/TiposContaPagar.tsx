@@ -27,30 +27,51 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { Plus, Search, Eye, Edit, TrendingDown } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { Plus, Search, Eye, Edit, Receipt, CheckCircle, XCircle, ToggleLeft, ToggleRight } from "lucide-react";
+import { toast } from "sonner";
 
 const tiposContaPagarMock = [
-  { id: 1, codigo: "CPG001", nome: "Fornecedores", categoria: "Operacional", contaContabil: "2.1.1.01", status: "Ativo" },
-  { id: 2, codigo: "CPG002", nome: "Salários e Encargos", categoria: "Pessoal", contaContabil: "2.1.2.01", status: "Ativo" },
-  { id: 3, codigo: "CPG003", nome: "Aluguel", categoria: "Fixo", contaContabil: "2.1.3.01", status: "Ativo" },
-  { id: 4, codigo: "CPG004", nome: "Energia Elétrica", categoria: "Utilidades", contaContabil: "2.1.3.02", status: "Ativo" },
-  { id: 5, codigo: "CPG005", nome: "Impostos", categoria: "Tributos", contaContabil: "2.1.4.01", status: "Ativo" },
-  { id: 6, codigo: "CPG006", nome: "Manutenção", categoria: "Operacional", contaContabil: "2.1.5.01", status: "Inativo" },
+  { id: 1, codigo: "CPG001", descricao: "Fornecedores", status: "Ativo" },
+  { id: 2, codigo: "CPG002", descricao: "Salários e Encargos", status: "Ativo" },
+  { id: 3, codigo: "CPG003", descricao: "Aluguel", status: "Ativo" },
+  { id: 4, codigo: "CPG004", descricao: "Energia Elétrica", status: "Ativo" },
+  { id: 5, codigo: "CPG005", descricao: "Impostos e Tributos", status: "Ativo" },
+  { id: 6, codigo: "CPG006", descricao: "Manutenção Predial", status: "Inativo" },
 ];
 
 export default function TiposContaPagar() {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("todos");
-  const [categoriaFilter, setCategoriaFilter] = useState("todos");
+  const [tipos, setTipos] = useState(tiposContaPagarMock);
 
-  const filteredTipos = tiposContaPagarMock.filter((item) => {
-    const matchesSearch = item.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  const filteredTipos = tipos.filter((item) => {
+    const matchesSearch = item.descricao.toLowerCase().includes(searchTerm.toLowerCase()) ||
       item.codigo.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === "todos" || item.status.toLowerCase() === statusFilter;
-    const matchesCategoria = categoriaFilter === "todos" || item.categoria === categoriaFilter;
-    return matchesSearch && matchesStatus && matchesCategoria;
+    return matchesSearch && matchesStatus;
   });
+
+  const totalTipos = tipos.length;
+  const tiposAtivos = tipos.filter(t => t.status === "Ativo").length;
+  const tiposInativos = tipos.filter(t => t.status === "Inativo").length;
+
+  const handleToggleStatus = (id: number) => {
+    setTipos(prev => prev.map(item => {
+      if (item.id === id) {
+        const newStatus = item.status === "Ativo" ? "Inativo" : "Ativo";
+        toast.success(`Tipo de conta ${newStatus === "Ativo" ? "ativado" : "inativado"} com sucesso`);
+        return { ...item, status: newStatus };
+      }
+      return item;
+    }));
+  };
 
   return (
     <div className="space-y-6">
@@ -69,24 +90,24 @@ export default function TiposContaPagar() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-foreground">Tipos de Contas a Pagar</h1>
-          <p className="text-muted-foreground">Gerencie os tipos de contas a pagar</p>
+          <p className="text-muted-foreground">Padronize e classifique as despesas do módulo financeiro</p>
         </div>
         <Button onClick={() => navigate("/cadastro/tipos-conta-pagar/novo")}>
           <Plus className="h-4 w-4 mr-2" />
-          Novo Tipo
+          Novo Tipo de Conta
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">
-              <div className="p-3 bg-blue-100 rounded-lg">
-                <TrendingDown className="h-6 w-6 text-blue-600" />
+              <div className="p-3 bg-primary/10 rounded-lg">
+                <Receipt className="h-6 w-6 text-primary" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Total</p>
-                <p className="text-2xl font-bold">{tiposContaPagarMock.length}</p>
+                <p className="text-sm text-muted-foreground">Total de Tipos</p>
+                <p className="text-2xl font-bold">{totalTipos}</p>
               </div>
             </div>
           </CardContent>
@@ -94,12 +115,12 @@ export default function TiposContaPagar() {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">
-              <div className="p-3 bg-green-100 rounded-lg">
-                <TrendingDown className="h-6 w-6 text-green-600" />
+              <div className="p-3 bg-green-500/10 rounded-lg">
+                <CheckCircle className="h-6 w-6 text-green-600" />
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Ativos</p>
-                <p className="text-2xl font-bold">{tiposContaPagarMock.filter(t => t.status === "Ativo").length}</p>
+                <p className="text-2xl font-bold">{tiposAtivos}</p>
               </div>
             </div>
           </CardContent>
@@ -107,25 +128,12 @@ export default function TiposContaPagar() {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">
-              <div className="p-3 bg-purple-100 rounded-lg">
-                <TrendingDown className="h-6 w-6 text-purple-600" />
+              <div className="p-3 bg-destructive/10 rounded-lg">
+                <XCircle className="h-6 w-6 text-destructive" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Operacional</p>
-                <p className="text-2xl font-bold">{tiposContaPagarMock.filter(t => t.categoria === "Operacional").length}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-orange-100 rounded-lg">
-                <TrendingDown className="h-6 w-6 text-orange-600" />
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Pessoal</p>
-                <p className="text-2xl font-bold">{tiposContaPagarMock.filter(t => t.categoria === "Pessoal").length}</p>
+                <p className="text-sm text-muted-foreground">Inativos</p>
+                <p className="text-2xl font-bold">{tiposInativos}</p>
               </div>
             </div>
           </CardContent>
@@ -137,29 +145,16 @@ export default function TiposContaPagar() {
           <CardTitle>Filtros</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="relative md:col-span-2">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Buscar por código ou nome..."
+                placeholder="Buscar por descrição..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"
               />
             </div>
-            <Select value={categoriaFilter} onValueChange={setCategoriaFilter}>
-              <SelectTrigger>
-                <SelectValue placeholder="Categoria" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="todos">Todas as categorias</SelectItem>
-                <SelectItem value="Operacional">Operacional</SelectItem>
-                <SelectItem value="Pessoal">Pessoal</SelectItem>
-                <SelectItem value="Fixo">Fixo</SelectItem>
-                <SelectItem value="Utilidades">Utilidades</SelectItem>
-                <SelectItem value="Tributos">Tributos</SelectItem>
-              </SelectContent>
-            </Select>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger>
                 <SelectValue placeholder="Status" />
@@ -180,47 +175,79 @@ export default function TiposContaPagar() {
             <TableHeader>
               <TableRow>
                 <TableHead>Código</TableHead>
-                <TableHead>Nome</TableHead>
-                <TableHead>Categoria</TableHead>
-                <TableHead>Conta Contábil</TableHead>
+                <TableHead>Descrição</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead className="text-right">Ações</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredTipos.map((item) => (
-                <TableRow key={item.id}>
-                  <TableCell className="font-medium">{item.codigo}</TableCell>
-                  <TableCell>{item.nome}</TableCell>
-                  <TableCell>
-                    <Badge variant="outline">{item.categoria}</Badge>
-                  </TableCell>
-                  <TableCell className="font-mono text-sm">{item.contaContabil}</TableCell>
-                  <TableCell>
-                    <Badge variant={item.status === "Ativo" ? "default" : "secondary"}>
-                      {item.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-2">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => navigate(`/cadastro/tipos-conta-pagar/${item.id}`)}
-                      >
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => navigate(`/cadastro/tipos-conta-pagar/${item.id}?edit=true`)}
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                    </div>
+              {filteredTipos.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
+                    Nenhum tipo de conta encontrado
                   </TableCell>
                 </TableRow>
-              ))}
+              ) : (
+                filteredTipos.map((item) => (
+                  <TableRow key={item.id}>
+                    <TableCell className="font-medium font-mono">{item.codigo}</TableCell>
+                    <TableCell>{item.descricao}</TableCell>
+                    <TableCell>
+                      <Badge variant={item.status === "Ativo" ? "default" : "secondary"}>
+                        {item.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <TooltipProvider>
+                        <div className="flex justify-end gap-1">
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => navigate(`/cadastro/tipos-conta-pagar/${item.id}`)}
+                              >
+                                <Eye className="h-4 w-4" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>Visualizar</TooltipContent>
+                          </Tooltip>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => navigate(`/cadastro/tipos-conta-pagar/${item.id}?edit=true`)}
+                              >
+                                <Edit className="h-4 w-4" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>Editar</TooltipContent>
+                          </Tooltip>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => handleToggleStatus(item.id)}
+                              >
+                                {item.status === "Ativo" ? (
+                                  <ToggleRight className="h-4 w-4 text-green-600" />
+                                ) : (
+                                  <ToggleLeft className="h-4 w-4 text-muted-foreground" />
+                                )}
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              {item.status === "Ativo" ? "Inativar" : "Ativar"}
+                            </TooltipContent>
+                          </Tooltip>
+                        </div>
+                      </TooltipProvider>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
             </TableBody>
           </Table>
         </CardContent>

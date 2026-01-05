@@ -27,29 +27,61 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { Plus, Search, Eye, Edit, FileSpreadsheet, Copy } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { Plus, Search, Eye, Edit, FileText, Copy, CheckCircle, XCircle, ToggleLeft, ToggleRight } from "lucide-react";
+import { toast } from "sonner";
 
 const modelosFolhaMock = [
-  { id: 1, codigo: "FLH001", nome: "Folha A4 Padrão", formato: "A4", orientacao: "Retrato", status: "Ativo" },
-  { id: 2, codigo: "FLH002", nome: "Folha A4 Paisagem", formato: "A4", orientacao: "Paisagem", status: "Ativo" },
-  { id: 3, codigo: "FLH003", nome: "Folha Carta", formato: "Carta", orientacao: "Retrato", status: "Ativo" },
-  { id: 4, codigo: "FLH004", nome: "Etiqueta Pequena", formato: "Personalizado", orientacao: "Retrato", status: "Ativo" },
-  { id: 5, codigo: "FLH005", nome: "Folha Antiga", formato: "A4", orientacao: "Retrato", status: "Inativo" },
+  { id: 1, codigo: "FLH001", nome: "Folha A4 Padrão", status: "Ativo" },
+  { id: 2, codigo: "FLH002", nome: "Folha A4 Paisagem", status: "Ativo" },
+  { id: 3, codigo: "FLH003", nome: "Folha Carta", status: "Ativo" },
+  { id: 4, codigo: "FLH004", nome: "Etiqueta Pequena", status: "Ativo" },
+  { id: 5, codigo: "FLH005", nome: "Folha Timbrada", status: "Inativo" },
 ];
 
 export default function ModelosFolha() {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("todos");
-  const [formatoFilter, setFormatoFilter] = useState("todos");
+  const [modelos, setModelos] = useState(modelosFolhaMock);
 
-  const filteredModelos = modelosFolhaMock.filter((item) => {
+  const filteredModelos = modelos.filter((item) => {
     const matchesSearch = item.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
       item.codigo.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === "todos" || item.status.toLowerCase() === statusFilter;
-    const matchesFormato = formatoFilter === "todos" || item.formato === formatoFilter;
-    return matchesSearch && matchesStatus && matchesFormato;
+    return matchesSearch && matchesStatus;
   });
+
+  const totalModelos = modelos.length;
+  const modelosAtivos = modelos.filter(m => m.status === "Ativo").length;
+  const modelosInativos = modelos.filter(m => m.status === "Inativo").length;
+
+  const handleToggleStatus = (id: number) => {
+    setModelos(prev => prev.map(item => {
+      if (item.id === id) {
+        const newStatus = item.status === "Ativo" ? "Inativo" : "Ativo";
+        toast.success(`Modelo ${newStatus === "Ativo" ? "ativado" : "inativado"} com sucesso`);
+        return { ...item, status: newStatus };
+      }
+      return item;
+    }));
+  };
+
+  const handleDuplicate = (item: typeof modelosFolhaMock[0]) => {
+    const newModelo = {
+      ...item,
+      id: modelos.length + 1,
+      codigo: `FLH${String(modelos.length + 1).padStart(3, '0')}`,
+      nome: `${item.nome} (Cópia)`,
+    };
+    setModelos(prev => [...prev, newModelo]);
+    toast.success("Modelo duplicado com sucesso");
+  };
 
   return (
     <div className="space-y-6">
@@ -60,7 +92,7 @@ export default function ModelosFolha() {
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbPage>Modelos de Folha</BreadcrumbPage>
+            <BreadcrumbPage>Modelos de Folha de Laudo</BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
@@ -68,24 +100,24 @@ export default function ModelosFolha() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-foreground">Modelos de Folha de Laudo</h1>
-          <p className="text-muted-foreground">Gerencie os modelos de folha para impressão</p>
+          <p className="text-muted-foreground">Gerencie os modelos de folha usados nos laudos médicos/laboratoriais</p>
         </div>
         <Button onClick={() => navigate("/cadastro/modelos-folha/novo")}>
           <Plus className="h-4 w-4 mr-2" />
-          Novo Modelo
+          Novo Modelo de Folha
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">
-              <div className="p-3 bg-blue-100 rounded-lg">
-                <FileSpreadsheet className="h-6 w-6 text-blue-600" />
+              <div className="p-3 bg-primary/10 rounded-lg">
+                <FileText className="h-6 w-6 text-primary" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Total</p>
-                <p className="text-2xl font-bold">{modelosFolhaMock.length}</p>
+                <p className="text-sm text-muted-foreground">Total de Modelos</p>
+                <p className="text-2xl font-bold">{totalModelos}</p>
               </div>
             </div>
           </CardContent>
@@ -93,12 +125,12 @@ export default function ModelosFolha() {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">
-              <div className="p-3 bg-green-100 rounded-lg">
-                <FileSpreadsheet className="h-6 w-6 text-green-600" />
+              <div className="p-3 bg-green-500/10 rounded-lg">
+                <CheckCircle className="h-6 w-6 text-green-600" />
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Ativos</p>
-                <p className="text-2xl font-bold">{modelosFolhaMock.filter(m => m.status === "Ativo").length}</p>
+                <p className="text-2xl font-bold">{modelosAtivos}</p>
               </div>
             </div>
           </CardContent>
@@ -106,25 +138,12 @@ export default function ModelosFolha() {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">
-              <div className="p-3 bg-purple-100 rounded-lg">
-                <FileSpreadsheet className="h-6 w-6 text-purple-600" />
+              <div className="p-3 bg-destructive/10 rounded-lg">
+                <XCircle className="h-6 w-6 text-destructive" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Formato A4</p>
-                <p className="text-2xl font-bold">{modelosFolhaMock.filter(m => m.formato === "A4").length}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-orange-100 rounded-lg">
-                <FileSpreadsheet className="h-6 w-6 text-orange-600" />
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Personalizados</p>
-                <p className="text-2xl font-bold">{modelosFolhaMock.filter(m => m.formato === "Personalizado").length}</p>
+                <p className="text-sm text-muted-foreground">Inativos</p>
+                <p className="text-2xl font-bold">{modelosInativos}</p>
               </div>
             </div>
           </CardContent>
@@ -136,27 +155,16 @@ export default function ModelosFolha() {
           <CardTitle>Filtros</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="relative md:col-span-2">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Buscar por código ou nome..."
+                placeholder="Buscar por nome ou código..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"
               />
             </div>
-            <Select value={formatoFilter} onValueChange={setFormatoFilter}>
-              <SelectTrigger>
-                <SelectValue placeholder="Formato" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="todos">Todos os formatos</SelectItem>
-                <SelectItem value="A4">A4</SelectItem>
-                <SelectItem value="Carta">Carta</SelectItem>
-                <SelectItem value="Personalizado">Personalizado</SelectItem>
-              </SelectContent>
-            </Select>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger>
                 <SelectValue placeholder="Status" />
@@ -177,50 +185,91 @@ export default function ModelosFolha() {
             <TableHeader>
               <TableRow>
                 <TableHead>Código</TableHead>
-                <TableHead>Nome</TableHead>
-                <TableHead>Formato</TableHead>
-                <TableHead>Orientação</TableHead>
+                <TableHead>Nome do Modelo</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead className="text-right">Ações</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredModelos.map((item) => (
-                <TableRow key={item.id}>
-                  <TableCell className="font-medium">{item.codigo}</TableCell>
-                  <TableCell>{item.nome}</TableCell>
-                  <TableCell>
-                    <Badge variant="outline">{item.formato}</Badge>
-                  </TableCell>
-                  <TableCell>{item.orientacao}</TableCell>
-                  <TableCell>
-                    <Badge variant={item.status === "Ativo" ? "default" : "secondary"}>
-                      {item.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-2">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => navigate(`/cadastro/modelos-folha/${item.id}`)}
-                      >
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => navigate(`/cadastro/modelos-folha/${item.id}?edit=true`)}
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button variant="ghost" size="icon" title="Duplicar">
-                        <Copy className="h-4 w-4" />
-                      </Button>
-                    </div>
+              {filteredModelos.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
+                    Nenhum modelo de folha encontrado
                   </TableCell>
                 </TableRow>
-              ))}
+              ) : (
+                filteredModelos.map((item) => (
+                  <TableRow key={item.id}>
+                    <TableCell className="font-medium font-mono">{item.codigo}</TableCell>
+                    <TableCell>{item.nome}</TableCell>
+                    <TableCell>
+                      <Badge variant={item.status === "Ativo" ? "default" : "secondary"}>
+                        {item.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <TooltipProvider>
+                        <div className="flex justify-end gap-1">
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => navigate(`/cadastro/modelos-folha/${item.id}`)}
+                              >
+                                <Eye className="h-4 w-4" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>Visualizar</TooltipContent>
+                          </Tooltip>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => navigate(`/cadastro/modelos-folha/${item.id}?edit=true`)}
+                              >
+                                <Edit className="h-4 w-4" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>Editar</TooltipContent>
+                          </Tooltip>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => handleDuplicate(item)}
+                              >
+                                <Copy className="h-4 w-4" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>Duplicar</TooltipContent>
+                          </Tooltip>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => handleToggleStatus(item.id)}
+                              >
+                                {item.status === "Ativo" ? (
+                                  <ToggleRight className="h-4 w-4 text-green-600" />
+                                ) : (
+                                  <ToggleLeft className="h-4 w-4 text-muted-foreground" />
+                                )}
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              {item.status === "Ativo" ? "Inativar" : "Ativar"}
+                            </TooltipContent>
+                          </Tooltip>
+                        </div>
+                      </TooltipProvider>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
             </TableBody>
           </Table>
         </CardContent>

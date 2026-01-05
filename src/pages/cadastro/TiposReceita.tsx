@@ -27,29 +27,50 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { Plus, Search, Eye, Edit, TrendingUp } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { Plus, Search, Eye, Edit, DollarSign, CheckCircle, XCircle, ToggleLeft, ToggleRight } from "lucide-react";
+import { toast } from "sonner";
 
 const tiposReceitaMock = [
-  { id: 1, codigo: "REC001", nome: "Exames Laboratoriais", categoria: "Serviços", contaContabil: "3.1.1.01", status: "Ativo" },
-  { id: 2, codigo: "REC002", nome: "Consultas Médicas", categoria: "Serviços", contaContabil: "3.1.1.02", status: "Ativo" },
-  { id: 3, codigo: "REC003", nome: "Procedimentos", categoria: "Serviços", contaContabil: "3.1.1.03", status: "Ativo" },
-  { id: 4, codigo: "REC004", nome: "Venda de Produtos", categoria: "Produtos", contaContabil: "3.1.2.01", status: "Ativo" },
-  { id: 5, codigo: "REC005", nome: "Taxas Administrativas", categoria: "Taxas", contaContabil: "3.1.3.01", status: "Inativo" },
+  { id: 1, codigo: "REC001", descricao: "Exames Laboratoriais", status: "Ativo" },
+  { id: 2, codigo: "REC002", descricao: "Consultas Médicas", status: "Ativo" },
+  { id: 3, codigo: "REC003", descricao: "Procedimentos", status: "Ativo" },
+  { id: 4, codigo: "REC004", descricao: "Venda de Produtos", status: "Ativo" },
+  { id: 5, codigo: "REC005", descricao: "Taxas Administrativas", status: "Inativo" },
 ];
 
 export default function TiposReceita() {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("todos");
-  const [categoriaFilter, setCategoriaFilter] = useState("todos");
+  const [tipos, setTipos] = useState(tiposReceitaMock);
 
-  const filteredTipos = tiposReceitaMock.filter((item) => {
-    const matchesSearch = item.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  const filteredTipos = tipos.filter((item) => {
+    const matchesSearch = item.descricao.toLowerCase().includes(searchTerm.toLowerCase()) ||
       item.codigo.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === "todos" || item.status.toLowerCase() === statusFilter;
-    const matchesCategoria = categoriaFilter === "todos" || item.categoria === categoriaFilter;
-    return matchesSearch && matchesStatus && matchesCategoria;
+    return matchesSearch && matchesStatus;
   });
+
+  const totalTipos = tipos.length;
+  const tiposAtivos = tipos.filter(t => t.status === "Ativo").length;
+  const tiposInativos = tipos.filter(t => t.status === "Inativo").length;
+
+  const handleToggleStatus = (id: number) => {
+    setTipos(prev => prev.map(item => {
+      if (item.id === id) {
+        const newStatus = item.status === "Ativo" ? "Inativo" : "Ativo";
+        toast.success(`Tipo de receita ${newStatus === "Ativo" ? "ativado" : "inativado"} com sucesso`);
+        return { ...item, status: newStatus };
+      }
+      return item;
+    }));
+  };
 
   return (
     <div className="space-y-6">
@@ -68,24 +89,24 @@ export default function TiposReceita() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-foreground">Tipos de Receita</h1>
-          <p className="text-muted-foreground">Gerencie os tipos de receita do sistema</p>
+          <p className="text-muted-foreground">Cadastre e gerencie os tipos de receita utilizados nos módulos financeiros</p>
         </div>
         <Button onClick={() => navigate("/cadastro/tipos-receita/novo")}>
           <Plus className="h-4 w-4 mr-2" />
-          Novo Tipo
+          Novo Tipo de Receita
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">
-              <div className="p-3 bg-blue-100 rounded-lg">
-                <TrendingUp className="h-6 w-6 text-blue-600" />
+              <div className="p-3 bg-primary/10 rounded-lg">
+                <DollarSign className="h-6 w-6 text-primary" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Total</p>
-                <p className="text-2xl font-bold">{tiposReceitaMock.length}</p>
+                <p className="text-sm text-muted-foreground">Total de Tipos</p>
+                <p className="text-2xl font-bold">{totalTipos}</p>
               </div>
             </div>
           </CardContent>
@@ -93,12 +114,12 @@ export default function TiposReceita() {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">
-              <div className="p-3 bg-green-100 rounded-lg">
-                <TrendingUp className="h-6 w-6 text-green-600" />
+              <div className="p-3 bg-green-500/10 rounded-lg">
+                <CheckCircle className="h-6 w-6 text-green-600" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Ativos</p>
-                <p className="text-2xl font-bold">{tiposReceitaMock.filter(t => t.status === "Ativo").length}</p>
+                <p className="text-sm text-muted-foreground">Tipos Ativos</p>
+                <p className="text-2xl font-bold">{tiposAtivos}</p>
               </div>
             </div>
           </CardContent>
@@ -106,25 +127,12 @@ export default function TiposReceita() {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">
-              <div className="p-3 bg-purple-100 rounded-lg">
-                <TrendingUp className="h-6 w-6 text-purple-600" />
+              <div className="p-3 bg-destructive/10 rounded-lg">
+                <XCircle className="h-6 w-6 text-destructive" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Serviços</p>
-                <p className="text-2xl font-bold">{tiposReceitaMock.filter(t => t.categoria === "Serviços").length}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-orange-100 rounded-lg">
-                <TrendingUp className="h-6 w-6 text-orange-600" />
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Produtos</p>
-                <p className="text-2xl font-bold">{tiposReceitaMock.filter(t => t.categoria === "Produtos").length}</p>
+                <p className="text-sm text-muted-foreground">Tipos Inativos</p>
+                <p className="text-2xl font-bold">{tiposInativos}</p>
               </div>
             </div>
           </CardContent>
@@ -136,27 +144,16 @@ export default function TiposReceita() {
           <CardTitle>Filtros</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="relative md:col-span-2">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Buscar por código ou nome..."
+                placeholder="Buscar por descrição..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"
               />
             </div>
-            <Select value={categoriaFilter} onValueChange={setCategoriaFilter}>
-              <SelectTrigger>
-                <SelectValue placeholder="Categoria" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="todos">Todas as categorias</SelectItem>
-                <SelectItem value="Serviços">Serviços</SelectItem>
-                <SelectItem value="Produtos">Produtos</SelectItem>
-                <SelectItem value="Taxas">Taxas</SelectItem>
-              </SelectContent>
-            </Select>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger>
                 <SelectValue placeholder="Status" />
@@ -177,47 +174,79 @@ export default function TiposReceita() {
             <TableHeader>
               <TableRow>
                 <TableHead>Código</TableHead>
-                <TableHead>Nome</TableHead>
-                <TableHead>Categoria</TableHead>
-                <TableHead>Conta Contábil</TableHead>
+                <TableHead>Descrição</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead className="text-right">Ações</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredTipos.map((item) => (
-                <TableRow key={item.id}>
-                  <TableCell className="font-medium">{item.codigo}</TableCell>
-                  <TableCell>{item.nome}</TableCell>
-                  <TableCell>
-                    <Badge variant="outline">{item.categoria}</Badge>
-                  </TableCell>
-                  <TableCell className="font-mono text-sm">{item.contaContabil}</TableCell>
-                  <TableCell>
-                    <Badge variant={item.status === "Ativo" ? "default" : "secondary"}>
-                      {item.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-2">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => navigate(`/cadastro/tipos-receita/${item.id}`)}
-                      >
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => navigate(`/cadastro/tipos-receita/${item.id}?edit=true`)}
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                    </div>
+              {filteredTipos.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
+                    Nenhum tipo de receita encontrado
                   </TableCell>
                 </TableRow>
-              ))}
+              ) : (
+                filteredTipos.map((item) => (
+                  <TableRow key={item.id}>
+                    <TableCell className="font-medium font-mono">{item.codigo}</TableCell>
+                    <TableCell>{item.descricao}</TableCell>
+                    <TableCell>
+                      <Badge variant={item.status === "Ativo" ? "default" : "secondary"}>
+                        {item.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <TooltipProvider>
+                        <div className="flex justify-end gap-1">
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => navigate(`/cadastro/tipos-receita/${item.id}`)}
+                              >
+                                <Eye className="h-4 w-4" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>Visualizar</TooltipContent>
+                          </Tooltip>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => navigate(`/cadastro/tipos-receita/${item.id}?edit=true`)}
+                              >
+                                <Edit className="h-4 w-4" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>Editar</TooltipContent>
+                          </Tooltip>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => handleToggleStatus(item.id)}
+                              >
+                                {item.status === "Ativo" ? (
+                                  <ToggleRight className="h-4 w-4 text-green-600" />
+                                ) : (
+                                  <ToggleLeft className="h-4 w-4 text-muted-foreground" />
+                                )}
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              {item.status === "Ativo" ? "Inativar" : "Ativar"}
+                            </TooltipContent>
+                          </Tooltip>
+                        </div>
+                      </TooltipProvider>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
             </TableBody>
           </Table>
         </CardContent>
