@@ -7,74 +7,47 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Collapsible,
-  CollapsibleContent,
-} from "@/components/ui/collapsible";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 // Mock data
-const mockContas = [
-  {
-    id: 1,
-    banco: "Banco do Brasil",
-    agencia: "1234-5",
-    conta: "12345-6",
-    tipo: "Conta Corrente",
-    saldoAtual: 45320.50,
-    situacao: "Ativa",
-  },
-  {
-    id: 2,
-    banco: "Itaú",
-    agencia: "0987",
-    conta: "98765-4",
-    tipo: "Conta Corrente",
-    saldoAtual: 28150.00,
-    situacao: "Ativa",
-  },
-  {
-    id: 3,
-    banco: "Bradesco",
-    agencia: "5678",
-    conta: "54321-0",
-    tipo: "Conta Poupança",
-    saldoAtual: 15000.00,
-    situacao: "Ativa",
-  },
-  {
-    id: 4,
-    banco: "Caixa Econômica",
-    agencia: "0123",
-    conta: "00123-4",
-    tipo: "Conta Corrente",
-    saldoAtual: 0,
-    situacao: "Inativa",
-  },
-];
-
+const mockContas = [{
+  id: 1,
+  banco: "Banco do Brasil",
+  agencia: "1234-5",
+  conta: "12345-6",
+  tipo: "Conta Corrente",
+  saldoAtual: 45320.50,
+  situacao: "Ativa"
+}, {
+  id: 2,
+  banco: "Itaú",
+  agencia: "0987",
+  conta: "98765-4",
+  tipo: "Conta Corrente",
+  saldoAtual: 28150.00,
+  situacao: "Ativa"
+}, {
+  id: 3,
+  banco: "Bradesco",
+  agencia: "5678",
+  conta: "54321-0",
+  tipo: "Conta Poupança",
+  saldoAtual: 15000.00,
+  situacao: "Ativa"
+}, {
+  id: 4,
+  banco: "Caixa Econômica",
+  agencia: "0123",
+  conta: "00123-4",
+  tipo: "Conta Corrente",
+  saldoAtual: 0,
+  situacao: "Inativa"
+}];
 type SortField = "banco" | "agencia" | "conta" | "saldoAtual" | "situacao";
 type SortDirection = "asc" | "desc";
-
 const ContasCorrentes = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
@@ -83,7 +56,6 @@ const ContasCorrentes = () => {
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
   const [filterSituacao, setFilterSituacao] = useState("");
   const [filterBanco, setFilterBanco] = useState("");
-
   const handleSort = (field: SortField) => {
     if (sortField === field) {
       setSortDirection(sortDirection === "asc" ? "desc" : "asc");
@@ -92,34 +64,24 @@ const ContasCorrentes = () => {
       setSortDirection("asc");
     }
   };
-
   const getSortIcon = (field: SortField) => {
     if (sortField !== field) return null;
-    return sortDirection === "asc" ? 
-      <ChevronUp className="h-4 w-4 ml-1" /> : 
-      <ChevronDown className="h-4 w-4 ml-1" />;
+    return sortDirection === "asc" ? <ChevronUp className="h-4 w-4 ml-1" /> : <ChevronDown className="h-4 w-4 ml-1" />;
   };
-
-  const filteredContas = mockContas
-    .filter(c => {
-      const matchesSearch = 
-        c.banco.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        c.conta.includes(searchTerm);
-      const matchesSituacao = !filterSituacao || c.situacao === filterSituacao;
-      const matchesBanco = !filterBanco || c.banco === filterBanco;
-      return matchesSearch && matchesSituacao && matchesBanco;
-    })
-    .sort((a, b) => {
-      const aValue = a[sortField];
-      const bValue = b[sortField];
-      const modifier = sortDirection === "asc" ? 1 : -1;
-      
-      if (typeof aValue === "number" && typeof bValue === "number") {
-        return (aValue - bValue) * modifier;
-      }
-      return String(aValue).localeCompare(String(bValue)) * modifier;
-    });
-
+  const filteredContas = mockContas.filter(c => {
+    const matchesSearch = c.banco.toLowerCase().includes(searchTerm.toLowerCase()) || c.conta.includes(searchTerm);
+    const matchesSituacao = !filterSituacao || c.situacao === filterSituacao;
+    const matchesBanco = !filterBanco || c.banco === filterBanco;
+    return matchesSearch && matchesSituacao && matchesBanco;
+  }).sort((a, b) => {
+    const aValue = a[sortField];
+    const bValue = b[sortField];
+    const modifier = sortDirection === "asc" ? 1 : -1;
+    if (typeof aValue === "number" && typeof bValue === "number") {
+      return (aValue - bValue) * modifier;
+    }
+    return String(aValue).localeCompare(String(bValue)) * modifier;
+  });
   const getSituacaoBadge = (situacao: string) => {
     switch (situacao) {
       case "Ativa":
@@ -130,11 +92,12 @@ const ContasCorrentes = () => {
         return <Badge variant="outline">{situacao}</Badge>;
     }
   };
-
   const formatCurrency = (value: number) => {
-    return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+    return value.toLocaleString("pt-BR", {
+      style: "currency",
+      currency: "BRL"
+    });
   };
-
   const clearFilters = () => {
     setFilterSituacao("");
     setFilterBanco("");
@@ -146,9 +109,7 @@ const ContasCorrentes = () => {
   const entradasPeriodo = 85000.00; // Mock value
   const saidasPeriodo = 42500.00; // Mock value
   const contasAtivas = mockContas.filter(c => c.situacao === "Ativa").length;
-
-  return (
-    <div className="min-h-screen flex w-full bg-background">
+  return <div className="min-h-screen flex w-full bg-background">
       <FinanceiroSidebar />
       
       <div className="flex-1 flex flex-col min-h-screen overflow-hidden">
@@ -157,13 +118,7 @@ const ContasCorrentes = () => {
         <main className="flex-1 overflow-auto">
           <div className="p-6 space-y-6">
             {/* Breadcrumb */}
-            <button
-              onClick={() => navigate("/financeiro")}
-              className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Voltar para Financeiro
-            </button>
+            
 
             {/* Page Header */}
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -176,25 +131,15 @@ const ContasCorrentes = () => {
                 </p>
               </div>
               <div className="flex items-center gap-3">
-                <Button 
-                  variant="outline" 
-                  onClick={() => setShowFilters(!showFilters)}
-                  className="gap-2"
-                >
+                <Button variant="outline" onClick={() => setShowFilters(!showFilters)} className="gap-2">
                   <Filter className="h-4 w-4" />
                   Filtrar
                 </Button>
-                <Button 
-                  variant="outline"
-                  className="gap-2"
-                >
+                <Button variant="outline" className="gap-2">
                   <FileDown className="h-4 w-4" />
                   Exportar
                 </Button>
-                <Button 
-                  onClick={() => navigate("/financeiro/contas-correntes/nova")}
-                  className="gap-2"
-                >
+                <Button onClick={() => navigate("/financeiro/contas-correntes/nova")} className="gap-2">
                   <Plus className="h-4 w-4" />
                   Nova Conta
                 </Button>
@@ -322,12 +267,7 @@ const ContasCorrentes = () => {
                   <CardTitle className="text-lg font-semibold">Lista de Contas Correntes</CardTitle>
                   <div className="relative w-full md:w-80">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      placeholder="Buscar por banco ou conta..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-10"
-                    />
+                    <Input placeholder="Buscar por banco ou conta..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="pl-10" />
                   </div>
                 </div>
               </CardHeader>
@@ -336,47 +276,32 @@ const ContasCorrentes = () => {
                   <Table>
                     <TableHeader>
                       <TableRow className="bg-muted/50">
-                        <TableHead 
-                          className="cursor-pointer hover:bg-muted/80 transition-colors"
-                          onClick={() => handleSort("banco")}
-                        >
+                        <TableHead className="cursor-pointer hover:bg-muted/80 transition-colors" onClick={() => handleSort("banco")}>
                           <div className="flex items-center">
                             Banco
                             {getSortIcon("banco")}
                           </div>
                         </TableHead>
-                        <TableHead 
-                          className="cursor-pointer hover:bg-muted/80 transition-colors"
-                          onClick={() => handleSort("agencia")}
-                        >
+                        <TableHead className="cursor-pointer hover:bg-muted/80 transition-colors" onClick={() => handleSort("agencia")}>
                           <div className="flex items-center">
                             Agência
                             {getSortIcon("agencia")}
                           </div>
                         </TableHead>
-                        <TableHead 
-                          className="cursor-pointer hover:bg-muted/80 transition-colors"
-                          onClick={() => handleSort("conta")}
-                        >
+                        <TableHead className="cursor-pointer hover:bg-muted/80 transition-colors" onClick={() => handleSort("conta")}>
                           <div className="flex items-center">
                             Conta
                             {getSortIcon("conta")}
                           </div>
                         </TableHead>
                         <TableHead>Tipo</TableHead>
-                        <TableHead 
-                          className="cursor-pointer hover:bg-muted/80 transition-colors text-right"
-                          onClick={() => handleSort("saldoAtual")}
-                        >
+                        <TableHead className="cursor-pointer hover:bg-muted/80 transition-colors text-right" onClick={() => handleSort("saldoAtual")}>
                           <div className="flex items-center justify-end">
                             Saldo Atual
                             {getSortIcon("saldoAtual")}
                           </div>
                         </TableHead>
-                        <TableHead 
-                          className="cursor-pointer hover:bg-muted/80 transition-colors"
-                          onClick={() => handleSort("situacao")}
-                        >
+                        <TableHead className="cursor-pointer hover:bg-muted/80 transition-colors" onClick={() => handleSort("situacao")}>
                           <div className="flex items-center">
                             Situação
                             {getSortIcon("situacao")}
@@ -386,19 +311,11 @@ const ContasCorrentes = () => {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {filteredContas.length === 0 ? (
-                        <TableRow>
+                      {filteredContas.length === 0 ? <TableRow>
                           <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
                             Nenhuma conta encontrada.
                           </TableCell>
-                        </TableRow>
-                      ) : (
-                        filteredContas.map((conta) => (
-                          <TableRow 
-                            key={conta.id} 
-                            className="hover:bg-muted/30 transition-colors cursor-pointer"
-                            onClick={() => navigate(`/financeiro/contas-correntes/${conta.id}`)}
-                          >
+                        </TableRow> : filteredContas.map(conta => <TableRow key={conta.id} className="hover:bg-muted/30 transition-colors cursor-pointer" onClick={() => navigate(`/financeiro/contas-correntes/${conta.id}`)}>
                             <TableCell className="font-medium">
                               <div className="flex items-center gap-2">
                                 <Building2 className="h-4 w-4 text-muted-foreground" />
@@ -415,23 +332,17 @@ const ContasCorrentes = () => {
                             <TableCell className="text-right">
                               <Tooltip>
                                 <TooltipTrigger asChild>
-                                  <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      navigate(`/financeiro/contas-correntes/${conta.id}`);
-                                    }}
-                                  >
+                                  <Button variant="ghost" size="icon" onClick={e => {
+                              e.stopPropagation();
+                              navigate(`/financeiro/contas-correntes/${conta.id}`);
+                            }}>
                                     <Eye className="h-4 w-4" />
                                   </Button>
                                 </TooltipTrigger>
                                 <TooltipContent>Ver detalhes</TooltipContent>
                               </Tooltip>
                             </TableCell>
-                          </TableRow>
-                        ))
-                      )}
+                          </TableRow>)}
                     </TableBody>
                   </Table>
                 </div>
@@ -440,8 +351,6 @@ const ContasCorrentes = () => {
           </div>
         </main>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default ContasCorrentes;
