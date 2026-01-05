@@ -214,9 +214,12 @@ const FaturamentoSidebar = () => {
               <Activity className="h-5 w-5 text-primary-foreground" strokeWidth={2.5} />
             </div>
             {!collapsed && (
-              <span className="text-base font-semibold text-sidebar-foreground animate-fade-in">
-                Saúde Faturamento
-              </span>
+              <div className="animate-fade-in">
+                <span className="text-base font-semibold text-sidebar-foreground block">
+                  Saúde Faturamento
+                </span>
+                <span className="text-xs text-sidebar-foreground/60">Gestão de Faturamento</span>
+              </div>
             )}
           </div>
         </div>
@@ -275,74 +278,50 @@ const FaturamentoSidebar = () => {
             {/* Separator */}
             <div className="my-4 mx-4 border-t border-sidebar-border/30" />
 
-            {/* Geral Group */}
-            {!collapsed && (
-              <p className="px-6 mb-2 text-xs font-medium text-sidebar-foreground/40 uppercase tracking-wider">
-                Geral
-              </p>
-            )}
-
-            <div className="space-y-1">
-              {!collapsed ? (
-                <>
-                  <NavLink
-                    to="/faturamento/configuracoes"
-                    className={cn(
-                      "flex items-center gap-3 py-2.5 font-medium transition-all duration-150 mx-2 rounded-lg text-sm px-4",
-                      location.pathname === "/faturamento/configuracoes"
-                        ? "bg-sidebar-accent text-sidebar-foreground border-l-2 border-dourado-sutil"
-                        : "text-sidebar-foreground/60 hover:bg-sidebar-accent hover:text-sidebar-foreground"
-                    )}
-                  >
-                    <Settings className="h-5 w-5 flex-shrink-0" />
-                    <span>Configurações</span>
-                  </NavLink>
-                  <button
-                    onClick={() => navigate("/services")}
-                    className="flex items-center gap-3 py-2.5 font-medium transition-all duration-150 mx-2 rounded-lg text-sm px-4 text-vermelho-moderno hover:bg-vermelho-moderno/10 w-full text-left"
-                  >
-                    <LogOut className="h-5 w-5 flex-shrink-0" />
-                    <span>Sair do Módulo</span>
-                  </button>
-                </>
-              ) : (
-                <>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <NavLink
-                        to="/faturamento/configuracoes"
-                        className={cn(
-                          "flex items-center gap-3 py-2.5 font-medium transition-all duration-150 mx-2 rounded-lg text-sm px-3 justify-center",
-                          location.pathname === "/faturamento/configuracoes"
-                            ? "bg-sidebar-accent text-sidebar-foreground"
-                            : "text-sidebar-foreground/60 hover:bg-sidebar-accent hover:text-sidebar-foreground"
-                        )}
-                      >
-                        <Settings className="h-5 w-5 flex-shrink-0" />
-                      </NavLink>
-                    </TooltipTrigger>
-                    <TooltipContent side="right" className="bg-card text-card-foreground border-border">
-                      Configurações
-                    </TooltipContent>
-                  </Tooltip>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button
-                        onClick={() => navigate("/services")}
-                        className="flex items-center gap-3 py-2.5 font-medium transition-all duration-150 mx-2 rounded-lg text-sm px-3 justify-center text-vermelho-moderno hover:bg-vermelho-moderno/10 w-[calc(100%-16px)]"
-                      >
-                        <LogOut className="h-5 w-5 flex-shrink-0" />
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent side="right" className="bg-card text-card-foreground border-border">
-                      Sair do Módulo
-                    </TooltipContent>
-                  </Tooltip>
-                </>
-              )}
-            </div>
+            {/* Configurações */}
+            <ul className="space-y-1">
+              <li>
+                <MenuItem 
+                  item={{ 
+                    title: "Configurações", 
+                    url: "/faturamento/configuracoes", 
+                    icon: Settings,
+                    tooltip: "Configurações do módulo"
+                  }} 
+                  collapsed={collapsed} 
+                  isActive={location.pathname === "/faturamento/configuracoes"} 
+                />
+              </li>
+            </ul>
           </nav>
         </ScrollArea>
+
+        {/* Footer */}
+        <div className="p-4 border-t border-sidebar-border">
+          {collapsed ? (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  onClick={() => navigate("/services")}
+                  className="flex items-center justify-center py-2.5 mx-2 rounded-lg text-sidebar-foreground/60 hover:text-vermelho-moderno transition-colors w-[calc(100%-16px)]"
+                >
+                  <ChevronLeft className="h-5 w-5" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="right" className="bg-card text-card-foreground border-border">
+                Voltar aos Módulos
+              </TooltipContent>
+            </Tooltip>
+          ) : (
+            <button
+              onClick={() => navigate("/services")}
+              className="flex items-center gap-2 text-sidebar-foreground/60 hover:text-vermelho-moderno transition-colors text-sm w-full px-4 py-2.5 rounded-lg hover:bg-sidebar-accent/30"
+            >
+              <ChevronLeft className="h-4 w-4" />
+              Voltar aos Módulos
+            </button>
+          )}
+        </div>
       </aside>
     </TooltipProvider>
   );

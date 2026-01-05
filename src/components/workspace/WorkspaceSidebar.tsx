@@ -1,4 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom";
+import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { 
   LayoutDashboard, 
@@ -8,45 +9,60 @@ import {
   FlaskConical, 
   Settings2,
   ChevronLeft,
+  ChevronRight,
   BarChart3
 } from "lucide-react";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 const menuItems = [
   {
     title: "Visão Geral",
     icon: LayoutDashboard,
     path: "/workspace",
+    tooltip: "Visão geral de todos os indicadores"
   },
   {
     title: "Dashboard Atendimento",
     icon: Stethoscope,
     path: "/workspace/atendimento",
+    tooltip: "Indicadores de atendimento"
   },
   {
     title: "Dashboard Financeiro",
     icon: DollarSign,
     path: "/workspace/financeiro",
+    tooltip: "Indicadores financeiros"
   },
   {
     title: "Atendimento x Financeiro",
     icon: ArrowLeftRight,
     path: "/workspace/atendimento-financeiro",
+    tooltip: "Cruzamento de dados"
   },
   {
     title: "Laboratório",
     icon: FlaskConical,
     path: "/workspace/laboratorio",
+    tooltip: "Indicadores do laboratório"
   },
   {
     title: "Dashboards Personalizados",
     icon: Settings2,
     path: "/workspace/personalizados",
+    tooltip: "Crie seus próprios dashboards"
   },
 ];
 
 const WorkspaceSidebar = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const [collapsed, setCollapsed] = useState(false);
 
   const isActive = (path: string) => {
     if (path === "/workspace") {
@@ -56,61 +72,114 @@ const WorkspaceSidebar = () => {
   };
 
   return (
-    <aside className="w-64 min-h-screen gradient-navy flex flex-col shrink-0">
-      {/* Header */}
-      <div className="p-6 border-b border-sidebar-border">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-sidebar-accent flex items-center justify-center">
-            <BarChart3 className="h-5 w-5 text-dourado-sutil" />
-          </div>
-          <div>
-            <h2 className="text-sm font-semibold text-sidebar-foreground">Workspace</h2>
-            <p className="text-xs text-sidebar-foreground/60">Dashboards Analíticos</p>
+    <TooltipProvider delayDuration={0}>
+      <aside
+        className={cn(
+          "h-screen gradient-navy flex flex-col transition-all duration-200 relative flex-shrink-0 sticky top-0",
+          collapsed ? "w-20" : "w-64"
+        )}
+      >
+        {/* Module Title */}
+        <div className="p-5 border-b border-sidebar-border flex-shrink-0">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-lg bg-petroleo flex items-center justify-center flex-shrink-0">
+              <BarChart3 className="h-5 w-5 text-primary-foreground" strokeWidth={2.5} />
+            </div>
+            {!collapsed && (
+              <div className="animate-fade-in">
+                <span className="text-base font-semibold text-sidebar-foreground block">
+                  Workspace
+                </span>
+                <span className="text-xs text-sidebar-foreground/60">Dashboards Analíticos</span>
+              </div>
+            )}
           </div>
         </div>
-      </div>
 
-      {/* Navigation */}
-      <nav className="flex-1 py-4 overflow-y-auto">
-        <div className="px-3 mb-2">
-          <span className="text-[10px] font-semibold uppercase tracking-wider text-sidebar-foreground/40 px-4">
-            Painéis
-          </span>
-        </div>
-        
-        <ul className="space-y-1 px-2">
-          {menuItems.map((item) => (
-            <li key={item.path}>
-              <button
-                onClick={() => navigate(item.path)}
-                className={cn(
-                  "flex items-center gap-3 w-full text-left px-4 py-2.5 rounded-lg transition-all duration-200",
-                  "text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/50",
-                  isActive(item.path) && "bg-sidebar-accent text-sidebar-foreground font-medium"
-                )}
-              >
-                <item.icon className={cn(
-                  "h-5 w-5 shrink-0",
-                  isActive(item.path) && "text-dourado-sutil"
-                )} />
-                <span className="text-sm">{item.title}</span>
-              </button>
-            </li>
-          ))}
-        </ul>
-      </nav>
-
-      {/* Footer */}
-      <div className="p-4 border-t border-sidebar-border">
+        {/* Toggle Button */}
         <button
-          onClick={() => navigate("/services")}
-          className="flex items-center gap-2 text-sidebar-foreground/60 hover:text-sidebar-foreground transition-colors text-sm w-full px-4 py-2.5 rounded-lg hover:bg-sidebar-accent/30"
+          onClick={() => setCollapsed(!collapsed)}
+          className="absolute -right-3 top-16 w-6 h-6 rounded-full bg-card border border-border shadow-sm flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors z-10"
         >
-          <ChevronLeft className="h-4 w-4" />
-          Voltar aos Módulos
+          {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
         </button>
-      </div>
-    </aside>
+
+        {/* Navigation */}
+        <ScrollArea className="flex-1">
+          <nav className="py-4">
+            {!collapsed && (
+              <p className="px-6 mb-2 text-xs font-semibold uppercase tracking-wider text-sidebar-foreground/40">
+                Painéis
+              </p>
+            )}
+            <ul className="space-y-1">
+              {menuItems.map((item) => {
+                const active = isActive(item.path);
+                
+                const content = (
+                  <button
+                    onClick={() => navigate(item.path)}
+                    className={cn(
+                      "flex items-center gap-3 py-2.5 font-medium transition-all duration-150 mx-2 rounded-lg text-sm w-[calc(100%-16px)]",
+                      collapsed ? "px-3 justify-center" : "px-4",
+                      active
+                        ? "bg-sidebar-accent text-sidebar-foreground border-l-2 border-dourado-sutil"
+                        : "text-sidebar-foreground/60 hover:bg-sidebar-accent hover:text-sidebar-foreground"
+                    )}
+                  >
+                    <item.icon className="h-5 w-5 flex-shrink-0" />
+                    {!collapsed && <span>{item.title}</span>}
+                  </button>
+                );
+
+                return (
+                  <li key={item.path}>
+                    {collapsed ? (
+                      <Tooltip>
+                        <TooltipTrigger asChild>{content}</TooltipTrigger>
+                        <TooltipContent side="right" className="bg-card text-card-foreground border-border">
+                          <p className="font-medium">{item.title}</p>
+                          {item.tooltip && <p className="text-xs text-muted-foreground">{item.tooltip}</p>}
+                        </TooltipContent>
+                      </Tooltip>
+                    ) : (
+                      content
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+          </nav>
+        </ScrollArea>
+
+        {/* Footer */}
+        <div className="p-4 border-t border-sidebar-border">
+          {collapsed ? (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  onClick={() => navigate("/services")}
+                  className="flex items-center justify-center py-2.5 mx-2 rounded-lg text-sidebar-foreground/60 hover:text-vermelho-moderno transition-colors w-[calc(100%-16px)]"
+                >
+                  <ChevronLeft className="h-5 w-5" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="right" className="bg-card text-card-foreground border-border">
+                Voltar aos Módulos
+              </TooltipContent>
+            </Tooltip>
+          ) : (
+            <button
+              onClick={() => navigate("/services")}
+              className="flex items-center gap-2 text-sidebar-foreground/60 hover:text-vermelho-moderno transition-colors text-sm w-full px-4 py-2.5 rounded-lg hover:bg-sidebar-accent/30"
+            >
+              <ChevronLeft className="h-4 w-4" />
+              Voltar aos Módulos
+            </button>
+          )}
+        </div>
+      </aside>
+    </TooltipProvider>
   );
 };
 
