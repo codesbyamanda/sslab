@@ -345,8 +345,12 @@ const App = () => (
             <Route path="convenios/:id" element={<Convenios />} />
             <Route path="tipos-receita" element={<TiposReceita />} />
             <Route path="tipos-receita/:id" element={<TipoReceitaDetalhe />} />
+            <Route path="tipo-receita" element={<TiposReceita />} />
+            <Route path="tipo-receita/:id" element={<TipoReceitaDetalhe />} />
             <Route path="tipos-conta-pagar" element={<TiposContaPagar />} />
             <Route path="tipos-conta-pagar/:id" element={<TipoContaPagarDetalhe />} />
+            <Route path="tipo-contas-pagar" element={<TiposContaPagar />} />
+            <Route path="tipo-contas-pagar/:id" element={<TipoContaPagarDetalhe />} />
             <Route path="adquirentes-cartao" element={<AdquirentesCartao />} />
             <Route path="adquirentes-cartao/:id" element={<AdquirenteCartaoDetalhe />} />
             {/* Médico */}
@@ -386,6 +390,8 @@ const App = () => (
             <Route path="modelos-laudo/:id" element={<ModeloLaudoDetalhe />} />
             <Route path="modelos-folha" element={<ModelosFolha />} />
             <Route path="modelos-folha/:id" element={<ModeloFolhaDetalhe />} />
+            <Route path="modelos-folha-laudo" element={<ModelosFolha />} />
+            <Route path="modelos-folha-laudo/:id" element={<ModeloFolhaDetalhe />} />
           </Route>
           <Route path="/interfaciamento" element={<InterfaciamentoLayout />}>
             <Route index element={<InterfaciamentoDashboard />} />

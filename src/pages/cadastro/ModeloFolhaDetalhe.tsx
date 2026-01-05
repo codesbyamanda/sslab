@@ -58,7 +58,7 @@ Data de Impressão: {DATA_IMPRESSAO}`,
     }
     
     toast.success(isNew ? "Modelo de folha criado com sucesso" : "Modelo de folha atualizado com sucesso");
-    navigate("/cadastro/modelos-folha");
+    navigate("/cadastro/modelos-folha-laudo");
   };
 
   return (
@@ -70,7 +70,7 @@ Data de Impressão: {DATA_IMPRESSAO}`,
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbLink href="/cadastro/modelos-folha">Modelos de Folha</BreadcrumbLink>
+            <BreadcrumbLink href="/cadastro/modelos-folha-laudo">Modelos de Folha</BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
@@ -83,7 +83,7 @@ Data de Impressão: {DATA_IMPRESSAO}`,
 
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={() => navigate("/cadastro/modelos-folha")}>
+          <Button variant="ghost" size="icon" onClick={() => navigate("/cadastro/modelos-folha-laudo")}>
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
@@ -96,7 +96,7 @@ Data de Impressão: {DATA_IMPRESSAO}`,
           </div>
         </div>
         {isViewMode && (
-          <Button onClick={() => navigate(`/cadastro/modelos-folha/${id}?edit=true`)}>
+          <Button onClick={() => navigate(`/cadastro/modelos-folha-laudo/${id}?edit=true`)}>
             Editar
           </Button>
         )}
@@ -178,7 +178,7 @@ Data de Impressão: {DATA_IMPRESSAO}`,
 
         {!isViewMode && (
           <div className="flex justify-end gap-4 mt-6">
-            <Button type="button" variant="outline" onClick={() => navigate("/cadastro/modelos-folha")}>
+            <Button type="button" variant="outline" onClick={() => navigate("/cadastro/modelos-folha-laudo")}>
               Cancelar
             </Button>
             <Button type="submit">
