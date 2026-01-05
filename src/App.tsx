@@ -136,13 +136,20 @@ import SetorDetalhe from "./pages/cadastro/SetorDetalhe";
 import Pessoas from "./pages/cadastro/Pessoas";
 import PessoaDetalhe from "./pages/cadastro/PessoaDetalhe";
 import ProfissoesCad from "./pages/cadastro/Profissoes";
+import ProfissaoDetalhe from "./pages/cadastro/ProfissaoDetalhe";
 import Feriados from "./pages/cadastro/Feriados";
+import FeriadoDetalhe from "./pages/cadastro/FeriadoDetalhe";
 import DestinoLaudo from "./pages/cadastro/DestinoLaudo";
+import DestinoLaudoDetalhe from "./pages/cadastro/DestinoLaudoDetalhe";
 import Terceiros from "./pages/cadastro/Terceiros";
+import TerceiroDetalhe from "./pages/cadastro/TerceiroDetalhe";
 import UnidadeMonetaria from "./pages/cadastro/UnidadeMonetaria";
+import MoedaDetalhe from "./pages/cadastro/MoedaDetalhe";
 import TabelasPreco from "./pages/cadastro/TabelasPreco";
+import TabelaPrecoDetalhe from "./pages/cadastro/TabelaPrecoDetalhe";
 import TabelaPrecoItens from "./pages/cadastro/TabelaPrecoItens";
 import Convenios from "./pages/cadastro/Convenios";
+import ConvenioDetalhe from "./pages/cadastro/ConvenioDetalhe";
 import CID from "./pages/cadastro/CID";
 import CIDDetalhe from "./pages/cadastro/CIDDetalhe";
 import EspecialidadesMedicas from "./pages/cadastro/EspecialidadesMedicas";
@@ -329,20 +336,20 @@ const App = () => (
             <Route path="pessoas" element={<Pessoas />} />
             <Route path="pessoas/:id" element={<PessoaDetalhe />} />
             <Route path="profissoes" element={<ProfissoesCad />} />
-            <Route path="profissoes/:id" element={<ProfissoesCad />} />
+            <Route path="profissoes/:id" element={<ProfissaoDetalhe />} />
             <Route path="feriados" element={<Feriados />} />
-            <Route path="feriados/:id" element={<Feriados />} />
+            <Route path="feriados/:id" element={<FeriadoDetalhe />} />
             <Route path="destino-laudo" element={<DestinoLaudo />} />
-            <Route path="destino-laudo/:id" element={<DestinoLaudo />} />
+            <Route path="destino-laudo/:id" element={<DestinoLaudoDetalhe />} />
             <Route path="terceiros" element={<Terceiros />} />
-            <Route path="terceiros/:id" element={<Terceiros />} />
+            <Route path="terceiros/:id" element={<TerceiroDetalhe />} />
             <Route path="unidade-monetaria" element={<UnidadeMonetaria />} />
-            <Route path="unidade-monetaria/:id" element={<UnidadeMonetaria />} />
+            <Route path="unidade-monetaria/:id" element={<MoedaDetalhe />} />
             <Route path="tabelas-preco" element={<TabelasPreco />} />
-            <Route path="tabelas-preco/:id" element={<TabelasPreco />} />
+            <Route path="tabelas-preco/:id" element={<TabelaPrecoDetalhe />} />
             <Route path="tabelas-preco/:id/itens" element={<TabelaPrecoItens />} />
             <Route path="convenios" element={<Convenios />} />
-            <Route path="convenios/:id" element={<Convenios />} />
+            <Route path="convenios/:id" element={<ConvenioDetalhe />} />
             <Route path="tipos-receita" element={<TiposReceita />} />
             <Route path="tipos-receita/:id" element={<TipoReceitaDetalhe />} />
             <Route path="tipo-receita" element={<TiposReceita />} />
