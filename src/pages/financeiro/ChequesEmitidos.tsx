@@ -7,110 +7,81 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Collapsible,
-  CollapsibleContent,
-} from "@/components/ui/collapsible";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 // Mock data
-const mockCheques = [
-  {
-    id: 1,
-    numero: "000451",
-    banco: "Banco do Brasil",
-    agencia: "1234-5",
-    conta: "56789-0",
-    favorecido: "LabSupply Ltda",
-    dataEmissao: "2024-01-10",
-    dataCompensacao: null,
-    valor: 4500.00,
-    situacao: "Aberto",
-  },
-  {
-    id: 2,
-    numero: "000450",
-    banco: "Banco do Brasil",
-    agencia: "1234-5",
-    conta: "56789-0",
-    favorecido: "Imobiliária Central",
-    dataEmissao: "2024-01-05",
-    dataCompensacao: "2024-01-12",
-    valor: 8000.00,
-    situacao: "Compensado",
-  },
-  {
-    id: 3,
-    numero: "000449",
-    banco: "Itaú",
-    agencia: "0987",
-    conta: "12345-6",
-    favorecido: "TechMed Serviços",
-    dataEmissao: "2024-01-08",
-    dataCompensacao: null,
-    valor: 2350.00,
-    situacao: "Devolvido",
-  },
-  {
-    id: 4,
-    numero: "000448",
-    banco: "Banco do Brasil",
-    agencia: "1234-5",
-    conta: "56789-0",
-    favorecido: "Papelaria Express",
-    dataEmissao: "2024-01-03",
-    dataCompensacao: "2024-01-08",
-    valor: 450.00,
-    situacao: "Compensado",
-  },
-  {
-    id: 5,
-    numero: "000447",
-    banco: "Itaú",
-    agencia: "0987",
-    conta: "12345-6",
-    favorecido: "Clean Pro",
-    dataEmissao: "2024-01-02",
-    dataCompensacao: null,
-    valor: 1800.00,
-    situacao: "Cancelado",
-  },
-  {
-    id: 6,
-    numero: "000452",
-    banco: "Banco do Brasil",
-    agencia: "1234-5",
-    conta: "56789-0",
-    favorecido: "Distribuidora Química",
-    dataEmissao: "2024-01-15",
-    dataCompensacao: null,
-    valor: 6200.00,
-    situacao: "Aberto",
-  },
-];
-
+const mockCheques = [{
+  id: 1,
+  numero: "000451",
+  banco: "Banco do Brasil",
+  agencia: "1234-5",
+  conta: "56789-0",
+  favorecido: "LabSupply Ltda",
+  dataEmissao: "2024-01-10",
+  dataCompensacao: null,
+  valor: 4500.00,
+  situacao: "Aberto"
+}, {
+  id: 2,
+  numero: "000450",
+  banco: "Banco do Brasil",
+  agencia: "1234-5",
+  conta: "56789-0",
+  favorecido: "Imobiliária Central",
+  dataEmissao: "2024-01-05",
+  dataCompensacao: "2024-01-12",
+  valor: 8000.00,
+  situacao: "Compensado"
+}, {
+  id: 3,
+  numero: "000449",
+  banco: "Itaú",
+  agencia: "0987",
+  conta: "12345-6",
+  favorecido: "TechMed Serviços",
+  dataEmissao: "2024-01-08",
+  dataCompensacao: null,
+  valor: 2350.00,
+  situacao: "Devolvido"
+}, {
+  id: 4,
+  numero: "000448",
+  banco: "Banco do Brasil",
+  agencia: "1234-5",
+  conta: "56789-0",
+  favorecido: "Papelaria Express",
+  dataEmissao: "2024-01-03",
+  dataCompensacao: "2024-01-08",
+  valor: 450.00,
+  situacao: "Compensado"
+}, {
+  id: 5,
+  numero: "000447",
+  banco: "Itaú",
+  agencia: "0987",
+  conta: "12345-6",
+  favorecido: "Clean Pro",
+  dataEmissao: "2024-01-02",
+  dataCompensacao: null,
+  valor: 1800.00,
+  situacao: "Cancelado"
+}, {
+  id: 6,
+  numero: "000452",
+  banco: "Banco do Brasil",
+  agencia: "1234-5",
+  conta: "56789-0",
+  favorecido: "Distribuidora Química",
+  dataEmissao: "2024-01-15",
+  dataCompensacao: null,
+  valor: 6200.00,
+  situacao: "Aberto"
+}];
 type SortField = "numero" | "favorecido" | "dataEmissao" | "valor" | "situacao";
 type SortDirection = "asc" | "desc";
-
 const ChequesEmitidos = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
@@ -124,7 +95,6 @@ const ChequesEmitidos = () => {
   const [filterDataInicio, setFilterDataInicio] = useState("");
   const [filterDataFim, setFilterDataFim] = useState("");
   const [filterFavorecido, setFilterFavorecido] = useState("");
-
   const handleSort = (field: SortField) => {
     if (sortField === field) {
       setSortDirection(sortDirection === "asc" ? "desc" : "asc");
@@ -133,35 +103,25 @@ const ChequesEmitidos = () => {
       setSortDirection("asc");
     }
   };
-
   const getSortIcon = (field: SortField) => {
     if (sortField !== field) return null;
-    return sortDirection === "asc" ? 
-      <ChevronUp className="h-4 w-4 ml-1" /> : 
-      <ChevronDown className="h-4 w-4 ml-1" />;
+    return sortDirection === "asc" ? <ChevronUp className="h-4 w-4 ml-1" /> : <ChevronDown className="h-4 w-4 ml-1" />;
   };
-
-  const filteredCheques = mockCheques
-    .filter(c => {
-      const matchesSearch = 
-        c.numero.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        c.favorecido.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesSituacao = !filterSituacao || c.situacao === filterSituacao;
-      const matchesBanco = !filterBanco || c.banco === filterBanco;
-      const matchesFavorecido = !filterFavorecido || c.favorecido.toLowerCase().includes(filterFavorecido.toLowerCase());
-      return matchesSearch && matchesSituacao && matchesBanco && matchesFavorecido;
-    })
-    .sort((a, b) => {
-      const aValue = a[sortField];
-      const bValue = b[sortField];
-      const modifier = sortDirection === "asc" ? 1 : -1;
-      
-      if (typeof aValue === "number" && typeof bValue === "number") {
-        return (aValue - bValue) * modifier;
-      }
-      return String(aValue).localeCompare(String(bValue)) * modifier;
-    });
-
+  const filteredCheques = mockCheques.filter(c => {
+    const matchesSearch = c.numero.toLowerCase().includes(searchTerm.toLowerCase()) || c.favorecido.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSituacao = !filterSituacao || c.situacao === filterSituacao;
+    const matchesBanco = !filterBanco || c.banco === filterBanco;
+    const matchesFavorecido = !filterFavorecido || c.favorecido.toLowerCase().includes(filterFavorecido.toLowerCase());
+    return matchesSearch && matchesSituacao && matchesBanco && matchesFavorecido;
+  }).sort((a, b) => {
+    const aValue = a[sortField];
+    const bValue = b[sortField];
+    const modifier = sortDirection === "asc" ? 1 : -1;
+    if (typeof aValue === "number" && typeof bValue === "number") {
+      return (aValue - bValue) * modifier;
+    }
+    return String(aValue).localeCompare(String(bValue)) * modifier;
+  });
   const getSituacaoBadge = (situacao: string) => {
     switch (situacao) {
       case "Aberto":
@@ -176,16 +136,16 @@ const ChequesEmitidos = () => {
         return <Badge variant="outline">{situacao}</Badge>;
     }
   };
-
   const formatDate = (dateStr: string | null) => {
     if (!dateStr) return "-";
     return new Date(dateStr).toLocaleDateString("pt-BR");
   };
-
   const formatCurrency = (value: number) => {
-    return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+    return value.toLocaleString("pt-BR", {
+      style: "currency",
+      currency: "BRL"
+    });
   };
-
   const clearFilters = () => {
     setFilterSituacao("");
     setFilterBanco("");
@@ -196,21 +156,14 @@ const ChequesEmitidos = () => {
   };
 
   // Cálculos para os cards
-  const totalEmitido = mockCheques
-    .filter(c => c.situacao !== "Cancelado")
-    .reduce((acc, c) => acc + c.valor, 0);
-
+  const totalEmitido = mockCheques.filter(c => c.situacao !== "Cancelado").reduce((acc, c) => acc + c.valor, 0);
   const chequesAbertos = mockCheques.filter(c => c.situacao === "Aberto");
   const valorAberto = chequesAbertos.reduce((acc, c) => acc + c.valor, 0);
-
   const chequesCompensados = mockCheques.filter(c => c.situacao === "Compensado");
   const valorCompensado = chequesCompensados.reduce((acc, c) => acc + c.valor, 0);
-
   const chequesDevolvidos = mockCheques.filter(c => c.situacao === "Devolvido");
   const valorDevolvido = chequesDevolvidos.reduce((acc, c) => acc + c.valor, 0);
-
-  return (
-    <div className="min-h-screen flex w-full bg-background">
+  return <div className="min-h-screen flex w-full bg-background">
       <FinanceiroSidebar />
       
       <div className="flex-1 flex flex-col min-h-screen overflow-hidden">
@@ -219,13 +172,7 @@ const ChequesEmitidos = () => {
         <main className="flex-1 overflow-auto">
           <div className="p-6 space-y-6">
             {/* Breadcrumb */}
-            <button
-              onClick={() => navigate("/financeiro")}
-              className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Voltar para Financeiro
-            </button>
+            
 
             {/* Page Header */}
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -238,25 +185,15 @@ const ChequesEmitidos = () => {
                 </p>
               </div>
               <div className="flex items-center gap-3">
-                <Button 
-                  variant="outline" 
-                  onClick={() => setShowFilters(!showFilters)}
-                  className="gap-2"
-                >
+                <Button variant="outline" onClick={() => setShowFilters(!showFilters)} className="gap-2">
                   <Filter className="h-4 w-4" />
                   Filtrar
                 </Button>
-                <Button 
-                  variant="outline"
-                  className="gap-2"
-                >
+                <Button variant="outline" className="gap-2">
                   <FileDown className="h-4 w-4" />
                   Exportar
                 </Button>
-                <Button 
-                  onClick={() => navigate("/financeiro/cheques-emitidos/novo")}
-                  className="gap-2"
-                >
+                <Button onClick={() => navigate("/financeiro/cheques-emitidos/novo")} className="gap-2">
                   <Plus className="h-4 w-4" />
                   Emitir Novo Cheque
                 </Button>
@@ -350,11 +287,7 @@ const ChequesEmitidos = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
                       <div className="space-y-2">
                         <label className="text-sm font-medium text-foreground">Favorecido</label>
-                        <Input
-                          placeholder="Buscar favorecido..."
-                          value={filterFavorecido}
-                          onChange={(e) => setFilterFavorecido(e.target.value)}
-                        />
+                        <Input placeholder="Buscar favorecido..." value={filterFavorecido} onChange={e => setFilterFavorecido(e.target.value)} />
                       </div>
                       <div className="space-y-2">
                         <label className="text-sm font-medium text-foreground">Banco</label>
@@ -387,19 +320,11 @@ const ChequesEmitidos = () => {
                       </div>
                       <div className="space-y-2">
                         <label className="text-sm font-medium text-foreground">Data Início</label>
-                        <Input
-                          type="date"
-                          value={filterDataInicio}
-                          onChange={(e) => setFilterDataInicio(e.target.value)}
-                        />
+                        <Input type="date" value={filterDataInicio} onChange={e => setFilterDataInicio(e.target.value)} />
                       </div>
                       <div className="space-y-2">
                         <label className="text-sm font-medium text-foreground">Data Fim</label>
-                        <Input
-                          type="date"
-                          value={filterDataFim}
-                          onChange={(e) => setFilterDataFim(e.target.value)}
-                        />
+                        <Input type="date" value={filterDataFim} onChange={e => setFilterDataFim(e.target.value)} />
                       </div>
                     </div>
                     <div className="flex justify-end gap-3 mt-4">
@@ -418,12 +343,7 @@ const ChequesEmitidos = () => {
                   <CardTitle className="text-lg font-semibold">Lista de Cheques Emitidos</CardTitle>
                   <div className="relative w-full md:w-80">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      placeholder="Buscar por número ou favorecido..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-10"
-                    />
+                    <Input placeholder="Buscar por número ou favorecido..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="pl-10" />
                   </div>
                 </div>
               </CardHeader>
@@ -432,45 +352,30 @@ const ChequesEmitidos = () => {
                   <Table>
                     <TableHeader>
                       <TableRow className="bg-muted/50">
-                        <TableHead 
-                          className="cursor-pointer hover:bg-muted/80 transition-colors"
-                          onClick={() => handleSort("numero")}
-                        >
+                        <TableHead className="cursor-pointer hover:bg-muted/80 transition-colors" onClick={() => handleSort("numero")}>
                           <div className="flex items-center">
                             Nº Cheque {getSortIcon("numero")}
                           </div>
                         </TableHead>
                         <TableHead>Banco</TableHead>
                         <TableHead>Agência / Conta</TableHead>
-                        <TableHead 
-                          className="cursor-pointer hover:bg-muted/80 transition-colors"
-                          onClick={() => handleSort("favorecido")}
-                        >
+                        <TableHead className="cursor-pointer hover:bg-muted/80 transition-colors" onClick={() => handleSort("favorecido")}>
                           <div className="flex items-center">
                             Favorecido {getSortIcon("favorecido")}
                           </div>
                         </TableHead>
-                        <TableHead 
-                          className="cursor-pointer hover:bg-muted/80 transition-colors"
-                          onClick={() => handleSort("dataEmissao")}
-                        >
+                        <TableHead className="cursor-pointer hover:bg-muted/80 transition-colors" onClick={() => handleSort("dataEmissao")}>
                           <div className="flex items-center">
                             Emissão {getSortIcon("dataEmissao")}
                           </div>
                         </TableHead>
                         <TableHead>Compensação</TableHead>
-                        <TableHead 
-                          className="cursor-pointer hover:bg-muted/80 transition-colors text-right"
-                          onClick={() => handleSort("valor")}
-                        >
+                        <TableHead className="cursor-pointer hover:bg-muted/80 transition-colors text-right" onClick={() => handleSort("valor")}>
                           <div className="flex items-center justify-end">
                             Valor {getSortIcon("valor")}
                           </div>
                         </TableHead>
-                        <TableHead 
-                          className="cursor-pointer hover:bg-muted/80 transition-colors"
-                          onClick={() => handleSort("situacao")}
-                        >
+                        <TableHead className="cursor-pointer hover:bg-muted/80 transition-colors" onClick={() => handleSort("situacao")}>
                           <div className="flex items-center">
                             Situação {getSortIcon("situacao")}
                           </div>
@@ -479,21 +384,11 @@ const ChequesEmitidos = () => {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {filteredCheques.length === 0 ? (
-                        <TableRow>
+                      {filteredCheques.length === 0 ? <TableRow>
                           <TableCell colSpan={9} className="text-center py-8 text-muted-foreground">
                             Nenhum cheque emitido encontrado com os filtros aplicados.
                           </TableCell>
-                        </TableRow>
-                      ) : (
-                        filteredCheques.map((cheque) => (
-                          <TableRow 
-                            key={cheque.id}
-                            className={cheque.situacao === "Devolvido" 
-                              ? "bg-red-500/5 hover:bg-red-500/10" 
-                              : "hover:bg-muted/50"
-                            }
-                          >
+                        </TableRow> : filteredCheques.map(cheque => <TableRow key={cheque.id} className={cheque.situacao === "Devolvido" ? "bg-red-500/5 hover:bg-red-500/10" : "hover:bg-muted/50"}>
                             <TableCell className="font-mono font-medium">
                               {cheque.numero}
                             </TableCell>
@@ -520,12 +415,7 @@ const ChequesEmitidos = () => {
                               <div className="flex items-center justify-center">
                                 <Tooltip>
                                   <TooltipTrigger asChild>
-                                    <Button
-                                      variant="ghost"
-                                      size="icon"
-                                      className="h-8 w-8"
-                                      onClick={() => navigate(`/financeiro/cheques-emitidos/${cheque.id}`)}
-                                    >
+                                    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => navigate(`/financeiro/cheques-emitidos/${cheque.id}`)}>
                                       <Eye className="h-4 w-4" />
                                     </Button>
                                   </TooltipTrigger>
@@ -535,9 +425,7 @@ const ChequesEmitidos = () => {
                                 </Tooltip>
                               </div>
                             </TableCell>
-                          </TableRow>
-                        ))
-                      )}
+                          </TableRow>)}
                     </TableBody>
                   </Table>
                 </div>
@@ -546,8 +434,6 @@ const ChequesEmitidos = () => {
           </div>
         </main>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default ChequesEmitidos;
