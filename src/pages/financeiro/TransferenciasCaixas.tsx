@@ -7,74 +7,47 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Collapsible,
-  CollapsibleContent,
-} from "@/components/ui/collapsible";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 // Mock data
-const mockTransferencias = [
-  {
-    id: 1,
-    data: "2024-01-20 14:30",
-    caixaOrigem: "Caixa Principal",
-    caixaDestino: "Caixa Recepção",
-    valor: 2000.00,
-    usuario: "Maria Silva",
-    situacao: "Concluída",
-  },
-  {
-    id: 2,
-    data: "2024-01-20 10:15",
-    caixaOrigem: "Caixa Recepção",
-    caixaDestino: "Caixa Coleta Externa",
-    valor: 500.00,
-    usuario: "João Santos",
-    situacao: "Concluída",
-  },
-  {
-    id: 3,
-    data: "2024-01-19 16:45",
-    caixaOrigem: "Caixa Principal",
-    caixaDestino: "Caixa Laboratório 2",
-    valor: 1500.00,
-    usuario: "Ana Costa",
-    situacao: "Concluída",
-  },
-  {
-    id: 4,
-    data: "2024-01-19 09:00",
-    caixaOrigem: "Caixa Coleta Externa",
-    caixaDestino: "Caixa Principal",
-    valor: 3200.00,
-    usuario: "Carlos Mendes",
-    situacao: "Cancelada",
-  },
-];
-
+const mockTransferencias = [{
+  id: 1,
+  data: "2024-01-20 14:30",
+  caixaOrigem: "Caixa Principal",
+  caixaDestino: "Caixa Recepção",
+  valor: 2000.00,
+  usuario: "Maria Silva",
+  situacao: "Concluída"
+}, {
+  id: 2,
+  data: "2024-01-20 10:15",
+  caixaOrigem: "Caixa Recepção",
+  caixaDestino: "Caixa Coleta Externa",
+  valor: 500.00,
+  usuario: "João Santos",
+  situacao: "Concluída"
+}, {
+  id: 3,
+  data: "2024-01-19 16:45",
+  caixaOrigem: "Caixa Principal",
+  caixaDestino: "Caixa Laboratório 2",
+  valor: 1500.00,
+  usuario: "Ana Costa",
+  situacao: "Concluída"
+}, {
+  id: 4,
+  data: "2024-01-19 09:00",
+  caixaOrigem: "Caixa Coleta Externa",
+  caixaDestino: "Caixa Principal",
+  valor: 3200.00,
+  usuario: "Carlos Mendes",
+  situacao: "Cancelada"
+}];
 type SortField = "data" | "caixaOrigem" | "caixaDestino" | "valor" | "situacao";
 type SortDirection = "asc" | "desc";
-
 const TransferenciasCaixas = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
@@ -84,7 +57,6 @@ const TransferenciasCaixas = () => {
   const [filterSituacao, setFilterSituacao] = useState("");
   const [filterDataInicio, setFilterDataInicio] = useState("");
   const [filterDataFim, setFilterDataFim] = useState("");
-
   const handleSort = (field: SortField) => {
     if (sortField === field) {
       setSortDirection(sortDirection === "asc" ? "desc" : "asc");
@@ -93,34 +65,23 @@ const TransferenciasCaixas = () => {
       setSortDirection("asc");
     }
   };
-
   const getSortIcon = (field: SortField) => {
     if (sortField !== field) return null;
-    return sortDirection === "asc" ? 
-      <ChevronUp className="h-4 w-4 ml-1" /> : 
-      <ChevronDown className="h-4 w-4 ml-1" />;
+    return sortDirection === "asc" ? <ChevronUp className="h-4 w-4 ml-1" /> : <ChevronDown className="h-4 w-4 ml-1" />;
   };
-
-  const filteredTransferencias = mockTransferencias
-    .filter(t => {
-      const matchesSearch = 
-        t.caixaOrigem.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        t.caixaDestino.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        t.usuario.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesSituacao = !filterSituacao || t.situacao === filterSituacao;
-      return matchesSearch && matchesSituacao;
-    })
-    .sort((a, b) => {
-      const aValue = a[sortField];
-      const bValue = b[sortField];
-      const modifier = sortDirection === "asc" ? 1 : -1;
-      
-      if (typeof aValue === "number" && typeof bValue === "number") {
-        return (aValue - bValue) * modifier;
-      }
-      return String(aValue).localeCompare(String(bValue)) * modifier;
-    });
-
+  const filteredTransferencias = mockTransferencias.filter(t => {
+    const matchesSearch = t.caixaOrigem.toLowerCase().includes(searchTerm.toLowerCase()) || t.caixaDestino.toLowerCase().includes(searchTerm.toLowerCase()) || t.usuario.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSituacao = !filterSituacao || t.situacao === filterSituacao;
+    return matchesSearch && matchesSituacao;
+  }).sort((a, b) => {
+    const aValue = a[sortField];
+    const bValue = b[sortField];
+    const modifier = sortDirection === "asc" ? 1 : -1;
+    if (typeof aValue === "number" && typeof bValue === "number") {
+      return (aValue - bValue) * modifier;
+    }
+    return String(aValue).localeCompare(String(bValue)) * modifier;
+  });
   const getSituacaoBadge = (situacao: string) => {
     switch (situacao) {
       case "Concluída":
@@ -133,11 +94,12 @@ const TransferenciasCaixas = () => {
         return <Badge variant="outline">{situacao}</Badge>;
     }
   };
-
   const formatCurrency = (value: number) => {
-    return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+    return value.toLocaleString("pt-BR", {
+      style: "currency",
+      currency: "BRL"
+    });
   };
-
   const clearFilters = () => {
     setFilterSituacao("");
     setFilterDataInicio("");
@@ -146,14 +108,10 @@ const TransferenciasCaixas = () => {
   };
 
   // Cálculos para os cards
-  const totalTransferido = mockTransferencias
-    .filter(t => t.situacao === "Concluída")
-    .reduce((acc, t) => acc + t.valor, 0);
+  const totalTransferido = mockTransferencias.filter(t => t.situacao === "Concluída").reduce((acc, t) => acc + t.valor, 0);
   const transferenciasPeriodo = mockTransferencias.filter(t => t.situacao === "Concluída").length;
   const transferenciasPendentes = mockTransferencias.filter(t => t.situacao === "Pendente").length;
-
-  return (
-    <div className="min-h-screen flex w-full bg-background">
+  return <div className="min-h-screen flex w-full bg-background">
       <FinanceiroSidebar />
       
       <div className="flex-1 flex flex-col min-h-screen overflow-hidden">
@@ -162,13 +120,7 @@ const TransferenciasCaixas = () => {
         <main className="flex-1 overflow-auto">
           <div className="p-6 space-y-6">
             {/* Breadcrumb */}
-            <button
-              onClick={() => navigate("/financeiro")}
-              className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Voltar para Financeiro
-            </button>
+            
 
             {/* Page Header */}
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -181,25 +133,15 @@ const TransferenciasCaixas = () => {
                 </p>
               </div>
               <div className="flex items-center gap-3">
-                <Button 
-                  variant="outline" 
-                  onClick={() => setShowFilters(!showFilters)}
-                  className="gap-2"
-                >
+                <Button variant="outline" onClick={() => setShowFilters(!showFilters)} className="gap-2">
                   <Filter className="h-4 w-4" />
                   Filtrar
                 </Button>
-                <Button 
-                  variant="outline"
-                  className="gap-2"
-                >
+                <Button variant="outline" className="gap-2">
                   <FileDown className="h-4 w-4" />
                   Exportar
                 </Button>
-                <Button 
-                  onClick={() => navigate("/financeiro/transferencias-caixas/nova")}
-                  className="gap-2"
-                >
+                <Button onClick={() => navigate("/financeiro/transferencias-caixas/nova")} className="gap-2">
                   <Plus className="h-4 w-4" />
                   Nova Transferência
                 </Button>
@@ -281,19 +223,11 @@ const TransferenciasCaixas = () => {
                       </div>
                       <div className="space-y-2">
                         <label className="text-sm font-medium text-foreground">Data Início</label>
-                        <Input
-                          type="date"
-                          value={filterDataInicio}
-                          onChange={(e) => setFilterDataInicio(e.target.value)}
-                        />
+                        <Input type="date" value={filterDataInicio} onChange={e => setFilterDataInicio(e.target.value)} />
                       </div>
                       <div className="space-y-2">
                         <label className="text-sm font-medium text-foreground">Data Fim</label>
-                        <Input
-                          type="date"
-                          value={filterDataFim}
-                          onChange={(e) => setFilterDataFim(e.target.value)}
-                        />
+                        <Input type="date" value={filterDataFim} onChange={e => setFilterDataFim(e.target.value)} />
                       </div>
                       <div className="flex items-end">
                         <Button variant="ghost" onClick={clearFilters}>Limpar filtros</Button>
@@ -311,12 +245,7 @@ const TransferenciasCaixas = () => {
                   <CardTitle className="text-lg font-semibold">Lista de Transferências</CardTitle>
                   <div className="relative w-full md:w-80">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      placeholder="Buscar por caixa ou usuário..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-10"
-                    />
+                    <Input placeholder="Buscar por caixa ou usuário..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="pl-10" />
                   </div>
                 </div>
               </CardHeader>
@@ -325,47 +254,32 @@ const TransferenciasCaixas = () => {
                   <Table>
                     <TableHeader>
                       <TableRow className="bg-muted/50">
-                        <TableHead 
-                          className="cursor-pointer hover:bg-muted/80 transition-colors"
-                          onClick={() => handleSort("data")}
-                        >
+                        <TableHead className="cursor-pointer hover:bg-muted/80 transition-colors" onClick={() => handleSort("data")}>
                           <div className="flex items-center">
                             Data
                             {getSortIcon("data")}
                           </div>
                         </TableHead>
-                        <TableHead 
-                          className="cursor-pointer hover:bg-muted/80 transition-colors"
-                          onClick={() => handleSort("caixaOrigem")}
-                        >
+                        <TableHead className="cursor-pointer hover:bg-muted/80 transition-colors" onClick={() => handleSort("caixaOrigem")}>
                           <div className="flex items-center">
                             Caixa Origem
                             {getSortIcon("caixaOrigem")}
                           </div>
                         </TableHead>
-                        <TableHead 
-                          className="cursor-pointer hover:bg-muted/80 transition-colors"
-                          onClick={() => handleSort("caixaDestino")}
-                        >
+                        <TableHead className="cursor-pointer hover:bg-muted/80 transition-colors" onClick={() => handleSort("caixaDestino")}>
                           <div className="flex items-center">
                             Caixa Destino
                             {getSortIcon("caixaDestino")}
                           </div>
                         </TableHead>
-                        <TableHead 
-                          className="cursor-pointer hover:bg-muted/80 transition-colors text-right"
-                          onClick={() => handleSort("valor")}
-                        >
+                        <TableHead className="cursor-pointer hover:bg-muted/80 transition-colors text-right" onClick={() => handleSort("valor")}>
                           <div className="flex items-center justify-end">
                             Valor
                             {getSortIcon("valor")}
                           </div>
                         </TableHead>
                         <TableHead>Usuário</TableHead>
-                        <TableHead 
-                          className="cursor-pointer hover:bg-muted/80 transition-colors"
-                          onClick={() => handleSort("situacao")}
-                        >
+                        <TableHead className="cursor-pointer hover:bg-muted/80 transition-colors" onClick={() => handleSort("situacao")}>
                           <div className="flex items-center">
                             Situação
                             {getSortIcon("situacao")}
@@ -375,19 +289,11 @@ const TransferenciasCaixas = () => {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {filteredTransferencias.length === 0 ? (
-                        <TableRow>
+                      {filteredTransferencias.length === 0 ? <TableRow>
                           <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
                             Nenhuma transferência encontrada.
                           </TableCell>
-                        </TableRow>
-                      ) : (
-                        filteredTransferencias.map((transferencia) => (
-                          <TableRow 
-                            key={transferencia.id} 
-                            className="hover:bg-muted/30 transition-colors cursor-pointer"
-                            onClick={() => navigate(`/financeiro/transferencias-caixas/${transferencia.id}`)}
-                          >
+                        </TableRow> : filteredTransferencias.map(transferencia => <TableRow key={transferencia.id} className="hover:bg-muted/30 transition-colors cursor-pointer" onClick={() => navigate(`/financeiro/transferencias-caixas/${transferencia.id}`)}>
                             <TableCell>
                               <div className="flex items-center gap-2">
                                 <Calendar className="h-4 w-4 text-muted-foreground" />
@@ -414,23 +320,17 @@ const TransferenciasCaixas = () => {
                             <TableCell className="text-right">
                               <Tooltip>
                                 <TooltipTrigger asChild>
-                                  <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      navigate(`/financeiro/transferencias-caixas/${transferencia.id}`);
-                                    }}
-                                  >
+                                  <Button variant="ghost" size="icon" onClick={e => {
+                              e.stopPropagation();
+                              navigate(`/financeiro/transferencias-caixas/${transferencia.id}`);
+                            }}>
                                     <Eye className="h-4 w-4" />
                                   </Button>
                                 </TooltipTrigger>
                                 <TooltipContent>Ver detalhes</TooltipContent>
                               </Tooltip>
                             </TableCell>
-                          </TableRow>
-                        ))
-                      )}
+                          </TableRow>)}
                     </TableBody>
                   </Table>
                 </div>
@@ -439,8 +339,6 @@ const TransferenciasCaixas = () => {
           </div>
         </main>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default TransferenciasCaixas;
