@@ -1,84 +1,12 @@
-import { Activity, LogOut, User, Bell, Search } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { GlobalNavbar } from "@/components/shared/GlobalNavbar";
 
 interface InterfaciamentoNavbarProps {
   userName?: string;
   showSearch?: boolean;
 }
 
-export function InterfaciamentoNavbar({ userName = "Ednaldo", showSearch = true }: InterfaciamentoNavbarProps) {
-  const navigate = useNavigate();
-
-  return (
-    <header className="h-14 bg-card border-b border-border/50 flex items-center justify-between px-6 shadow-navbar flex-shrink-0">
-      {/* Logo */}
-      <div className="flex items-center gap-4">
-        <div className="flex items-center gap-2.5">
-          <Activity className="h-5 w-5 text-primary" strokeWidth={2.5} />
-          <span className="text-lg font-bold text-primary italic">
-            Saúde Systems
-          </span>
-        </div>
-
-        {showSearch && (
-          <>
-            <div className="h-6 w-px bg-border" />
-            <div className="relative w-80">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <Input
-                placeholder="Buscar equipamentos, protocolos..."
-                className="pl-9 h-9"
-              />
-            </div>
-          </>
-        )}
-      </div>
-
-      {/* User Actions */}
-      <div className="flex items-center gap-3">
-        <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground h-8 w-8 relative">
-          <Bell className="h-4 w-4" />
-          <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-destructive text-destructive-foreground text-[10px] rounded-full flex items-center justify-center">
-            3
-          </span>
-        </Button>
-
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <button className="flex items-center gap-2.5 hover:opacity-80 transition-opacity">
-              <span className="text-sm font-medium text-foreground">Olá, {userName}</span>
-              <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center border border-border">
-                <User className="h-4 w-4 text-muted-foreground" />
-              </div>
-            </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-48">
-            <DropdownMenuItem onClick={() => navigate("/perfil")}>
-              <User className="h-4 w-4 mr-2" />
-              Meu Perfil
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem 
-              onClick={() => navigate("/")}
-              className="text-vermelho-moderno focus:text-vermelho-moderno"
-            >
-              <LogOut className="h-4 w-4 mr-2" />
-              Sair do Sistema
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
-    </header>
-  );
+export function InterfaciamentoNavbar({ userName = "Ednaldo" }: InterfaciamentoNavbarProps) {
+  return <GlobalNavbar userName={userName} />;
 }
 
 export default InterfaciamentoNavbar;
