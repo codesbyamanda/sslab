@@ -92,7 +92,7 @@ export default function TiposContaPagar() {
           <h1 className="text-2xl font-bold text-foreground">Tipos de Contas a Pagar</h1>
           <p className="text-muted-foreground">Padronize e classifique as despesas do módulo financeiro</p>
         </div>
-        <Button onClick={() => navigate("/cadastro/tipos-conta-pagar/novo")}>
+        <Button onClick={() => navigate("/cadastro/tipo-contas-pagar/novo")}>
           <Plus className="h-4 w-4 mr-2" />
           Novo Tipo de Conta
         </Button>
@@ -205,7 +205,7 @@ export default function TiposContaPagar() {
                               <Button
                                 variant="ghost"
                                 size="icon"
-                                onClick={() => navigate(`/cadastro/tipos-conta-pagar/${item.id}`)}
+                                onClick={() => navigate(`/cadastro/tipo-contas-pagar/${item.id}`)}
                               >
                                 <Eye className="h-4 w-4" />
                               </Button>
@@ -217,7 +217,7 @@ export default function TiposContaPagar() {
                               <Button
                                 variant="ghost"
                                 size="icon"
-                                onClick={() => navigate(`/cadastro/tipos-conta-pagar/${item.id}?edit=true`)}
+                                onClick={() => navigate(`/cadastro/tipo-contas-pagar/${item.id}?edit=true`)}
                               >
                                 <Edit className="h-4 w-4" />
                               </Button>

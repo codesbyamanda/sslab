@@ -91,7 +91,7 @@ export default function TiposReceita() {
           <h1 className="text-2xl font-bold text-foreground">Tipos de Receita</h1>
           <p className="text-muted-foreground">Cadastre e gerencie os tipos de receita utilizados nos módulos financeiros</p>
         </div>
-        <Button onClick={() => navigate("/cadastro/tipos-receita/novo")}>
+        <Button onClick={() => navigate("/cadastro/tipo-receita/novo")}>
           <Plus className="h-4 w-4 mr-2" />
           Novo Tipo de Receita
         </Button>
@@ -204,7 +204,7 @@ export default function TiposReceita() {
                               <Button
                                 variant="ghost"
                                 size="icon"
-                                onClick={() => navigate(`/cadastro/tipos-receita/${item.id}`)}
+                                onClick={() => navigate(`/cadastro/tipo-receita/${item.id}`)}
                               >
                                 <Eye className="h-4 w-4" />
                               </Button>
@@ -216,7 +216,7 @@ export default function TiposReceita() {
                               <Button
                                 variant="ghost"
                                 size="icon"
-                                onClick={() => navigate(`/cadastro/tipos-receita/${item.id}?edit=true`)}
+                                onClick={() => navigate(`/cadastro/tipo-receita/${item.id}?edit=true`)}
                               >
                                 <Edit className="h-4 w-4" />
                               </Button>

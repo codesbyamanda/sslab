@@ -41,7 +41,7 @@ export default function TipoReceitaDetalhe() {
     }
     
     toast.success(isNew ? "Tipo de receita criado com sucesso" : "Tipo de receita atualizado com sucesso");
-    navigate("/cadastro/tipos-receita");
+    navigate("/cadastro/tipo-receita");
   };
 
   return (
@@ -53,7 +53,7 @@ export default function TipoReceitaDetalhe() {
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbLink href="/cadastro/tipos-receita">Tipos de Receita</BreadcrumbLink>
+            <BreadcrumbLink href="/cadastro/tipo-receita">Tipos de Receita</BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
@@ -66,7 +66,7 @@ export default function TipoReceitaDetalhe() {
 
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={() => navigate("/cadastro/tipos-receita")}>
+          <Button variant="ghost" size="icon" onClick={() => navigate("/cadastro/tipo-receita")}>
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
@@ -79,7 +79,7 @@ export default function TipoReceitaDetalhe() {
           </div>
         </div>
         {isViewMode && (
-          <Button onClick={() => navigate(`/cadastro/tipos-receita/${id}?edit=true`)}>
+          <Button onClick={() => navigate(`/cadastro/tipo-receita/${id}?edit=true`)}>
             Editar
           </Button>
         )}
@@ -145,7 +145,7 @@ export default function TipoReceitaDetalhe() {
 
         {!isViewMode && (
           <div className="flex justify-end gap-4 mt-6">
-            <Button type="button" variant="outline" onClick={() => navigate("/cadastro/tipos-receita")}>
+            <Button type="button" variant="outline" onClick={() => navigate("/cadastro/tipo-receita")}>
               Cancelar
             </Button>
             <Button type="submit">

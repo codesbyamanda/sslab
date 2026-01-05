@@ -41,7 +41,7 @@ export default function TipoContaPagarDetalhe() {
     }
     
     toast.success(isNew ? "Tipo de conta criado com sucesso" : "Tipo de conta atualizado com sucesso");
-    navigate("/cadastro/tipos-conta-pagar");
+    navigate("/cadastro/tipo-contas-pagar");
   };
 
   return (
@@ -53,7 +53,7 @@ export default function TipoContaPagarDetalhe() {
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbLink href="/cadastro/tipos-conta-pagar">Tipos de Contas a Pagar</BreadcrumbLink>
+            <BreadcrumbLink href="/cadastro/tipo-contas-pagar">Tipos de Contas a Pagar</BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
@@ -66,7 +66,7 @@ export default function TipoContaPagarDetalhe() {
 
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={() => navigate("/cadastro/tipos-conta-pagar")}>
+          <Button variant="ghost" size="icon" onClick={() => navigate("/cadastro/tipo-contas-pagar")}>
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
@@ -79,7 +79,7 @@ export default function TipoContaPagarDetalhe() {
           </div>
         </div>
         {isViewMode && (
-          <Button onClick={() => navigate(`/cadastro/tipos-conta-pagar/${id}?edit=true`)}>
+          <Button onClick={() => navigate(`/cadastro/tipo-contas-pagar/${id}?edit=true`)}>
             Editar
           </Button>
         )}
@@ -145,7 +145,7 @@ export default function TipoContaPagarDetalhe() {
 
         {!isViewMode && (
           <div className="flex justify-end gap-4 mt-6">
-            <Button type="button" variant="outline" onClick={() => navigate("/cadastro/tipos-conta-pagar")}>
+            <Button type="button" variant="outline" onClick={() => navigate("/cadastro/tipo-contas-pagar")}>
               Cancelar
             </Button>
             <Button type="submit">

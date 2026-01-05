@@ -102,7 +102,7 @@ export default function ModelosFolha() {
           <h1 className="text-2xl font-bold text-foreground">Modelos de Folha de Laudo</h1>
           <p className="text-muted-foreground">Gerencie os modelos de folha usados nos laudos médicos/laboratoriais</p>
         </div>
-        <Button onClick={() => navigate("/cadastro/modelos-folha/novo")}>
+        <Button onClick={() => navigate("/cadastro/modelos-folha-laudo/novo")}>
           <Plus className="h-4 w-4 mr-2" />
           Novo Modelo de Folha
         </Button>
@@ -215,7 +215,7 @@ export default function ModelosFolha() {
                               <Button
                                 variant="ghost"
                                 size="icon"
-                                onClick={() => navigate(`/cadastro/modelos-folha/${item.id}`)}
+                                onClick={() => navigate(`/cadastro/modelos-folha-laudo/${item.id}`)}
                               >
                                 <Eye className="h-4 w-4" />
                               </Button>
@@ -227,7 +227,7 @@ export default function ModelosFolha() {
                               <Button
                                 variant="ghost"
                                 size="icon"
-                                onClick={() => navigate(`/cadastro/modelos-folha/${item.id}?edit=true`)}
+                                onClick={() => navigate(`/cadastro/modelos-folha-laudo/${item.id}?edit=true`)}
                               >
                                 <Edit className="h-4 w-4" />
                               </Button>
