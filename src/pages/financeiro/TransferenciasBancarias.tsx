@@ -7,74 +7,47 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Collapsible,
-  CollapsibleContent,
-} from "@/components/ui/collapsible";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 // Mock data
-const mockTransferencias = [
-  {
-    id: 1,
-    data: "2024-01-20",
-    contaOrigem: "BB - 1234-5 / 12345-6",
-    contaDestino: "Itaú - 0987 / 98765-4",
-    valor: 25000.00,
-    tipo: "TED",
-    situacao: "Efetuada",
-  },
-  {
-    id: 2,
-    data: "2024-01-19",
-    contaOrigem: "Itaú - 0987 / 98765-4",
-    contaDestino: "BB - 1234-5 / 12345-6",
-    valor: 15000.00,
-    tipo: "PIX",
-    situacao: "Efetuada",
-  },
-  {
-    id: 3,
-    data: "2024-01-18",
-    contaOrigem: "BB - 1234-5 / 12345-6",
-    contaDestino: "Bradesco - 5678 / 54321-0",
-    valor: 8500.00,
-    tipo: "DOC",
-    situacao: "Pendente",
-  },
-  {
-    id: 4,
-    data: "2024-01-17",
-    contaOrigem: "Bradesco - 5678 / 54321-0",
-    contaDestino: "Itaú - 0987 / 98765-4",
-    valor: 3200.00,
-    tipo: "PIX",
-    situacao: "Cancelada",
-  },
-];
-
+const mockTransferencias = [{
+  id: 1,
+  data: "2024-01-20",
+  contaOrigem: "BB - 1234-5 / 12345-6",
+  contaDestino: "Itaú - 0987 / 98765-4",
+  valor: 25000.00,
+  tipo: "TED",
+  situacao: "Efetuada"
+}, {
+  id: 2,
+  data: "2024-01-19",
+  contaOrigem: "Itaú - 0987 / 98765-4",
+  contaDestino: "BB - 1234-5 / 12345-6",
+  valor: 15000.00,
+  tipo: "PIX",
+  situacao: "Efetuada"
+}, {
+  id: 3,
+  data: "2024-01-18",
+  contaOrigem: "BB - 1234-5 / 12345-6",
+  contaDestino: "Bradesco - 5678 / 54321-0",
+  valor: 8500.00,
+  tipo: "DOC",
+  situacao: "Pendente"
+}, {
+  id: 4,
+  data: "2024-01-17",
+  contaOrigem: "Bradesco - 5678 / 54321-0",
+  contaDestino: "Itaú - 0987 / 98765-4",
+  valor: 3200.00,
+  tipo: "PIX",
+  situacao: "Cancelada"
+}];
 type SortField = "data" | "contaOrigem" | "contaDestino" | "valor" | "tipo" | "situacao";
 type SortDirection = "asc" | "desc";
-
 const TransferenciasBancarias = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
@@ -85,7 +58,6 @@ const TransferenciasBancarias = () => {
   const [filterTipo, setFilterTipo] = useState("");
   const [filterDataInicio, setFilterDataInicio] = useState("");
   const [filterDataFim, setFilterDataFim] = useState("");
-
   const handleSort = (field: SortField) => {
     if (sortField === field) {
       setSortDirection(sortDirection === "asc" ? "desc" : "asc");
@@ -94,34 +66,24 @@ const TransferenciasBancarias = () => {
       setSortDirection("asc");
     }
   };
-
   const getSortIcon = (field: SortField) => {
     if (sortField !== field) return null;
-    return sortDirection === "asc" ? 
-      <ChevronUp className="h-4 w-4 ml-1" /> : 
-      <ChevronDown className="h-4 w-4 ml-1" />;
+    return sortDirection === "asc" ? <ChevronUp className="h-4 w-4 ml-1" /> : <ChevronDown className="h-4 w-4 ml-1" />;
   };
-
-  const filteredTransferencias = mockTransferencias
-    .filter(t => {
-      const matchesSearch = 
-        t.contaOrigem.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        t.contaDestino.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesSituacao = !filterSituacao || t.situacao === filterSituacao;
-      const matchesTipo = !filterTipo || t.tipo === filterTipo;
-      return matchesSearch && matchesSituacao && matchesTipo;
-    })
-    .sort((a, b) => {
-      const aValue = a[sortField];
-      const bValue = b[sortField];
-      const modifier = sortDirection === "asc" ? 1 : -1;
-      
-      if (typeof aValue === "number" && typeof bValue === "number") {
-        return (aValue - bValue) * modifier;
-      }
-      return String(aValue).localeCompare(String(bValue)) * modifier;
-    });
-
+  const filteredTransferencias = mockTransferencias.filter(t => {
+    const matchesSearch = t.contaOrigem.toLowerCase().includes(searchTerm.toLowerCase()) || t.contaDestino.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSituacao = !filterSituacao || t.situacao === filterSituacao;
+    const matchesTipo = !filterTipo || t.tipo === filterTipo;
+    return matchesSearch && matchesSituacao && matchesTipo;
+  }).sort((a, b) => {
+    const aValue = a[sortField];
+    const bValue = b[sortField];
+    const modifier = sortDirection === "asc" ? 1 : -1;
+    if (typeof aValue === "number" && typeof bValue === "number") {
+      return (aValue - bValue) * modifier;
+    }
+    return String(aValue).localeCompare(String(bValue)) * modifier;
+  });
   const getSituacaoBadge = (situacao: string) => {
     switch (situacao) {
       case "Efetuada":
@@ -134,7 +96,6 @@ const TransferenciasBancarias = () => {
         return <Badge variant="outline">{situacao}</Badge>;
     }
   };
-
   const getTipoBadge = (tipo: string) => {
     switch (tipo) {
       case "TED":
@@ -147,15 +108,15 @@ const TransferenciasBancarias = () => {
         return <Badge variant="outline">{tipo}</Badge>;
     }
   };
-
   const formatCurrency = (value: number) => {
-    return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+    return value.toLocaleString("pt-BR", {
+      style: "currency",
+      currency: "BRL"
+    });
   };
-
   const formatDate = (dateStr: string) => {
     return new Date(dateStr).toLocaleDateString("pt-BR");
   };
-
   const clearFilters = () => {
     setFilterSituacao("");
     setFilterTipo("");
@@ -165,14 +126,10 @@ const TransferenciasBancarias = () => {
   };
 
   // Cálculos para os cards
-  const totalTransferido = mockTransferencias
-    .filter(t => t.situacao === "Efetuada")
-    .reduce((acc, t) => acc + t.valor, 0);
+  const totalTransferido = mockTransferencias.filter(t => t.situacao === "Efetuada").reduce((acc, t) => acc + t.valor, 0);
   const transferenciasEfetuadas = mockTransferencias.filter(t => t.situacao === "Efetuada").length;
   const transferenciasPendentes = mockTransferencias.filter(t => t.situacao === "Pendente").length;
-
-  return (
-    <div className="min-h-screen flex w-full bg-background">
+  return <div className="min-h-screen flex w-full bg-background">
       <FinanceiroSidebar />
       
       <div className="flex-1 flex flex-col min-h-screen overflow-hidden">
@@ -181,13 +138,7 @@ const TransferenciasBancarias = () => {
         <main className="flex-1 overflow-auto">
           <div className="p-6 space-y-6">
             {/* Breadcrumb */}
-            <button
-              onClick={() => navigate("/financeiro")}
-              className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Voltar para Financeiro
-            </button>
+            
 
             {/* Page Header */}
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -200,25 +151,15 @@ const TransferenciasBancarias = () => {
                 </p>
               </div>
               <div className="flex items-center gap-3">
-                <Button 
-                  variant="outline" 
-                  onClick={() => setShowFilters(!showFilters)}
-                  className="gap-2"
-                >
+                <Button variant="outline" onClick={() => setShowFilters(!showFilters)} className="gap-2">
                   <Filter className="h-4 w-4" />
                   Filtrar
                 </Button>
-                <Button 
-                  variant="outline"
-                  className="gap-2"
-                >
+                <Button variant="outline" className="gap-2">
                   <FileDown className="h-4 w-4" />
                   Exportar
                 </Button>
-                <Button 
-                  onClick={() => navigate("/financeiro/transferencias-bancarias/nova")}
-                  className="gap-2"
-                >
+                <Button onClick={() => navigate("/financeiro/transferencias-bancarias/nova")} className="gap-2">
                   <Plus className="h-4 w-4" />
                   Nova Transferência
                 </Button>
@@ -313,19 +254,11 @@ const TransferenciasBancarias = () => {
                       </div>
                       <div className="space-y-2">
                         <label className="text-sm font-medium text-foreground">Data Início</label>
-                        <Input
-                          type="date"
-                          value={filterDataInicio}
-                          onChange={(e) => setFilterDataInicio(e.target.value)}
-                        />
+                        <Input type="date" value={filterDataInicio} onChange={e => setFilterDataInicio(e.target.value)} />
                       </div>
                       <div className="space-y-2">
                         <label className="text-sm font-medium text-foreground">Data Fim</label>
-                        <Input
-                          type="date"
-                          value={filterDataFim}
-                          onChange={(e) => setFilterDataFim(e.target.value)}
-                        />
+                        <Input type="date" value={filterDataFim} onChange={e => setFilterDataFim(e.target.value)} />
                       </div>
                       <div className="flex items-end">
                         <Button variant="ghost" onClick={clearFilters}>Limpar filtros</Button>
@@ -343,12 +276,7 @@ const TransferenciasBancarias = () => {
                   <CardTitle className="text-lg font-semibold">Lista de Transferências</CardTitle>
                   <div className="relative w-full md:w-80">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      placeholder="Buscar por conta..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-10"
-                    />
+                    <Input placeholder="Buscar por conta..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="pl-10" />
                   </div>
                 </div>
               </CardHeader>
@@ -357,55 +285,37 @@ const TransferenciasBancarias = () => {
                   <Table>
                     <TableHeader>
                       <TableRow className="bg-muted/50">
-                        <TableHead 
-                          className="cursor-pointer hover:bg-muted/80 transition-colors"
-                          onClick={() => handleSort("data")}
-                        >
+                        <TableHead className="cursor-pointer hover:bg-muted/80 transition-colors" onClick={() => handleSort("data")}>
                           <div className="flex items-center">
                             Data
                             {getSortIcon("data")}
                           </div>
                         </TableHead>
-                        <TableHead 
-                          className="cursor-pointer hover:bg-muted/80 transition-colors"
-                          onClick={() => handleSort("contaOrigem")}
-                        >
+                        <TableHead className="cursor-pointer hover:bg-muted/80 transition-colors" onClick={() => handleSort("contaOrigem")}>
                           <div className="flex items-center">
                             Conta Origem
                             {getSortIcon("contaOrigem")}
                           </div>
                         </TableHead>
-                        <TableHead 
-                          className="cursor-pointer hover:bg-muted/80 transition-colors"
-                          onClick={() => handleSort("contaDestino")}
-                        >
+                        <TableHead className="cursor-pointer hover:bg-muted/80 transition-colors" onClick={() => handleSort("contaDestino")}>
                           <div className="flex items-center">
                             Conta Destino
                             {getSortIcon("contaDestino")}
                           </div>
                         </TableHead>
-                        <TableHead 
-                          className="cursor-pointer hover:bg-muted/80 transition-colors text-right"
-                          onClick={() => handleSort("valor")}
-                        >
+                        <TableHead className="cursor-pointer hover:bg-muted/80 transition-colors text-right" onClick={() => handleSort("valor")}>
                           <div className="flex items-center justify-end">
                             Valor
                             {getSortIcon("valor")}
                           </div>
                         </TableHead>
-                        <TableHead 
-                          className="cursor-pointer hover:bg-muted/80 transition-colors"
-                          onClick={() => handleSort("tipo")}
-                        >
+                        <TableHead className="cursor-pointer hover:bg-muted/80 transition-colors" onClick={() => handleSort("tipo")}>
                           <div className="flex items-center">
                             Tipo
                             {getSortIcon("tipo")}
                           </div>
                         </TableHead>
-                        <TableHead 
-                          className="cursor-pointer hover:bg-muted/80 transition-colors"
-                          onClick={() => handleSort("situacao")}
-                        >
+                        <TableHead className="cursor-pointer hover:bg-muted/80 transition-colors" onClick={() => handleSort("situacao")}>
                           <div className="flex items-center">
                             Situação
                             {getSortIcon("situacao")}
@@ -415,19 +325,11 @@ const TransferenciasBancarias = () => {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {filteredTransferencias.length === 0 ? (
-                        <TableRow>
+                      {filteredTransferencias.length === 0 ? <TableRow>
                           <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
                             Nenhuma transferência encontrada.
                           </TableCell>
-                        </TableRow>
-                      ) : (
-                        filteredTransferencias.map((transferencia) => (
-                          <TableRow 
-                            key={transferencia.id} 
-                            className="hover:bg-muted/30 transition-colors cursor-pointer"
-                            onClick={() => navigate(`/financeiro/transferencias-bancarias/${transferencia.id}`)}
-                          >
+                        </TableRow> : filteredTransferencias.map(transferencia => <TableRow key={transferencia.id} className="hover:bg-muted/30 transition-colors cursor-pointer" onClick={() => navigate(`/financeiro/transferencias-bancarias/${transferencia.id}`)}>
                             <TableCell>
                               <div className="flex items-center gap-2">
                                 <Calendar className="h-4 w-4 text-muted-foreground" />
@@ -454,23 +356,17 @@ const TransferenciasBancarias = () => {
                             <TableCell className="text-right">
                               <Tooltip>
                                 <TooltipTrigger asChild>
-                                  <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      navigate(`/financeiro/transferencias-bancarias/${transferencia.id}`);
-                                    }}
-                                  >
+                                  <Button variant="ghost" size="icon" onClick={e => {
+                              e.stopPropagation();
+                              navigate(`/financeiro/transferencias-bancarias/${transferencia.id}`);
+                            }}>
                                     <Eye className="h-4 w-4" />
                                   </Button>
                                 </TooltipTrigger>
                                 <TooltipContent>Ver detalhes</TooltipContent>
                               </Tooltip>
                             </TableCell>
-                          </TableRow>
-                        ))
-                      )}
+                          </TableRow>)}
                     </TableBody>
                   </Table>
                 </div>
@@ -479,8 +375,6 @@ const TransferenciasBancarias = () => {
           </div>
         </main>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default TransferenciasBancarias;
