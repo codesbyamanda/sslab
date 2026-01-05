@@ -7,99 +7,70 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 // Mock data
-const mockReceitas = [
-  {
-    id: 1,
-    data: "2024-01-15",
-    dataVencimento: "2024-02-15",
-    descricao: "Consulta particular - João Silva",
-    pessoa: "João Silva",
-    tipoPessoa: "Paciente",
-    valorOriginal: 350.00,
-    valorDevido: 350.00,
-    situacao: "Aberto",
-    tipoReceita: "Consulta Particular",
-  },
-  {
-    id: 2,
-    data: "2024-01-10",
-    dataVencimento: "2024-01-25",
-    descricao: "Exames laboratoriais - Maria Santos",
-    pessoa: "Maria Santos",
-    tipoPessoa: "Paciente",
-    valorOriginal: 520.00,
-    valorDevido: 260.00,
-    situacao: "Parcial",
-    tipoReceita: "Exames",
-  },
-  {
-    id: 3,
-    data: "2024-01-05",
-    dataVencimento: "2024-01-20",
-    descricao: "Guia faturada - Unimed #45892",
-    pessoa: "Unimed",
-    tipoPessoa: "Convênio",
-    valorOriginal: 1250.00,
-    valorDevido: 0,
-    situacao: "Quitado",
-    tipoReceita: "Guia Faturada",
-  },
-  {
-    id: 4,
-    data: "2024-01-18",
-    dataVencimento: "2024-01-10",
-    descricao: "Procedimento cirúrgico - Carlos Oliveira",
-    pessoa: "Carlos Oliveira",
-    tipoPessoa: "Paciente",
-    valorOriginal: 2800.00,
-    valorDevido: 2800.00,
-    situacao: "Aberto",
-    tipoReceita: "Procedimento",
-  },
-  {
-    id: 5,
-    data: "2024-01-20",
-    dataVencimento: "2024-02-20",
-    descricao: "Aluguel sala consultório",
-    pessoa: "Imobiliária Central",
-    tipoPessoa: "Terceiro",
-    valorOriginal: 1500.00,
-    valorDevido: 1500.00,
-    situacao: "Aberto",
-    tipoReceita: "Aluguel",
-  },
-];
-
+const mockReceitas = [{
+  id: 1,
+  data: "2024-01-15",
+  dataVencimento: "2024-02-15",
+  descricao: "Consulta particular - João Silva",
+  pessoa: "João Silva",
+  tipoPessoa: "Paciente",
+  valorOriginal: 350.00,
+  valorDevido: 350.00,
+  situacao: "Aberto",
+  tipoReceita: "Consulta Particular"
+}, {
+  id: 2,
+  data: "2024-01-10",
+  dataVencimento: "2024-01-25",
+  descricao: "Exames laboratoriais - Maria Santos",
+  pessoa: "Maria Santos",
+  tipoPessoa: "Paciente",
+  valorOriginal: 520.00,
+  valorDevido: 260.00,
+  situacao: "Parcial",
+  tipoReceita: "Exames"
+}, {
+  id: 3,
+  data: "2024-01-05",
+  dataVencimento: "2024-01-20",
+  descricao: "Guia faturada - Unimed #45892",
+  pessoa: "Unimed",
+  tipoPessoa: "Convênio",
+  valorOriginal: 1250.00,
+  valorDevido: 0,
+  situacao: "Quitado",
+  tipoReceita: "Guia Faturada"
+}, {
+  id: 4,
+  data: "2024-01-18",
+  dataVencimento: "2024-01-10",
+  descricao: "Procedimento cirúrgico - Carlos Oliveira",
+  pessoa: "Carlos Oliveira",
+  tipoPessoa: "Paciente",
+  valorOriginal: 2800.00,
+  valorDevido: 2800.00,
+  situacao: "Aberto",
+  tipoReceita: "Procedimento"
+}, {
+  id: 5,
+  data: "2024-01-20",
+  dataVencimento: "2024-02-20",
+  descricao: "Aluguel sala consultório",
+  pessoa: "Imobiliária Central",
+  tipoPessoa: "Terceiro",
+  valorOriginal: 1500.00,
+  valorDevido: 1500.00,
+  situacao: "Aberto",
+  tipoReceita: "Aluguel"
+}];
 type SortField = "data" | "dataVencimento" | "descricao" | "pessoa" | "valorOriginal" | "valorDevido" | "situacao";
 type SortDirection = "asc" | "desc";
-
 const ReceitasReceber = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
@@ -112,7 +83,6 @@ const ReceitasReceber = () => {
   const [filterSituacao, setFilterSituacao] = useState("");
   const [filterDataInicio, setFilterDataInicio] = useState("");
   const [filterDataFim, setFilterDataFim] = useState("");
-
   const handleSort = (field: SortField) => {
     if (sortField === field) {
       setSortDirection(sortDirection === "asc" ? "desc" : "asc");
@@ -121,34 +91,24 @@ const ReceitasReceber = () => {
       setSortDirection("asc");
     }
   };
-
   const getSortIcon = (field: SortField) => {
     if (sortField !== field) return null;
-    return sortDirection === "asc" ? 
-      <ChevronUp className="h-4 w-4 ml-1" /> : 
-      <ChevronDown className="h-4 w-4 ml-1" />;
+    return sortDirection === "asc" ? <ChevronUp className="h-4 w-4 ml-1" /> : <ChevronDown className="h-4 w-4 ml-1" />;
   };
-
-  const filteredReceitas = mockReceitas
-    .filter(r => {
-      const matchesSearch = 
-        r.descricao.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        r.pessoa.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesTipo = !filterTipoReceita || r.tipoReceita === filterTipoReceita;
-      const matchesSituacao = !filterSituacao || r.situacao === filterSituacao;
-      return matchesSearch && matchesTipo && matchesSituacao;
-    })
-    .sort((a, b) => {
-      const aValue = a[sortField];
-      const bValue = b[sortField];
-      const modifier = sortDirection === "asc" ? 1 : -1;
-      
-      if (typeof aValue === "number" && typeof bValue === "number") {
-        return (aValue - bValue) * modifier;
-      }
-      return String(aValue).localeCompare(String(bValue)) * modifier;
-    });
-
+  const filteredReceitas = mockReceitas.filter(r => {
+    const matchesSearch = r.descricao.toLowerCase().includes(searchTerm.toLowerCase()) || r.pessoa.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesTipo = !filterTipoReceita || r.tipoReceita === filterTipoReceita;
+    const matchesSituacao = !filterSituacao || r.situacao === filterSituacao;
+    return matchesSearch && matchesTipo && matchesSituacao;
+  }).sort((a, b) => {
+    const aValue = a[sortField];
+    const bValue = b[sortField];
+    const modifier = sortDirection === "asc" ? 1 : -1;
+    if (typeof aValue === "number" && typeof bValue === "number") {
+      return (aValue - bValue) * modifier;
+    }
+    return String(aValue).localeCompare(String(bValue)) * modifier;
+  });
   const getSituacaoBadge = (situacao: string) => {
     switch (situacao) {
       case "Aberto":
@@ -161,22 +121,21 @@ const ReceitasReceber = () => {
         return <Badge variant="outline">{situacao}</Badge>;
     }
   };
-
   const isVencido = (dataVencimento: string, situacao: string) => {
     if (situacao === "Quitado") return false;
     const hoje = new Date();
     const vencimento = new Date(dataVencimento);
     return vencimento < hoje;
   };
-
   const formatDate = (dateStr: string) => {
     return new Date(dateStr).toLocaleDateString("pt-BR");
   };
-
   const formatCurrency = (value: number) => {
-    return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+    return value.toLocaleString("pt-BR", {
+      style: "currency",
+      currency: "BRL"
+    });
   };
-
   const clearFilters = () => {
     setFilterTipoReceita("");
     setFilterSituacao("");
@@ -184,15 +143,11 @@ const ReceitasReceber = () => {
     setFilterDataFim("");
     setSearchTerm("");
   };
-
   const hasRecebimentos = (receita: typeof mockReceitas[0]) => {
     // Mock: considerar que receitas parciais ou quitadas têm recebimentos
     return receita.situacao === "Parcial" || receita.situacao === "Quitado";
   };
-
-
-  return (
-    <div className="min-h-screen flex w-full bg-background">
+  return <div className="min-h-screen flex w-full bg-background">
       <FinanceiroSidebar />
       
       <div className="flex-1 flex flex-col min-h-screen overflow-hidden">
@@ -201,13 +156,7 @@ const ReceitasReceber = () => {
         <main className="flex-1 overflow-auto">
           <div className="p-6 space-y-6">
             {/* Breadcrumb */}
-            <button
-              onClick={() => navigate("/financeiro")}
-              className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Voltar para Financeiro
-            </button>
+            
 
             {/* Page Header */}
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -220,11 +169,7 @@ const ReceitasReceber = () => {
                 </p>
               </div>
               <div className="flex items-center gap-3">
-                <Button 
-                  variant="outline" 
-                  onClick={() => setShowFilters(!showFilters)}
-                  className="gap-2"
-                >
+                <Button variant="outline" onClick={() => setShowFilters(!showFilters)} className="gap-2">
                   <Filter className="h-4 w-4" />
                   Filtrar
                 </Button>
@@ -270,19 +215,11 @@ const ReceitasReceber = () => {
                       </div>
                       <div className="space-y-2">
                         <label className="text-sm font-medium text-foreground">Data Início</label>
-                        <Input
-                          type="date"
-                          value={filterDataInicio}
-                          onChange={(e) => setFilterDataInicio(e.target.value)}
-                        />
+                        <Input type="date" value={filterDataInicio} onChange={e => setFilterDataInicio(e.target.value)} />
                       </div>
                       <div className="space-y-2">
                         <label className="text-sm font-medium text-foreground">Data Fim</label>
-                        <Input
-                          type="date"
-                          value={filterDataFim}
-                          onChange={(e) => setFilterDataFim(e.target.value)}
-                        />
+                        <Input type="date" value={filterDataFim} onChange={e => setFilterDataFim(e.target.value)} />
                       </div>
                     </div>
                     <div className="flex justify-end gap-3 mt-4">
@@ -301,12 +238,7 @@ const ReceitasReceber = () => {
                   <CardTitle className="text-lg font-semibold">Lista de Receitas</CardTitle>
                   <div className="relative w-full md:w-80">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      placeholder="Buscar por nome, pessoa ou requisição..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-10"
-                    />
+                    <Input placeholder="Buscar por nome, pessoa ou requisição..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="pl-10" />
                   </div>
                 </div>
               </CardHeader>
@@ -315,58 +247,37 @@ const ReceitasReceber = () => {
                   <Table>
                     <TableHeader>
                       <TableRow className="bg-muted/50">
-                        <TableHead 
-                          className="cursor-pointer hover:bg-muted/80 transition-colors"
-                          onClick={() => handleSort("data")}
-                        >
+                        <TableHead className="cursor-pointer hover:bg-muted/80 transition-colors" onClick={() => handleSort("data")}>
                           <div className="flex items-center">
                             Data {getSortIcon("data")}
                           </div>
                         </TableHead>
-                        <TableHead 
-                          className="cursor-pointer hover:bg-muted/80 transition-colors"
-                          onClick={() => handleSort("dataVencimento")}
-                        >
+                        <TableHead className="cursor-pointer hover:bg-muted/80 transition-colors" onClick={() => handleSort("dataVencimento")}>
                           <div className="flex items-center">
                             Vencimento {getSortIcon("dataVencimento")}
                           </div>
                         </TableHead>
-                        <TableHead 
-                          className="cursor-pointer hover:bg-muted/80 transition-colors"
-                          onClick={() => handleSort("descricao")}
-                        >
+                        <TableHead className="cursor-pointer hover:bg-muted/80 transition-colors" onClick={() => handleSort("descricao")}>
                           <div className="flex items-center">
                             Descrição {getSortIcon("descricao")}
                           </div>
                         </TableHead>
-                        <TableHead 
-                          className="cursor-pointer hover:bg-muted/80 transition-colors"
-                          onClick={() => handleSort("pessoa")}
-                        >
+                        <TableHead className="cursor-pointer hover:bg-muted/80 transition-colors" onClick={() => handleSort("pessoa")}>
                           <div className="flex items-center">
                             Pessoa {getSortIcon("pessoa")}
                           </div>
                         </TableHead>
-                        <TableHead 
-                          className="cursor-pointer hover:bg-muted/80 transition-colors text-right"
-                          onClick={() => handleSort("valorOriginal")}
-                        >
+                        <TableHead className="cursor-pointer hover:bg-muted/80 transition-colors text-right" onClick={() => handleSort("valorOriginal")}>
                           <div className="flex items-center justify-end">
                             Valor Original {getSortIcon("valorOriginal")}
                           </div>
                         </TableHead>
-                        <TableHead 
-                          className="cursor-pointer hover:bg-muted/80 transition-colors text-right"
-                          onClick={() => handleSort("valorDevido")}
-                        >
+                        <TableHead className="cursor-pointer hover:bg-muted/80 transition-colors text-right" onClick={() => handleSort("valorDevido")}>
                           <div className="flex items-center justify-end">
                             Valor Devido {getSortIcon("valorDevido")}
                           </div>
                         </TableHead>
-                        <TableHead 
-                          className="cursor-pointer hover:bg-muted/80 transition-colors"
-                          onClick={() => handleSort("situacao")}
-                        >
+                        <TableHead className="cursor-pointer hover:bg-muted/80 transition-colors" onClick={() => handleSort("situacao")}>
                           <div className="flex items-center">
                             Situação {getSortIcon("situacao")}
                           </div>
@@ -375,23 +286,14 @@ const ReceitasReceber = () => {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {filteredReceitas.map((receita) => (
-                        <TableRow 
-                          key={receita.id}
-                          className={isVencido(receita.dataVencimento, receita.situacao) 
-                            ? "bg-red-500/5 hover:bg-red-500/10" 
-                            : "hover:bg-muted/50"
-                          }
-                        >
+                      {filteredReceitas.map(receita => <TableRow key={receita.id} className={isVencido(receita.dataVencimento, receita.situacao) ? "bg-red-500/5 hover:bg-red-500/10" : "hover:bg-muted/50"}>
                           <TableCell className="font-medium">
                             {formatDate(receita.data)}
                           </TableCell>
                           <TableCell>
                             <div className="flex items-center gap-2">
                               {formatDate(receita.dataVencimento)}
-                              {isVencido(receita.dataVencimento, receita.situacao) && (
-                                <AlertCircle className="h-4 w-4 text-red-500" />
-                              )}
+                              {isVencido(receita.dataVencimento, receita.situacao) && <AlertCircle className="h-4 w-4 text-red-500" />}
                             </div>
                           </TableCell>
                           <TableCell className="max-w-[200px] truncate">
@@ -420,53 +322,33 @@ const ReceitasReceber = () => {
                             <div className="flex items-center justify-center gap-1">
                               <Tooltip>
                                 <TooltipTrigger asChild>
-                                  <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className="h-8 w-8"
-                                    onClick={() => navigate(`/financeiro/receitas/${receita.id}`)}
-                                  >
+                                  <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => navigate(`/financeiro/receitas/${receita.id}`)}>
                                     <Eye className="h-4 w-4" />
                                   </Button>
                                 </TooltipTrigger>
                                 <TooltipContent>Visualizar Receita</TooltipContent>
                               </Tooltip>
                               
-                              {receita.situacao !== "Quitado" && (
-                                <Tooltip>
+                              {receita.situacao !== "Quitado" && <Tooltip>
                                   <TooltipTrigger asChild>
-                                    <Button
-                                      variant="ghost"
-                                      size="icon"
-                                      className="h-8 w-8 text-green-600 hover:text-green-700"
-                                      onClick={() => navigate(`/financeiro/receitas/${receita.id}/recebimento`)}
-                                    >
+                                    <Button variant="ghost" size="icon" className="h-8 w-8 text-green-600 hover:text-green-700" onClick={() => navigate(`/financeiro/receitas/${receita.id}/recebimento`)}>
                                       <DollarSign className="h-4 w-4" />
                                     </Button>
                                   </TooltipTrigger>
                                   <TooltipContent>Registrar Recebimento</TooltipContent>
-                                </Tooltip>
-                              )}
+                                </Tooltip>}
                               
-                              {hasRecebimentos(receita) && (
-                                <Tooltip>
+                              {hasRecebimentos(receita) && <Tooltip>
                                   <TooltipTrigger asChild>
-                                    <Button
-                                      variant="ghost"
-                                      size="icon"
-                                      className="h-8 w-8 text-orange-600 hover:text-orange-700"
-                                      onClick={() => navigate(`/financeiro/receitas/${receita.id}/extorno`)}
-                                    >
+                                    <Button variant="ghost" size="icon" className="h-8 w-8 text-orange-600 hover:text-orange-700" onClick={() => navigate(`/financeiro/receitas/${receita.id}/extorno`)}>
                                       <RotateCcw className="h-4 w-4" />
                                     </Button>
                                   </TooltipTrigger>
                                   <TooltipContent>Extornar Recebimento</TooltipContent>
-                                </Tooltip>
-                              )}
+                                </Tooltip>}
                             </div>
                           </TableCell>
-                        </TableRow>
-                      ))}
+                        </TableRow>)}
                     </TableBody>
                   </Table>
                 </div>
@@ -538,8 +420,6 @@ const ReceitasReceber = () => {
         </main>
       </div>
 
-    </div>
-  );
+    </div>;
 };
-
 export default ReceitasReceber;
