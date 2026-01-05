@@ -1,21 +1,5 @@
 import { useState } from "react";
-import { 
-  ArrowLeft, 
-  FileText, 
-  Plus, 
-  Filter, 
-  X, 
-  ChevronDown, 
-  ChevronUp, 
-  Search,
-  CheckCircle2,
-  Download,
-  Lock,
-  FileArchive,
-  Info,
-  Send,
-  History
-} from "lucide-react";
+import { ArrowLeft, FileText, Plus, Filter, X, ChevronDown, ChevronUp, Search, CheckCircle2, Download, Lock, FileArchive, Info, Send, History } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import FaturamentoSidebar from "@/components/faturamento/FaturamentoSidebar";
 import FaturamentoNavbar from "@/components/faturamento/FaturamentoNavbar";
@@ -23,56 +7,64 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { FaturaBadge, type FaturaStatus } from "@/components/faturamento/StatusBadge";
 import { FaturamentoTimeline, type TimelineEvent, createFaturaTimelineEvent } from "@/components/faturamento/FaturamentoTimeline";
 
 // Mock data for pre-faturas fechadas
-const mockPreFaturas = [
-  { id: 1, codigo: "PF-2024-002", convenio: "Unimed", dataFechamento: "2024-01-16", usuario: "João Santos", qtdGuias: 32, total: 8750.50, selected: true },
-  { id: 2, codigo: "PF-2024-003", convenio: "Unimed", dataFechamento: "2024-01-15", usuario: "Ana Costa", qtdGuias: 28, total: 6200.00, selected: true },
-  { id: 3, codigo: "PF-2024-006", convenio: "Unimed", dataFechamento: "2024-01-14", usuario: "Maria Silva", qtdGuias: 41, total: 11350.75, selected: true },
-  { id: 4, codigo: "PF-2024-008", convenio: "Bradesco Saúde", dataFechamento: "2024-01-13", usuario: "Pedro Lima", qtdGuias: 19, total: 5420.00, selected: true },
-  { id: 5, codigo: "PF-2024-009", convenio: "SulAmérica", dataFechamento: "2024-01-12", usuario: "Carla Dias", qtdGuias: 25, total: 7890.25, selected: true },
-];
-
+const mockPreFaturas = [{
+  id: 1,
+  codigo: "PF-2024-002",
+  convenio: "Unimed",
+  dataFechamento: "2024-01-16",
+  usuario: "João Santos",
+  qtdGuias: 32,
+  total: 8750.50,
+  selected: true
+}, {
+  id: 2,
+  codigo: "PF-2024-003",
+  convenio: "Unimed",
+  dataFechamento: "2024-01-15",
+  usuario: "Ana Costa",
+  qtdGuias: 28,
+  total: 6200.00,
+  selected: true
+}, {
+  id: 3,
+  codigo: "PF-2024-006",
+  convenio: "Unimed",
+  dataFechamento: "2024-01-14",
+  usuario: "Maria Silva",
+  qtdGuias: 41,
+  total: 11350.75,
+  selected: true
+}, {
+  id: 4,
+  codigo: "PF-2024-008",
+  convenio: "Bradesco Saúde",
+  dataFechamento: "2024-01-13",
+  usuario: "Pedro Lima",
+  qtdGuias: 19,
+  total: 5420.00,
+  selected: true
+}, {
+  id: 5,
+  codigo: "PF-2024-009",
+  convenio: "SulAmérica",
+  dataFechamento: "2024-01-12",
+  usuario: "Carla Dias",
+  qtdGuias: 25,
+  total: 7890.25,
+  selected: true
+}];
 const convenios = ["Unimed", "Bradesco Saúde", "SulAmérica", "Amil", "Porto Seguro", "Hapvida", "NotreDame"];
-
 interface Fatura {
   codigo: string;
   convenio: string;
@@ -85,11 +77,12 @@ interface Fatura {
   status: FaturaStatus;
   timeline: TimelineEvent[];
 }
-
 const Faturamento = () => {
   const navigate = useNavigate();
-  const { toast } = useToast();
-  
+  const {
+    toast
+  } = useToast();
+
   // States
   const [isInfoExpanded, setIsInfoExpanded] = useState(false);
   const [filterConvenio, setFilterConvenio] = useState<string>("all");
@@ -111,22 +104,17 @@ const Faturamento = () => {
   const handleFilter = () => {
     setHasFiltered(true);
     let filtered = [...mockPreFaturas];
-    
     if (filterConvenio && filterConvenio !== "all") {
       filtered = filtered.filter(pf => pf.convenio === filterConvenio);
     }
-    
     if (filterDataInicio) {
       filtered = filtered.filter(pf => pf.dataFechamento >= filterDataInicio);
     }
-    
     if (filterDataFim) {
       filtered = filtered.filter(pf => pf.dataFechamento <= filterDataFim);
     }
-    
     setPreFaturas(filtered);
   };
-
   const clearFilters = () => {
     setFilterConvenio("all");
     setFilterDataInicio("");
@@ -135,17 +123,18 @@ const Faturamento = () => {
     setPreFaturas(mockPreFaturas);
     setFaturaGerada(null);
   };
-
   const handleSelectAll = (checked: boolean) => {
-    setPreFaturas(preFaturas.map(pf => ({ ...pf, selected: checked })));
+    setPreFaturas(preFaturas.map(pf => ({
+      ...pf,
+      selected: checked
+    })));
   };
-
   const handlePreFaturaSelect = (id: number, checked: boolean) => {
-    setPreFaturas(preFaturas.map(pf => 
-      pf.id === id ? { ...pf, selected: checked } : pf
-    ));
+    setPreFaturas(preFaturas.map(pf => pf.id === id ? {
+      ...pf,
+      selected: checked
+    } : pf));
   };
-
   const handleGerarFatura = () => {
     if (selectedPreFaturas.length === 0) {
       toast({
@@ -155,7 +144,6 @@ const Faturamento = () => {
       });
       return;
     }
-
     const now = new Date().toISOString();
     const novaFatura: Fatura = {
       codigo: `FAT-2024-${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}`,
@@ -167,19 +155,14 @@ const Faturamento = () => {
       qtdGuias: totalGuias,
       total: totalValor,
       status: "aberto",
-      timeline: [
-        createFaturaTimelineEvent("fatura_gerada", "Sistema", `Fatura gerada a partir de ${selectedPreFaturas.length} pré-lote(s)`)
-      ]
+      timeline: [createFaturaTimelineEvent("fatura_gerada", "Sistema", `Fatura gerada a partir de ${selectedPreFaturas.length} pré-lote(s)`)]
     };
-
     setFaturaGerada(novaFatura);
     setShowSuccessModal(true);
   };
-
   const handleFecharFatura = () => {
     setShowCloseConfirmModal(true);
   };
-
   const confirmFecharFatura = () => {
     if (faturaGerada) {
       const now = new Date().toISOString();
@@ -187,36 +170,28 @@ const Faturamento = () => {
         ...faturaGerada,
         status: "fechado",
         dataFechamento: now,
-        timeline: [
-          ...faturaGerada.timeline,
-          createFaturaTimelineEvent("fatura_fechada", "Usuário", "Fatura fechada e pronta para geração de arquivo magnético")
-        ]
+        timeline: [...faturaGerada.timeline, createFaturaTimelineEvent("fatura_fechada", "Usuário", "Fatura fechada e pronta para geração de arquivo magnético")]
       });
       setShowCloseConfirmModal(false);
       toast({
         title: "Fatura fechada com sucesso",
-        description: "Agora você pode gerar o arquivo magnético.",
+        description: "Agora você pode gerar o arquivo magnético."
       });
     }
   };
-
   const handleGerarArquivoMagnetico = () => {
     if (faturaGerada && faturaGerada.status === "fechado") {
       setFaturaGerada({
         ...faturaGerada,
         status: "arquivo_gerado",
-        timeline: [
-          ...faturaGerada.timeline,
-          createFaturaTimelineEvent("arquivo_gerado", "Sistema", "Arquivo XML TISS gerado com sucesso")
-        ]
+        timeline: [...faturaGerada.timeline, createFaturaTimelineEvent("arquivo_gerado", "Sistema", "Arquivo XML TISS gerado com sucesso")]
       });
       toast({
         title: "Arquivo magnético gerado",
-        description: "O arquivo foi gerado e está pronto para download.",
+        description: "O arquivo foi gerado e está pronto para download."
       });
     }
   };
-
   const handleEnviarConvenio = () => {
     if (faturaGerada && faturaGerada.status === "arquivo_gerado") {
       const now = new Date().toISOString();
@@ -224,24 +199,18 @@ const Faturamento = () => {
         ...faturaGerada,
         status: "enviado",
         dataEnvio: now,
-        timeline: [
-          ...faturaGerada.timeline,
-          createFaturaTimelineEvent("fatura_enviada", "Sistema", `Enviada para ${faturaGerada.convenio}`)
-        ]
+        timeline: [...faturaGerada.timeline, createFaturaTimelineEvent("fatura_enviada", "Sistema", `Enviada para ${faturaGerada.convenio}`)]
       });
       toast({
         title: "Fatura enviada",
-        description: `Fatura enviada para ${faturaGerada.convenio} com sucesso.`,
+        description: `Fatura enviada para ${faturaGerada.convenio} com sucesso.`
       });
     }
   };
-
   const handleNovaFatura = () => {
     clearFilters();
   };
-
-  return (
-    <div className="flex min-h-screen w-full bg-gradient-services">
+  return <div className="flex min-h-screen w-full bg-gradient-services">
       <FaturamentoSidebar />
       
       <div className="flex-1 flex flex-col min-w-0">
@@ -249,13 +218,7 @@ const Faturamento = () => {
         
         <main className="flex-1 p-6 overflow-auto">
           {/* Breadcrumb */}
-          <button 
-            onClick={() => navigate("/services")}
-            className="flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary/80 transition-colors mb-4 animate-fade-in"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            <span>Voltar para Serviços</span>
-          </button>
+          
 
           {/* Page Header */}
           <div className="mb-6 animate-fade-in">
@@ -301,8 +264,7 @@ const Faturamento = () => {
           </Collapsible>
 
           {/* Main Content - Only show if no fatura generated */}
-          {!faturaGerada && (
-            <div className="space-y-6 animate-fade-in">
+          {!faturaGerada && <div className="space-y-6 animate-fade-in">
               {/* Pre-Faturas Card */}
               <div className="bg-card rounded-xl border border-border/50 shadow-sm">
                 {/* Card Header */}
@@ -321,29 +283,17 @@ const Faturamento = () => {
                         </SelectTrigger>
                         <SelectContent className="bg-background border-border">
                           <SelectItem value="all">Todos os convênios</SelectItem>
-                          {convenios.map(c => (
-                            <SelectItem key={c} value={c}>{c}</SelectItem>
-                          ))}
+                          {convenios.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
                         </SelectContent>
                       </Select>
                     </div>
                     <div className="space-y-1.5">
                       <Label className="text-xs font-medium text-muted-foreground">Data Fechamento Inicial</Label>
-                      <Input 
-                        type="date" 
-                        value={filterDataInicio}
-                        onChange={(e) => setFilterDataInicio(e.target.value)}
-                        className="h-9 bg-background"
-                      />
+                      <Input type="date" value={filterDataInicio} onChange={e => setFilterDataInicio(e.target.value)} className="h-9 bg-background" />
                     </div>
                     <div className="space-y-1.5">
                       <Label className="text-xs font-medium text-muted-foreground">Data Fechamento Final</Label>
-                      <Input 
-                        type="date" 
-                        value={filterDataFim}
-                        onChange={(e) => setFilterDataFim(e.target.value)}
-                        className="h-9 bg-background"
-                      />
+                      <Input type="date" value={filterDataFim} onChange={e => setFilterDataFim(e.target.value)} className="h-9 bg-background" />
                     </div>
                     <div className="flex items-end gap-2">
                       <Button size="sm" onClick={handleFilter} className="flex-1">
@@ -358,17 +308,13 @@ const Faturamento = () => {
                 </div>
 
                 {/* Table - Only show after filtering */}
-                {hasFiltered && (
-                  <>
+                {hasFiltered && <>
                     <div className="overflow-x-auto">
                       <Table>
                         <TableHeader>
                           <TableRow className="hover:bg-transparent">
                             <TableHead className="w-12">
-                              <Checkbox 
-                                checked={preFaturas.length > 0 && preFaturas.every(pf => pf.selected)}
-                                onCheckedChange={(checked) => handleSelectAll(!!checked)}
-                              />
+                              <Checkbox checked={preFaturas.length > 0 && preFaturas.every(pf => pf.selected)} onCheckedChange={checked => handleSelectAll(!!checked)} />
                             </TableHead>
                             <TableHead className="font-semibold">Código do Pré-Lote</TableHead>
                             <TableHead className="font-semibold">Convênio</TableHead>
@@ -379,49 +325,41 @@ const Faturamento = () => {
                           </TableRow>
                         </TableHeader>
                         <TableBody>
-                          {preFaturas.map((pf) => (
-                            <TableRow key={pf.id} className={cn(pf.selected && "bg-primary/5")}>
+                          {preFaturas.map(pf => <TableRow key={pf.id} className={cn(pf.selected && "bg-primary/5")}>
                               <TableCell>
-                                <Checkbox 
-                                  checked={pf.selected}
-                                  onCheckedChange={(checked) => handlePreFaturaSelect(pf.id, !!checked)}
-                                />
+                                <Checkbox checked={pf.selected} onCheckedChange={checked => handlePreFaturaSelect(pf.id, !!checked)} />
                               </TableCell>
                               <TableCell className="font-medium text-primary">{pf.codigo}</TableCell>
                               <TableCell>{pf.convenio}</TableCell>
                               <TableCell>{new Date(pf.dataFechamento).toLocaleDateString('pt-BR')}</TableCell>
                               <TableCell>{pf.usuario}</TableCell>
                               <TableCell className="text-center">{pf.qtdGuias}</TableCell>
-                              <TableCell className="text-right font-medium">{pf.total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</TableCell>
-                            </TableRow>
-                          ))}
+                              <TableCell className="text-right font-medium">{pf.total.toLocaleString('pt-BR', {
+                          style: 'currency',
+                          currency: 'BRL'
+                        })}</TableCell>
+                            </TableRow>)}
                         </TableBody>
                       </Table>
                     </div>
 
                     {/* Empty state */}
-                    {preFaturas.length === 0 && (
-                      <div className="p-8 text-center text-muted-foreground">
+                    {preFaturas.length === 0 && <div className="p-8 text-center text-muted-foreground">
                         <FileText className="h-12 w-12 mx-auto mb-4 opacity-50" />
                         <p>Nenhuma pré-fatura fechada encontrada para os filtros aplicados.</p>
-                      </div>
-                    )}
-                  </>
-                )}
+                      </div>}
+                  </>}
 
                 {/* Initial state - before filter */}
-                {!hasFiltered && (
-                  <div className="p-8 text-center text-muted-foreground">
+                {!hasFiltered && <div className="p-8 text-center text-muted-foreground">
                     <Search className="h-12 w-12 mx-auto mb-4 opacity-50" />
                     <p className="font-medium text-foreground mb-1">Localize as pré-faturas fechadas</p>
                     <p className="text-sm">Utilize os filtros acima para encontrar as pré-faturas disponíveis para faturamento.</p>
-                  </div>
-                )}
+                  </div>}
               </div>
 
               {/* Actions Card - Only show when has selected items */}
-              {hasFiltered && selectedPreFaturas.length > 0 && (
-                <div className="bg-card rounded-xl border border-border/50 shadow-sm p-5 animate-fade-in">
+              {hasFiltered && selectedPreFaturas.length > 0 && <div className="bg-card rounded-xl border border-border/50 shadow-sm p-5 animate-fade-in">
                   <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                     {/* Summary */}
                     <div className="flex flex-wrap items-center gap-6">
@@ -437,7 +375,10 @@ const Faturamento = () => {
                       <div className="h-10 w-px bg-border hidden lg:block" />
                       <div>
                         <p className="text-xs text-muted-foreground">Valor total</p>
-                        <p className="text-xl font-bold text-verde-ativo">{totalValor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
+                        <p className="text-xl font-bold text-verde-ativo">{totalValor.toLocaleString('pt-BR', {
+                      style: 'currency',
+                      currency: 'BRL'
+                    })}</p>
                       </div>
                     </div>
 
@@ -452,14 +393,11 @@ const Faturamento = () => {
                       </Button>
                     </div>
                   </div>
-                </div>
-              )}
-            </div>
-          )}
+                </div>}
+            </div>}
 
           {/* Fatura Generated - Show fatura details */}
-          {faturaGerada && (
-            <div className="space-y-6 animate-fade-in">
+          {faturaGerada && <div className="space-y-6 animate-fade-in">
               {/* Fatura Details Card */}
               <div className="bg-card rounded-xl border border-border/50 shadow-sm">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 border-b border-border/50">
@@ -505,49 +443,43 @@ const Faturamento = () => {
                     </div>
                     <div>
                       <p className="text-xs text-muted-foreground mb-1">Total</p>
-                      <p className="font-semibold text-verde-ativo">{faturaGerada.total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
+                      <p className="font-semibold text-verde-ativo">{faturaGerada.total.toLocaleString('pt-BR', {
+                      style: 'currency',
+                      currency: 'BRL'
+                    })}</p>
                     </div>
                   </div>
 
-                  {faturaGerada.dataFechamento && (
-                    <div className="mt-4 pt-4 border-t border-border/50">
+                  {faturaGerada.dataFechamento && <div className="mt-4 pt-4 border-t border-border/50">
                       <div className="flex items-center gap-2 text-sm">
                         <CheckCircle2 className="h-4 w-4 text-verde-ativo" />
                         <span className="text-muted-foreground">Fechada em:</span>
                         <span className="font-medium">{new Date(faturaGerada.dataFechamento).toLocaleDateString('pt-BR')}</span>
                       </div>
-                    </div>
-                  )}
+                    </div>}
 
-                  {faturaGerada.dataEnvio && (
-                    <div className="mt-2">
+                  {faturaGerada.dataEnvio && <div className="mt-2">
                       <div className="flex items-center gap-2 text-sm">
                         <Send className="h-4 w-4 text-primary" />
                         <span className="text-muted-foreground">Enviada em:</span>
                         <span className="font-medium">{new Date(faturaGerada.dataEnvio).toLocaleDateString('pt-BR')}</span>
                       </div>
-                    </div>
-                  )}
+                    </div>}
                 </div>
 
                 {/* Actions */}
                 <div className="p-5 border-t border-border/50 bg-muted/20 flex flex-wrap gap-3">
-                  {faturaGerada.status === "aberto" && (
-                    <Button onClick={handleFecharFatura}>
+                  {faturaGerada.status === "aberto" && <Button onClick={handleFecharFatura}>
                       <Lock className="h-4 w-4 mr-2" />
                       Fechar Fatura
-                    </Button>
-                  )}
+                    </Button>}
                   
-                  {faturaGerada.status === "fechado" && (
-                    <Button onClick={handleGerarArquivoMagnetico}>
+                  {faturaGerada.status === "fechado" && <Button onClick={handleGerarArquivoMagnetico}>
                       <FileArchive className="h-4 w-4 mr-2" />
                       Gerar Arquivo Magnético
-                    </Button>
-                  )}
+                    </Button>}
 
-                  {faturaGerada.status === "arquivo_gerado" && (
-                    <>
+                  {faturaGerada.status === "arquivo_gerado" && <>
                       <Button variant="outline">
                         <Download className="h-4 w-4 mr-2" />
                         Baixar Arquivo
@@ -556,8 +488,7 @@ const Faturamento = () => {
                         <Send className="h-4 w-4 mr-2" />
                         Marcar como Enviada
                       </Button>
-                    </>
-                  )}
+                    </>}
 
                   <Button variant="ghost" onClick={handleNovaFatura}>
                     <Plus className="h-4 w-4 mr-2" />
@@ -567,8 +498,7 @@ const Faturamento = () => {
               </div>
 
               {/* Help text for next steps */}
-              {faturaGerada.status === "aberto" && (
-                <div className="bg-amarelo-alerta/10 border border-amarelo-alerta/30 rounded-xl p-4 flex items-start gap-3">
+              {faturaGerada.status === "aberto" && <div className="bg-amarelo-alerta/10 border border-amarelo-alerta/30 rounded-xl p-4 flex items-start gap-3">
                   <Info className="h-5 w-5 text-amarelo-alerta flex-shrink-0 mt-0.5" />
                   <div>
                     <p className="font-medium text-foreground">Próximo passo: Fechar a fatura</p>
@@ -576,11 +506,9 @@ const Faturamento = () => {
                       Para gerar o arquivo magnético e enviar ao convênio, primeiro feche a fatura clicando no botão "Fechar Fatura".
                     </p>
                   </div>
-                </div>
-              )}
+                </div>}
 
-              {faturaGerada.status === "fechado" && (
-                <div className="bg-verde-ativo/10 border border-verde-ativo/30 rounded-xl p-4 flex items-start gap-3">
+              {faturaGerada.status === "fechado" && <div className="bg-verde-ativo/10 border border-verde-ativo/30 rounded-xl p-4 flex items-start gap-3">
                   <CheckCircle2 className="h-5 w-5 text-verde-ativo flex-shrink-0 mt-0.5" />
                   <div>
                     <p className="font-medium text-foreground">Fatura pronta para geração de arquivo</p>
@@ -588,11 +516,9 @@ const Faturamento = () => {
                       Agora você pode gerar o arquivo magnético para envio ao convênio clicando no botão "Gerar Arquivo Magnético".
                     </p>
                   </div>
-                </div>
-              )}
+                </div>}
 
-              {faturaGerada.status === "arquivo_gerado" && (
-                <div className="bg-primary/10 border border-primary/30 rounded-xl p-4 flex items-start gap-3">
+              {faturaGerada.status === "arquivo_gerado" && <div className="bg-primary/10 border border-primary/30 rounded-xl p-4 flex items-start gap-3">
                   <FileArchive className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
                   <div>
                     <p className="font-medium text-foreground">Arquivo gerado com sucesso</p>
@@ -600,11 +526,9 @@ const Faturamento = () => {
                       Baixe o arquivo e envie ao convênio. Após o envio, clique em "Marcar como Enviada" para registrar.
                     </p>
                   </div>
-                </div>
-              )}
+                </div>}
 
-              {faturaGerada.status === "enviado" && (
-                <div className="bg-verde-ativo/10 border border-verde-ativo/30 rounded-xl p-4 flex items-start gap-3">
+              {faturaGerada.status === "enviado" && <div className="bg-verde-ativo/10 border border-verde-ativo/30 rounded-xl p-4 flex items-start gap-3">
                   <Send className="h-5 w-5 text-verde-ativo flex-shrink-0 mt-0.5" />
                   <div>
                     <p className="font-medium text-foreground">Fatura enviada ao convênio</p>
@@ -612,10 +536,8 @@ const Faturamento = () => {
                       A fatura foi marcada como enviada. Aguarde o retorno do convênio para dar continuidade ao processo.
                     </p>
                   </div>
-                </div>
-              )}
-            </div>
-          )}
+                </div>}
+            </div>}
         </main>
       </div>
 
@@ -637,7 +559,10 @@ const Faturamento = () => {
             <Button variant="outline" onClick={() => setShowSuccessModal(false)}>
               Fechar
             </Button>
-            <Button onClick={() => { setShowSuccessModal(false); handleFecharFatura(); }}>
+            <Button onClick={() => {
+            setShowSuccessModal(false);
+            handleFecharFatura();
+          }}>
               <Lock className="h-4 w-4 mr-2" />
               Fechar Fatura
             </Button>
@@ -673,14 +598,10 @@ const Faturamento = () => {
             <SheetTitle>Histórico da Fatura</SheetTitle>
           </SheetHeader>
           <div className="mt-6">
-            {faturaGerada && (
-              <FaturamentoTimeline events={faturaGerada.timeline} title="Linha do Tempo" />
-            )}
+            {faturaGerada && <FaturamentoTimeline events={faturaGerada.timeline} title="Linha do Tempo" />}
           </div>
         </SheetContent>
       </Sheet>
-    </div>
-  );
+    </div>;
 };
-
 export default Faturamento;
