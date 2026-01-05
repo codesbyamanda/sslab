@@ -7,70 +7,43 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Collapsible,
-  CollapsibleContent,
-} from "@/components/ui/collapsible";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 // Mock data
-const mockCaixas = [
-  {
-    id: 1,
-    nome: "Caixa Principal",
-    responsavel: "Maria Silva",
-    saldoAtual: 15420.50,
-    situacao: "Aberto",
-    ultimaMovimentacao: "2024-01-20 14:35",
-  },
-  {
-    id: 2,
-    nome: "Caixa Recepção",
-    responsavel: "João Santos",
-    saldoAtual: 3250.00,
-    situacao: "Aberto",
-    ultimaMovimentacao: "2024-01-20 12:10",
-  },
-  {
-    id: 3,
-    nome: "Caixa Coleta Externa",
-    responsavel: "Ana Costa",
-    saldoAtual: 1800.00,
-    situacao: "Fechado",
-    ultimaMovimentacao: "2024-01-19 18:00",
-  },
-  {
-    id: 4,
-    nome: "Caixa Laboratório 2",
-    responsavel: "Carlos Mendes",
-    saldoAtual: 5670.25,
-    situacao: "Aberto",
-    ultimaMovimentacao: "2024-01-20 10:45",
-  },
-];
-
+const mockCaixas = [{
+  id: 1,
+  nome: "Caixa Principal",
+  responsavel: "Maria Silva",
+  saldoAtual: 15420.50,
+  situacao: "Aberto",
+  ultimaMovimentacao: "2024-01-20 14:35"
+}, {
+  id: 2,
+  nome: "Caixa Recepção",
+  responsavel: "João Santos",
+  saldoAtual: 3250.00,
+  situacao: "Aberto",
+  ultimaMovimentacao: "2024-01-20 12:10"
+}, {
+  id: 3,
+  nome: "Caixa Coleta Externa",
+  responsavel: "Ana Costa",
+  saldoAtual: 1800.00,
+  situacao: "Fechado",
+  ultimaMovimentacao: "2024-01-19 18:00"
+}, {
+  id: 4,
+  nome: "Caixa Laboratório 2",
+  responsavel: "Carlos Mendes",
+  saldoAtual: 5670.25,
+  situacao: "Aberto",
+  ultimaMovimentacao: "2024-01-20 10:45"
+}];
 type SortField = "nome" | "responsavel" | "saldoAtual" | "situacao";
 type SortDirection = "asc" | "desc";
-
 const Caixas = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
@@ -78,7 +51,6 @@ const Caixas = () => {
   const [sortField, setSortField] = useState<SortField>("nome");
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
   const [filterSituacao, setFilterSituacao] = useState("");
-
   const handleSort = (field: SortField) => {
     if (sortField === field) {
       setSortDirection(sortDirection === "asc" ? "desc" : "asc");
@@ -87,33 +59,23 @@ const Caixas = () => {
       setSortDirection("asc");
     }
   };
-
   const getSortIcon = (field: SortField) => {
     if (sortField !== field) return null;
-    return sortDirection === "asc" ? 
-      <ChevronUp className="h-4 w-4 ml-1" /> : 
-      <ChevronDown className="h-4 w-4 ml-1" />;
+    return sortDirection === "asc" ? <ChevronUp className="h-4 w-4 ml-1" /> : <ChevronDown className="h-4 w-4 ml-1" />;
   };
-
-  const filteredCaixas = mockCaixas
-    .filter(c => {
-      const matchesSearch = 
-        c.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        c.responsavel.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesSituacao = !filterSituacao || c.situacao === filterSituacao;
-      return matchesSearch && matchesSituacao;
-    })
-    .sort((a, b) => {
-      const aValue = a[sortField];
-      const bValue = b[sortField];
-      const modifier = sortDirection === "asc" ? 1 : -1;
-      
-      if (typeof aValue === "number" && typeof bValue === "number") {
-        return (aValue - bValue) * modifier;
-      }
-      return String(aValue).localeCompare(String(bValue)) * modifier;
-    });
-
+  const filteredCaixas = mockCaixas.filter(c => {
+    const matchesSearch = c.nome.toLowerCase().includes(searchTerm.toLowerCase()) || c.responsavel.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSituacao = !filterSituacao || c.situacao === filterSituacao;
+    return matchesSearch && matchesSituacao;
+  }).sort((a, b) => {
+    const aValue = a[sortField];
+    const bValue = b[sortField];
+    const modifier = sortDirection === "asc" ? 1 : -1;
+    if (typeof aValue === "number" && typeof bValue === "number") {
+      return (aValue - bValue) * modifier;
+    }
+    return String(aValue).localeCompare(String(bValue)) * modifier;
+  });
   const getSituacaoBadge = (situacao: string) => {
     switch (situacao) {
       case "Aberto":
@@ -124,11 +86,12 @@ const Caixas = () => {
         return <Badge variant="outline">{situacao}</Badge>;
     }
   };
-
   const formatCurrency = (value: number) => {
-    return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+    return value.toLocaleString("pt-BR", {
+      style: "currency",
+      currency: "BRL"
+    });
   };
-
   const clearFilters = () => {
     setFilterSituacao("");
     setSearchTerm("");
@@ -139,9 +102,7 @@ const Caixas = () => {
   const entradasPeriodo = 28500.00; // Mock value
   const saidasPeriodo = 12350.00; // Mock value
   const caixasAbertos = mockCaixas.filter(c => c.situacao === "Aberto").length;
-
-  return (
-    <div className="min-h-screen flex w-full bg-background">
+  return <div className="min-h-screen flex w-full bg-background">
       <FinanceiroSidebar />
       
       <div className="flex-1 flex flex-col min-h-screen overflow-hidden">
@@ -150,13 +111,7 @@ const Caixas = () => {
         <main className="flex-1 overflow-auto">
           <div className="p-6 space-y-6">
             {/* Breadcrumb */}
-            <button
-              onClick={() => navigate("/financeiro")}
-              className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Voltar para Financeiro
-            </button>
+            
 
             {/* Page Header */}
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -169,25 +124,15 @@ const Caixas = () => {
                 </p>
               </div>
               <div className="flex items-center gap-3">
-                <Button 
-                  variant="outline" 
-                  onClick={() => setShowFilters(!showFilters)}
-                  className="gap-2"
-                >
+                <Button variant="outline" onClick={() => setShowFilters(!showFilters)} className="gap-2">
                   <Filter className="h-4 w-4" />
                   Filtrar
                 </Button>
-                <Button 
-                  variant="outline"
-                  className="gap-2"
-                >
+                <Button variant="outline" className="gap-2">
                   <FileDown className="h-4 w-4" />
                   Exportar
                 </Button>
-                <Button 
-                  onClick={() => navigate("/financeiro/caixas/novo")}
-                  className="gap-2"
-                >
+                <Button onClick={() => navigate("/financeiro/caixas/novo")} className="gap-2">
                   <Plus className="h-4 w-4" />
                   Novo Caixa
                 </Button>
@@ -275,11 +220,7 @@ const Caixas = () => {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <div className="space-y-2">
                         <label className="text-sm font-medium text-foreground">Nome do Caixa</label>
-                        <Input
-                          placeholder="Buscar caixa..."
-                          value={searchTerm}
-                          onChange={(e) => setSearchTerm(e.target.value)}
-                        />
+                        <Input placeholder="Buscar caixa..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} />
                       </div>
                       <div className="space-y-2">
                         <label className="text-sm font-medium text-foreground">Situação</label>
@@ -309,12 +250,7 @@ const Caixas = () => {
                   <CardTitle className="text-lg font-semibold">Lista de Caixas</CardTitle>
                   <div className="relative w-full md:w-80">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      placeholder="Buscar por nome ou responsável..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-10"
-                    />
+                    <Input placeholder="Buscar por nome ou responsável..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="pl-10" />
                   </div>
                 </div>
               </CardHeader>
@@ -323,38 +259,26 @@ const Caixas = () => {
                   <Table>
                     <TableHeader>
                       <TableRow className="bg-muted/50">
-                        <TableHead 
-                          className="cursor-pointer hover:bg-muted/80 transition-colors"
-                          onClick={() => handleSort("nome")}
-                        >
+                        <TableHead className="cursor-pointer hover:bg-muted/80 transition-colors" onClick={() => handleSort("nome")}>
                           <div className="flex items-center">
                             Nome do Caixa
                             {getSortIcon("nome")}
                           </div>
                         </TableHead>
-                        <TableHead 
-                          className="cursor-pointer hover:bg-muted/80 transition-colors"
-                          onClick={() => handleSort("responsavel")}
-                        >
+                        <TableHead className="cursor-pointer hover:bg-muted/80 transition-colors" onClick={() => handleSort("responsavel")}>
                           <div className="flex items-center">
                             Responsável
                             {getSortIcon("responsavel")}
                           </div>
                         </TableHead>
-                        <TableHead 
-                          className="cursor-pointer hover:bg-muted/80 transition-colors text-right"
-                          onClick={() => handleSort("saldoAtual")}
-                        >
+                        <TableHead className="cursor-pointer hover:bg-muted/80 transition-colors text-right" onClick={() => handleSort("saldoAtual")}>
                           <div className="flex items-center justify-end">
                             Saldo Atual
                             {getSortIcon("saldoAtual")}
                           </div>
                         </TableHead>
                         <TableHead>Última Movimentação</TableHead>
-                        <TableHead 
-                          className="cursor-pointer hover:bg-muted/80 transition-colors"
-                          onClick={() => handleSort("situacao")}
-                        >
+                        <TableHead className="cursor-pointer hover:bg-muted/80 transition-colors" onClick={() => handleSort("situacao")}>
                           <div className="flex items-center">
                             Situação
                             {getSortIcon("situacao")}
@@ -364,19 +288,11 @@ const Caixas = () => {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {filteredCaixas.length === 0 ? (
-                        <TableRow>
+                      {filteredCaixas.length === 0 ? <TableRow>
                           <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
                             Nenhum caixa encontrado.
                           </TableCell>
-                        </TableRow>
-                      ) : (
-                        filteredCaixas.map((caixa) => (
-                          <TableRow 
-                            key={caixa.id} 
-                            className="hover:bg-muted/30 transition-colors cursor-pointer"
-                            onClick={() => navigate(`/financeiro/caixas/${caixa.id}`)}
-                          >
+                        </TableRow> : filteredCaixas.map(caixa => <TableRow key={caixa.id} className="hover:bg-muted/30 transition-colors cursor-pointer" onClick={() => navigate(`/financeiro/caixas/${caixa.id}`)}>
                             <TableCell className="font-medium">
                               <div className="flex items-center gap-2">
                                 <Wallet className="h-4 w-4 text-muted-foreground" />
@@ -397,23 +313,17 @@ const Caixas = () => {
                             <TableCell className="text-right">
                               <Tooltip>
                                 <TooltipTrigger asChild>
-                                  <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      navigate(`/financeiro/caixas/${caixa.id}`);
-                                    }}
-                                  >
+                                  <Button variant="ghost" size="icon" onClick={e => {
+                              e.stopPropagation();
+                              navigate(`/financeiro/caixas/${caixa.id}`);
+                            }}>
                                     <Eye className="h-4 w-4" />
                                   </Button>
                                 </TooltipTrigger>
                                 <TooltipContent>Ver detalhes</TooltipContent>
                               </Tooltip>
                             </TableCell>
-                          </TableRow>
-                        ))
-                      )}
+                          </TableRow>)}
                     </TableBody>
                   </Table>
                 </div>
@@ -422,8 +332,6 @@ const Caixas = () => {
           </div>
         </main>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default Caixas;
