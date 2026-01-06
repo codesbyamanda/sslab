@@ -34,7 +34,7 @@ interface Servico {
   dataColeta: string;
   horaColeta: string;
   convenio: string;
-  medicoSolicitante: string;
+  medicosSolicitantes: string[];
   valor: number;
 }
 

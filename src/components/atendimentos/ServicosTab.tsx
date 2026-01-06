@@ -16,7 +16,7 @@ interface Servico {
   dataColeta: string;
   horaColeta: string;
   convenio: string;
-  medicoSolicitante: string;
+  medicosSolicitantes: string[];
   valor: number;
 }
 
@@ -96,7 +96,7 @@ const ServicosTab = ({
           dataColeta: "",
           horaColeta: "",
           convenio: "Unimed",
-          medicoSolicitante: "",
+          medicosSolicitantes: [],
           valor: 25.0,
         });
       });
@@ -238,8 +238,12 @@ const ServicosTab = ({
                             <p className="font-medium">{servico.codigo}</p>
                           </div>
                           <div>
-                            <span className="text-muted-foreground">Médico Solicitante:</span>
-                            <p className="font-medium">{servico.medicoSolicitante || "-"}</p>
+                            <span className="text-muted-foreground">Médico(s) Solicitante(s):</span>
+                            <p className="font-medium">
+                              {servico.medicosSolicitantes && servico.medicosSolicitantes.length > 0
+                                ? servico.medicosSolicitantes.join(", ")
+                                : "-"}
+                            </p>
                           </div>
                           <div>
                             <span className="text-muted-foreground">Convênio:</span>
