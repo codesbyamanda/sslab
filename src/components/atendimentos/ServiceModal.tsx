@@ -6,7 +6,17 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, X, ChevronDown, Check } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Badge } from "@/components/ui/badge";
+
+const medicosDisponiveis = [
+  { id: "1", nome: "Dr. Carlos Mendes" },
+  { id: "2", nome: "Dra. Ana Paula Costa" },
+  { id: "3", nome: "Dr. Ricardo Souza" },
+  { id: "4", nome: "Dra. Fernanda Lima" },
+  { id: "5", nome: "Dr. João Oliveira" },
+];
 
 interface Servico {
   id: number;
@@ -19,7 +29,7 @@ interface Servico {
   dataColeta: string;
   horaColeta: string;
   convenio: string;
-  medicoSolicitante: string;
+  medicosSolicitantes: string[];
   valor: number;
 }
 
@@ -54,7 +64,8 @@ const ServiceModal = ({ open, onClose, onSave, editingServico }: ServiceModalPro
   const [selectedService, setSelectedService] = useState<MockService | null>(null);
   const [suggestions, setSuggestions] = useState<MockService[]>([]);
   const [convenio, setConvenio] = useState("Unimed");
-  const [medicoSolicitante, setMedicoSolicitante] = useState("");
+  const [medicosSelecionados, setMedicosSelecionados] = useState<string[]>([]);
+  const [medicosPopoverOpen, setMedicosPopoverOpen] = useState(false);
   const [urgencia, setUrgencia] = useState(false);
   const [observacoes, setObservacoes] = useState("");
   const [showWarning, setShowWarning] = useState<string | null>(null);
@@ -70,7 +81,7 @@ const ServiceModal = ({ open, onClose, onSave, editingServico }: ServiceModalPro
         recipiente: "Tubo EDTA",
       });
       setConvenio(editingServico.convenio);
-      setMedicoSolicitante(editingServico.medicoSolicitante);
+      setMedicosSelecionados(editingServico.medicosSolicitantes || []);
       setUrgencia(editingServico.urgencia);
     } else {
       resetForm();
@@ -82,10 +93,22 @@ const ServiceModal = ({ open, onClose, onSave, editingServico }: ServiceModalPro
     setSelectedService(null);
     setSuggestions([]);
     setConvenio("Unimed");
-    setMedicoSolicitante("");
+    setMedicosSelecionados([]);
     setUrgencia(false);
     setObservacoes("");
     setShowWarning(null);
+  };
+
+  const toggleMedico = (nome: string) => {
+    setMedicosSelecionados(prev =>
+      prev.includes(nome)
+        ? prev.filter(m => m !== nome)
+        : [...prev, nome]
+    );
+  };
+
+  const removeMedico = (nome: string) => {
+    setMedicosSelecionados(prev => prev.filter(m => m !== nome));
   };
 
   const handleMnemonicoChange = (value: string) => {
@@ -128,7 +151,7 @@ const ServiceModal = ({ open, onClose, onSave, editingServico }: ServiceModalPro
       dataColeta: "",
       horaColeta: "",
       convenio,
-      medicoSolicitante,
+      medicosSolicitantes: medicosSelecionados,
       valor: selectedService.valor,
     });
 
@@ -234,17 +257,66 @@ const ServiceModal = ({ open, onClose, onSave, editingServico }: ServiceModalPro
             </div>
 
             <div>
-              <Label htmlFor="medico">Médico Solicitante</Label>
-              <Select value={medicoSolicitante} onValueChange={setMedicoSolicitante}>
-                <SelectTrigger className="input-premium">
-                  <SelectValue placeholder="Selecione..." />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Dr. Carlos Mendes">Dr. Carlos Mendes</SelectItem>
-                  <SelectItem value="Dra. Ana Paula Costa">Dra. Ana Paula Costa</SelectItem>
-                  <SelectItem value="Dr. Ricardo Souza">Dr. Ricardo Souza</SelectItem>
-                </SelectContent>
-              </Select>
+              <Label htmlFor="medico">Médico(s) Solicitante(s)</Label>
+              <Popover open={medicosPopoverOpen} onOpenChange={setMedicosPopoverOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    aria-expanded={medicosPopoverOpen}
+                    className="w-full justify-between input-premium font-normal"
+                  >
+                    {medicosSelecionados.length === 0
+                      ? "Selecione..."
+                      : `${medicosSelecionados.length} médico(s) selecionado(s)`}
+                    <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-[300px] p-0 bg-popover border border-border z-50" align="start">
+                  <div className="max-h-60 overflow-y-auto">
+                    {medicosDisponiveis.map((medico) => (
+                      <div
+                        key={medico.id}
+                        className="flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-muted"
+                        onClick={() => toggleMedico(medico.nome)}
+                      >
+                        <div className={`flex h-4 w-4 items-center justify-center rounded border ${
+                          medicosSelecionados.includes(medico.nome)
+                            ? "bg-primary border-primary"
+                            : "border-muted-foreground"
+                        }`}>
+                          {medicosSelecionados.includes(medico.nome) && (
+                            <Check className="h-3 w-3 text-primary-foreground" />
+                          )}
+                        </div>
+                        <span className="text-sm">{medico.nome}</span>
+                      </div>
+                    ))}
+                  </div>
+                </PopoverContent>
+              </Popover>
+
+              {/* Tags dos médicos selecionados */}
+              {medicosSelecionados.length > 0 && (
+                <div className="flex flex-wrap gap-1.5 mt-2">
+                  {medicosSelecionados.map((nome) => (
+                    <Badge
+                      key={nome}
+                      variant="secondary"
+                      className="text-xs py-0.5 pl-2 pr-1 flex items-center gap-1"
+                    >
+                      {nome}
+                      <button
+                        type="button"
+                        onClick={() => removeMedico(nome)}
+                        className="ml-1 hover:bg-muted rounded-full p-0.5"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </Badge>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 

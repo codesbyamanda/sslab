@@ -58,7 +58,7 @@ interface Servico {
   dataColeta: string;
   horaColeta: string;
   convenio: string;
-  medicoSolicitante: string;
+  medicosSolicitantes: string[];
   valor: number;
 }
 
@@ -155,7 +155,7 @@ const AtendimentoCadastro = () => {
           dataColeta: "",
           horaColeta: "",
           convenio: "Unimed",
-          medicoSolicitante: "Dr. Carlos Mendes",
+          medicosSolicitantes: ["Dr. Carlos Mendes"],
           valor: 35.0,
         },
       ]);
