@@ -1,4 +1,4 @@
-import { Edit, Eye, History, TestTube, FileText, CreditCard, Tag, MoreHorizontal } from "lucide-react";
+import { Edit, Eye, History, TestTube, FileText, CreditCard, X, MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -280,7 +280,7 @@ const AtendimentoListTable = ({
                           <Tooltip>
                             <TooltipTrigger asChild>
                               <DropdownMenuItem onClick={() => navigate(`/atendimento/impressoes/${atendimento.id}`)} className="flex items-center gap-2 cursor-pointer">
-                                <Tag className="h-4 w-4" />
+                                <X className="h-4 w-4" />
                                 <span>Impressões de Atendimento</span>
                               </DropdownMenuItem>
                             </TooltipTrigger>
