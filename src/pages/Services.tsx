@@ -10,7 +10,10 @@ const moduloRecepcao = [
     description: "Gestão completa de atendimentos e consultas médicas",
     icon: Stethoscope,
     enabled: true
-  },
+  }
+];
+
+const moduloAreaTecnica = [
   {
     title: "Saúde Laboratório",
     description: "Gestão de exames e resultados laboratoriais",
@@ -79,6 +82,11 @@ const sections: ModuleSection[] = [
     title: "Recepção",
     description: "Módulos operacionais de atendimento e rotina clínica",
     modules: moduloRecepcao
+  },
+  {
+    title: "Área Técnica do Laboratório",
+    description: "Módulos técnicos e operacionais do laboratório",
+    modules: moduloAreaTecnica
   },
   {
     title: "Financeiro",
