@@ -74,6 +74,7 @@ const OrcamentoCadastro = () => {
   const [selectedPatient, setSelectedPatient] = useState<typeof mockPatients[0] | null>(null);
   const [patientDropdownOpen, setPatientDropdownOpen] = useState(false);
   const [filteredPatients, setFilteredPatients] = useState(mockPatients);
+  const [manualPatientName, setManualPatientName] = useState(""); // For non-registered patients
 
   // Form fields
   const [convenio, setConvenio] = useState("");
@@ -104,12 +105,31 @@ const OrcamentoCadastro = () => {
         p.codigo.toLowerCase().includes(patientSearch.toLowerCase())
       );
       setFilteredPatients(filtered);
-      setPatientDropdownOpen(true);
+      setPatientDropdownOpen(filtered.length > 0);
     } else {
       setFilteredPatients(mockPatients);
       setPatientDropdownOpen(false);
     }
   }, [patientSearch]);
+
+  // Handle blur - if no patient selected, use typed name as manual patient
+  const handlePatientInputBlur = () => {
+    // Delay to allow click on dropdown item
+    setTimeout(() => {
+      if (!selectedPatient && patientSearch.trim()) {
+        setManualPatientName(patientSearch.trim());
+      }
+      setPatientDropdownOpen(false);
+    }, 200);
+  };
+
+  // Clear manual patient when a registered patient is selected
+  const selectPatientAndClearManual = (patient: typeof mockPatients[0]) => {
+    setSelectedPatient(patient);
+    setManualPatientName("");
+    setPatientSearch("");
+    setPatientDropdownOpen(false);
+  };
 
   // Filter services
   useEffect(() => {
@@ -124,10 +144,10 @@ const OrcamentoCadastro = () => {
     }
   }, [serviceSearch]);
 
-  const selectPatient = (patient: typeof mockPatients[0]) => {
-    setSelectedPatient(patient);
+  const clearPatientSelection = () => {
+    setSelectedPatient(null);
+    setManualPatientName("");
     setPatientSearch("");
-    setPatientDropdownOpen(false);
   };
 
   const getServicePrice = (service: typeof mockServices[0], convenioName: string): number => {
@@ -215,11 +235,18 @@ const OrcamentoCadastro = () => {
     }
   }, [convenio]);
 
+  // Get patient name for display (registered or manual)
+  const getPatientDisplayName = () => {
+    if (selectedPatient) return selectedPatient.nome;
+    if (manualPatientName) return manualPatientName;
+    return "-";
+  };
+
   const handleSave = () => {
-    if (!selectedPatient) {
+    if (!selectedPatient && !manualPatientName) {
       toast({
         title: "Erro",
-        description: "Selecione um paciente para continuar.",
+        description: "Informe o nome do paciente para continuar.",
         variant: "destructive"
       });
       return;
@@ -242,10 +269,10 @@ const OrcamentoCadastro = () => {
   };
 
   const handleSaveAndPrint = () => {
-    if (!selectedPatient) {
+    if (!selectedPatient && !manualPatientName) {
       toast({
         title: "Erro",
-        description: "Selecione um paciente para continuar.",
+        description: "Informe o nome do paciente para continuar.",
         variant: "destructive"
       });
       return;
@@ -316,7 +343,23 @@ const OrcamentoCadastro = () => {
                       <Button
                         variant="ghost"
                         size="icon"
-                        onClick={() => setSelectedPatient(null)}
+                        onClick={clearPatientSelection}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ) : manualPatientName ? (
+                    <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg border border-dashed border-amber-400">
+                      <div>
+                        <p className="font-medium">{manualPatientName}</p>
+                        <p className="text-sm text-amber-600">
+                          Paciente não cadastrado
+                        </p>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={clearPatientSelection}
                       >
                         <X className="h-4 w-4" />
                       </Button>
@@ -326,9 +369,10 @@ const OrcamentoCadastro = () => {
                       <div className="relative">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                         <Input
-                          placeholder="Buscar por nome, CPF ou código..."
+                          placeholder="Digite o nome ou busque por CPF/código..."
                           value={patientSearch}
                           onChange={(e) => setPatientSearch(e.target.value)}
+                          onBlur={handlePatientInputBlur}
                           className="pl-9"
                         />
                       </div>
@@ -337,7 +381,7 @@ const OrcamentoCadastro = () => {
                           {filteredPatients.map(patient => (
                             <button
                               key={patient.id}
-                              onClick={() => selectPatient(patient)}
+                              onClick={() => selectPatientAndClearManual(patient)}
                               className="w-full text-left px-4 py-2.5 hover:bg-muted transition-colors border-b last:border-0"
                             >
                               <p className="font-medium">{patient.nome}</p>
@@ -347,6 +391,11 @@ const OrcamentoCadastro = () => {
                             </button>
                           ))}
                         </div>
+                      )}
+                      {patientSearch && filteredPatients.length === 0 && (
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Nenhum paciente encontrado. O nome digitado será usado como paciente avulso.
+                        </p>
                       )}
                     </>
                   )}
@@ -604,7 +653,7 @@ const OrcamentoCadastro = () => {
             <div className="bg-muted/50 rounded-lg p-4 space-y-2">
               <div className="flex justify-between">
                 <span className="text-sm text-muted-foreground">Paciente:</span>
-                <span className="text-sm font-medium">{selectedPatient?.nome || "-"}</span>
+                <span className="text-sm font-medium">{getPatientDisplayName()}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-sm text-muted-foreground">Convênio:</span>
