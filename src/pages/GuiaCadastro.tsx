@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, FileText, Trash2 } from "lucide-react";
+import { ArrowLeft, FileText, Trash2, ArrowRightLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -20,9 +20,29 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { toast } from "sonner";
 import AtendimentoSidebar from "@/components/atendimento/AtendimentoSidebar";
 import AtendimentoNavbar from "@/components/atendimento/AtendimentoNavbar";
+
+// Mock de guias disponíveis para transferência
+const guiasDisponiveis = [
+  { id: "2", numGuia: "GUI-2024-0002", convenio: "Bradesco Saúde" },
+  { id: "3", numGuia: "GUI-2024-0003", convenio: "SulAmérica" },
+  { id: "4", numGuia: "GUI-2024-0004", convenio: "Amil" },
+];
 
 interface ItemGuia {
   id: string;
@@ -75,9 +95,32 @@ const GuiaCadastro = () => {
   });
 
   const [itens, setItens] = useState<ItemGuia[]>(isEditing ? mockItens : []);
+  const [moveModalOpen, setMoveModalOpen] = useState(false);
+  const [itemToMove, setItemToMove] = useState<ItemGuia | null>(null);
+  const [selectedGuia, setSelectedGuia] = useState<string>("");
 
   const handleChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleOpenMoveModal = (item: ItemGuia) => {
+    setItemToMove(item);
+    setSelectedGuia("");
+    setMoveModalOpen(true);
+  };
+
+  const handleConfirmMove = () => {
+    if (!itemToMove || !selectedGuia) {
+      toast.error("Selecione uma guia de destino");
+      return;
+    }
+    
+    const guiaDestino = guiasDisponiveis.find(g => g.id === selectedGuia);
+    setItens((prev) => prev.filter((item) => item.id !== itemToMove.id));
+    toast.success(`Item "${itemToMove.descricao}" movido para ${guiaDestino?.numGuia}`);
+    setMoveModalOpen(false);
+    setItemToMove(null);
+    setSelectedGuia("");
   };
 
 
@@ -351,14 +394,34 @@ const GuiaCadastro = () => {
                             })}
                           </TableCell>
                           <TableCell>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8 text-muted-foreground hover:text-vermelho-moderno"
-                              onClick={() => handleRemoveItem(item.id)}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
+                            <div className="flex items-center gap-1">
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-8 w-8 text-muted-foreground hover:text-primary"
+                                    onClick={() => handleOpenMoveModal(item)}
+                                  >
+                                    <ArrowRightLeft className="h-4 w-4" />
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>Mover para outra guia</TooltipContent>
+                              </Tooltip>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-8 w-8 text-muted-foreground hover:text-vermelho-moderno"
+                                    onClick={() => handleRemoveItem(item.id)}
+                                  >
+                                    <Trash2 className="h-4 w-4" />
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>Excluir item</TooltipContent>
+                              </Tooltip>
+                            </div>
                           </TableCell>
                         </TableRow>
                       ))
@@ -386,6 +449,60 @@ const GuiaCadastro = () => {
               Salvar
             </Button>
           </div>
+
+          {/* Modal Mover Item */}
+          <Dialog open={moveModalOpen} onOpenChange={setMoveModalOpen}>
+            <DialogContent className="sm:max-w-md">
+              <DialogHeader>
+                <DialogTitle>Mover Item para Outra Guia</DialogTitle>
+                <DialogDescription>
+                  Selecione a guia de destino para mover o item "{itemToMove?.descricao}".
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4 py-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-foreground">
+                    Guia de Destino <span className="text-vermelho-moderno">*</span>
+                  </label>
+                  <Select value={selectedGuia} onValueChange={setSelectedGuia}>
+                    <SelectTrigger className="input-modern">
+                      <SelectValue placeholder="Selecione uma guia" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {guiasDisponiveis.map((guia) => (
+                        <SelectItem key={guia.id} value={guia.id}>
+                          {guia.numGuia} - {guia.convenio}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                {itemToMove && (
+                  <div className="rounded-lg border bg-muted/30 p-3 space-y-1">
+                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                      Item a ser movido
+                    </p>
+                    <p className="text-sm font-medium">{itemToMove.descricao}</p>
+                    <p className="text-xs text-muted-foreground">
+                      Código: {itemToMove.codAMB} | Valor:{" "}
+                      {(itemToMove.quantidade * itemToMove.valorUnitario).toLocaleString("pt-BR", {
+                        style: "currency",
+                        currency: "BRL",
+                      })}
+                    </p>
+                  </div>
+                )}
+              </div>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setMoveModalOpen(false)}>
+                  Cancelar
+                </Button>
+                <Button onClick={handleConfirmMove} className="btn-primary-premium">
+                  Confirmar Movimentação
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </main>
       </div>
     </div>
