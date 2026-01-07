@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, FileText, Plus, Trash2 } from "lucide-react";
+import { ArrowLeft, FileText, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -80,17 +80,6 @@ const GuiaCadastro = () => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleAddItem = () => {
-    const newItem: ItemGuia = {
-      id: Date.now().toString(),
-      codAMB: "",
-      tabela: "CBHPM",
-      descricao: "",
-      quantidade: 1,
-      valorUnitario: 0,
-    };
-    setItens((prev) => [...prev, newItem]);
-  };
 
   const handleRemoveItem = (itemId: string) => {
     setItens((prev) => prev.filter((item) => item.id !== itemId));
@@ -263,19 +252,13 @@ const GuiaCadastro = () => {
             <CardHeader className="pb-4">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-base font-semibold">Itens</CardTitle>
-                <div className="flex items-center gap-3">
-                  <Badge variant="secondary" className="font-medium">
-                    Total:{" "}
-                    {calcularTotal().toLocaleString("pt-BR", {
-                      style: "currency",
-                      currency: "BRL",
-                    })}
-                  </Badge>
-                  <Button variant="outline" size="sm" onClick={handleAddItem} className="gap-1">
-                    <Plus className="h-4 w-4" />
-                    Adicionar Item
-                  </Button>
-                </div>
+                <Badge variant="secondary" className="font-medium">
+                  Total:{" "}
+                  {calcularTotal().toLocaleString("pt-BR", {
+                    style: "currency",
+                    currency: "BRL",
+                  })}
+                </Badge>
               </div>
             </CardHeader>
             <CardContent className="p-0">
@@ -296,7 +279,7 @@ const GuiaCadastro = () => {
                     {itens.length === 0 ? (
                       <TableRow>
                         <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
-                          Nenhum item adicionado. Clique em "Adicionar Item" para começar.
+                          Nenhum item vinculado a esta guia.
                         </TableCell>
                       </TableRow>
                     ) : (
