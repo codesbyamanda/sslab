@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, FileText, Plus, Edit, Trash2 } from "lucide-react";
+import { ArrowLeft, FileText, Edit, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -83,9 +83,6 @@ const GuiasAtendimento = () => {
     navigate(`/atendimento/guias/${id}/editar/${guiaId}`);
   };
 
-  const handleNewGuia = () => {
-    navigate(`/atendimento/guias/${id}/nova`);
-  };
 
   const handleDeleteGuia = () => {
     if (deleteGuia) {
@@ -135,22 +132,16 @@ const GuiasAtendimento = () => {
           </button>
 
           {/* Header */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 animate-fade-in">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                <FileText className="h-5 w-5 text-primary" />
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold text-foreground">Guias</h1>
-                <p className="text-sm text-muted-foreground">
-                  Gerencie as guias de convênio vinculadas à requisição
-                </p>
-              </div>
+          <div className="flex items-center gap-3 mb-6 animate-fade-in">
+            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+              <FileText className="h-5 w-5 text-primary" />
             </div>
-            <Button onClick={handleNewGuia} className="btn-primary-premium gap-2">
-              <Plus className="h-4 w-4" />
-              Nova Guia
-            </Button>
+            <div>
+              <h1 className="text-2xl font-bold text-foreground">Guias</h1>
+              <p className="text-sm text-muted-foreground">
+                Gerencie as guias de convênio vinculadas à requisição
+              </p>
+            </div>
           </div>
 
           {/* Informações da Requisição */}
