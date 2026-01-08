@@ -12,8 +12,6 @@ import Atendimentos from "./pages/Atendimentos";
 import AtendimentoCadastro from "./pages/AtendimentoCadastro";
 import RecebimentoMaterial from "./pages/RecebimentoMaterial";
 import RecebimentoDetalhe from "./pages/RecebimentoDetalhe";
-import ImpressaoLaudos from "./pages/ImpressaoLaudos";
-import ImpressaoLaudoPaciente from "./pages/ImpressaoLaudoPaciente";
 import ImpressoesAtendimento from "./pages/ImpressoesAtendimento";
 import GuiasAtendimento from "./pages/GuiasAtendimento";
 import GuiaCadastro from "./pages/GuiaCadastro";
@@ -209,8 +207,6 @@ const App = () => (
           <Route path="/atendimento/requisicao/:id" element={<AtendimentoCadastro />} />
           <Route path="/atendimento/recebimento" element={<RecebimentoMaterial />} />
           <Route path="/atendimento/recebimento/:id" element={<RecebimentoDetalhe />} />
-          <Route path="/atendimento/laudos" element={<ImpressaoLaudos />} />
-          <Route path="/atendimento/laudo-paciente/:id" element={<ImpressaoLaudoPaciente />} />
           <Route path="/atendimento/impressoes/:id" element={<ImpressoesAtendimento />} />
           <Route path="/atendimento/guias/:id" element={<GuiasAtendimento />} />
           <Route path="/atendimento/guias/:id/nova" element={<GuiaCadastro />} />

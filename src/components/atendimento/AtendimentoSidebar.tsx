@@ -12,7 +12,6 @@ import {
   ChevronDown,
   Package,
   Calculator,
-  Printer,
   Wallet,
   BarChart3,
   CreditCard,
@@ -72,12 +71,6 @@ const mainMenuItems = [
     url: "/atendimento/profissionais", 
     icon: UserCog,
     tooltip: "Cadastro de profissionais solicitantes (CRM, Crefito, COREN etc.)"
-  },
-  { 
-    title: "Impressão de Laudo", 
-    url: "/atendimento/laudos", 
-    icon: Printer,
-    tooltip: "Impressão e geração de laudos individuais por paciente"
   },
 ];
 
