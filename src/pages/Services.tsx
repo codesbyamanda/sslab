@@ -28,7 +28,7 @@ const moduloAreaTecnica = [
   },
   {
     title: "Saúde Transferência",
-    description: "Transferência de pacientes e prontuários",
+    description: "Integração com laboratórios parceiros para envio e recebimento de requisições, exames e laudos",
     icon: ArrowLeftRight,
     enabled: true
   }
