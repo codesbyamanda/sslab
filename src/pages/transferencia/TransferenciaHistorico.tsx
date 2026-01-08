@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { Search, Filter, Eye, History, Upload, Download } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -12,6 +11,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   Table,
   TableBody,
@@ -150,9 +156,9 @@ const getTipoBadge = (tipo: string) => {
 };
 
 const TransferenciaHistorico = () => {
-  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [tipoFilter, setTipoFilter] = useState("todos");
+  const [eventoSelecionado, setEventoSelecionado] = useState<typeof historico[0] | null>(null);
 
   const filteredHistorico = historico.filter((h) => {
     const matchesSearch = 
@@ -267,16 +273,14 @@ const TransferenciaHistorico = () => {
                         {item.detalhes}
                       </TableCell>
                       <TableCell className="text-right">
-                        {item.lote !== "-" && (
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => navigate(`/transferencia/lotes/${item.id}`)}
-                            title="Visualizar lote"
-                          >
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                        )}
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => setEventoSelecionado(item)}
+                          title="Visualizar detalhes do evento"
+                        >
+                          <Eye className="h-4 w-4" />
+                        </Button>
                       </TableCell>
                     </TableRow>
                   ))
@@ -285,6 +289,73 @@ const TransferenciaHistorico = () => {
             </Table>
           </CardContent>
         </Card>
+
+        {/* Modal de Detalhes do Evento */}
+        <Dialog open={!!eventoSelecionado} onOpenChange={() => setEventoSelecionado(null)}>
+          <DialogContent className="max-w-lg">
+            <DialogHeader>
+              <DialogTitle>Detalhes do Evento</DialogTitle>
+              <DialogDescription>
+                Informações completas do registro de auditoria
+              </DialogDescription>
+            </DialogHeader>
+            {eventoSelecionado && (
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-sm text-muted-foreground">Data/Hora</p>
+                    <p className="font-medium">{eventoSelecionado.data} {eventoSelecionado.hora}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Usuário</p>
+                    <p className="font-medium">{eventoSelecionado.usuario}</p>
+                  </div>
+                </div>
+                
+                <div>
+                  <p className="text-sm text-muted-foreground">Ação</p>
+                  <div className="mt-1">{getAcaoBadge(eventoSelecionado.acao)}</div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-sm text-muted-foreground">Parceiro</p>
+                    <p className="font-medium">{eventoSelecionado.parceiro}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Tipo</p>
+                    <div className="mt-1">{getTipoBadge(eventoSelecionado.tipo)}</div>
+                  </div>
+                </div>
+
+                {eventoSelecionado.lote !== "-" && (
+                  <div>
+                    <p className="text-sm text-muted-foreground">Lote</p>
+                    <p className="font-mono font-medium text-primary">{eventoSelecionado.lote}</p>
+                  </div>
+                )}
+
+                {eventoSelecionado.tipoDados !== "-" && (
+                  <div>
+                    <p className="text-sm text-muted-foreground">Tipo de Dados</p>
+                    <p className="font-medium">{eventoSelecionado.tipoDados}</p>
+                  </div>
+                )}
+
+                <div>
+                  <p className="text-sm text-muted-foreground">Detalhes</p>
+                  <p className="text-sm bg-muted p-3 rounded-lg mt-1">{eventoSelecionado.detalhes}</p>
+                </div>
+
+                <div className="flex justify-end pt-2">
+                  <Button variant="outline" onClick={() => setEventoSelecionado(null)}>
+                    Fechar
+                  </Button>
+                </div>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
       </div>
     </TransferenciaLayout>
   );

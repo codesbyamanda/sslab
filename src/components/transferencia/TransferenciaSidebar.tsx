@@ -9,7 +9,6 @@ import {
   Settings,
   ChevronLeft,
   ChevronRight,
-  RefreshCw,
   Package
 } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -34,12 +33,6 @@ const menuItems = [
     tooltip: "Lista de transferências realizadas"
   },
   {
-    title: "Processar",
-    icon: RefreshCw,
-    path: "/transferencia/processar",
-    tooltip: "Processar nova transferência"
-  },
-  {
     title: "Lotes",
     icon: Package,
     path: "/transferencia/lotes",
@@ -49,7 +42,7 @@ const menuItems = [
     title: "Histórico",
     icon: History,
     path: "/transferencia/historico",
-    tooltip: "Histórico de integrações"
+    tooltip: "Log de auditoria"
   },
   {
     title: "Relatórios",
