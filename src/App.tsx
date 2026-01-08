@@ -103,11 +103,13 @@ import LaboratorioConfigLaudoInternet from "./pages/laboratorio/LaboratorioConfi
 import LaboratorioRelatorios from "./pages/laboratorio/LaboratorioRelatorios";
 import TransferenciaDashboard from "./pages/transferencia/TransferenciaDashboard";
 import TransferenciaLista from "./pages/transferencia/TransferenciaLista";
-import TransferenciaDetalhe from "./pages/transferencia/TransferenciaDetalhe";
-import NovaTransferencia from "./pages/transferencia/NovaTransferencia";
+import ProcessarTransferencia from "./pages/transferencia/ProcessarTransferencia";
+import LotesTransferencia from "./pages/transferencia/LotesTransferencia";
+import LoteDetalhe from "./pages/transferencia/LoteDetalhe";
 import TransferenciaHistorico from "./pages/transferencia/TransferenciaHistorico";
 import TransferenciaRelatorios from "./pages/transferencia/TransferenciaRelatorios";
 import TransferenciaConfiguracoes from "./pages/transferencia/TransferenciaConfiguracoes";
+import ParceiroDetalhe from "./pages/transferencia/ParceiroDetalhe";
 import NotFound from "./pages/NotFound";
 import ModuloEmConfiguracao from "./pages/ModuloEmConfiguracao";
 import GrupoControleAcesso from "./pages/seguranca/GrupoControleAcesso";
@@ -310,15 +312,16 @@ const App = () => (
           <Route path="/seguranca/perfil/novo" element={<PerfilAcesso />} />
           <Route path="/seguranca/perfil/:id" element={<PerfilAcesso />} />
           <Route path="/seguranca" element={<ModuloEmConfiguracao />} />
-          {/* Transferência */}
+          {/* Transferência - Integração entre Sistemas Laboratoriais */}
           <Route path="/transferencia" element={<TransferenciaDashboard />} />
           <Route path="/transferencia/lista" element={<TransferenciaLista />} />
-          <Route path="/transferencia/nova" element={<NovaTransferencia />} />
-          <Route path="/transferencia/:id" element={<TransferenciaDetalhe />} />
-          <Route path="/transferencia/:id/editar" element={<NovaTransferencia />} />
+          <Route path="/transferencia/processar" element={<ProcessarTransferencia />} />
+          <Route path="/transferencia/lotes" element={<LotesTransferencia />} />
+          <Route path="/transferencia/lotes/:id" element={<LoteDetalhe />} />
           <Route path="/transferencia/historico" element={<TransferenciaHistorico />} />
           <Route path="/transferencia/relatorios" element={<TransferenciaRelatorios />} />
           <Route path="/transferencia/configuracoes" element={<TransferenciaConfiguracoes />} />
+          <Route path="/transferencia/configuracoes/parceiro/:id" element={<ParceiroDetalhe />} />
           {/* Cadastro */}
           <Route path="/cadastro" element={<CadastroLayout />}>
             <Route index element={<CadastroDashboard />} />
