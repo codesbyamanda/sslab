@@ -22,6 +22,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { toast } from "@/hooks/use-toast";
 import { 
   Wallet, 
   CreditCard, 
@@ -32,101 +33,118 @@ import {
   X,
   FileText,
   Printer,
-  ExternalLink
+  ExternalLink,
+  Plus,
+  TrendingUp,
+  Building2
 } from "lucide-react";
+import LancamentoCaixaModal from "@/components/financeiro/LancamentoCaixaModal";
 
-// Mock data
-const mockLancamentos = [
+// Mock data - lançamentos do caixa da unidade
+const initialMockLancamentos = [
   {
     id: 1,
     dataHora: "11/12/2025 08:32",
     tipo: "Recebimento",
-    origem: "Atendimento #2024001",
+    origem: "Registro RC-2024-045",
     formaPagamento: "Dinheiro",
-    valor: 150.00,
-    observacoes: "Pagamento à vista"
+    valor: 650.00,
+    motivo: null,
+    observacoes: "Consolidação do registro de Maria Silva"
   },
   {
     id: 2,
     dataHora: "11/12/2025 09:15",
     tipo: "Recebimento",
-    origem: "Atendimento #2024002",
+    origem: "Registro RC-2024-045",
     formaPagamento: "Cartão Crédito",
     valor: 320.00,
-    observacoes: "Parcelado 2x"
+    motivo: null,
+    observacoes: "Consolidação do registro de Maria Silva"
   },
   {
     id: 3,
     dataHora: "11/12/2025 10:00",
-    tipo: "Desconto",
-    origem: "Atendimento #2024001",
-    formaPagamento: "-",
-    valor: -25.00,
-    observacoes: "Desconto autorizado"
+    tipo: "Saída Manual",
+    origem: "Caixa da Unidade",
+    formaPagamento: "Dinheiro",
+    valor: -2500.00,
+    motivo: "Sangria para banco",
+    observacoes: "Depósito conta corrente Banco do Brasil"
   },
   {
     id: 4,
     dataHora: "11/12/2025 11:45",
     tipo: "Recebimento",
-    origem: "Atendimento #2024003",
+    origem: "Registro RC-2024-044",
     formaPagamento: "Cheque",
     valor: 580.00,
-    observacoes: "Banco Itaú - Cheque 123456"
+    motivo: null,
+    observacoes: "Consolidação do registro de João Santos"
   },
   {
     id: 5,
     dataHora: "11/12/2025 14:20",
-    tipo: "Transferência",
-    origem: "Registro de Caixa #45",
+    tipo: "Entrada Manual",
+    origem: "Caixa da Unidade",
     formaPagamento: "Dinheiro",
     valor: 500.00,
-    observacoes: "Transferência do caixa da recepção"
+    motivo: "Reforço de caixa",
+    observacoes: "Troco para atendimento"
   },
   {
     id: 6,
-    dataHora: "11/12/2025 15:30",
-    tipo: "Estorno",
-    origem: "Atendimento #2024002",
-    formaPagamento: "Cartão Crédito",
-    valor: -100.00,
-    observacoes: "Estorno parcial autorizado"
+    dataHora: "10/12/2025 19:00",
+    tipo: "Recebimento",
+    origem: "Registro RC-2024-044",
+    formaPagamento: "Diversos",
+    valor: 2250.00,
+    motivo: null,
+    observacoes: "Fechamento do registro de João Santos"
   }
 ];
 
 const FinanceiroCaixa = () => {
   const navigate = useNavigate();
-  const [dataInicio, setDataInicio] = useState("2025-12-11");
+  const [lancamentos, setLancamentos] = useState(initialMockLancamentos);
+  const [dataInicio, setDataInicio] = useState("2025-12-10");
   const [dataFim, setDataFim] = useState("2025-12-11");
-  const [atendente, setAtendente] = useState("");
-  const [situacao, setSituacao] = useState("aberto");
+  const [tipoFiltro, setTipoFiltro] = useState("todos");
+  const [showLancamentoModal, setShowLancamentoModal] = useState(false);
 
   // Cálculos dos resumos
-  const saldoInicial = 1000.00;
-  const totalDinheiro = mockLancamentos
+  const saldoInicial = 3000.00; // Saldo inicial do caixa da unidade
+  const totalDinheiro = lancamentos
     .filter(l => l.formaPagamento === "Dinheiro" && l.valor > 0)
     .reduce((acc, l) => acc + l.valor, 0);
-  const totalCartao = mockLancamentos
+  const totalCartao = lancamentos
     .filter(l => l.formaPagamento.includes("Cartão") && l.valor > 0)
     .reduce((acc, l) => acc + l.valor, 0);
-  const totalCheque = mockLancamentos
+  const totalCheque = lancamentos
     .filter(l => l.formaPagamento === "Cheque" && l.valor > 0)
     .reduce((acc, l) => acc + l.valor, 0);
-  const totalRecebido = totalDinheiro + totalCartao + totalCheque;
-  const descontosEstornos = mockLancamentos
+  const saidasManuais = lancamentos
+    .filter(l => l.tipo === "Saída Manual")
+    .reduce((acc, l) => acc + l.valor, 0);
+  const entradasManuais = lancamentos
+    .filter(l => l.tipo === "Entrada Manual")
+    .reduce((acc, l) => acc + l.valor, 0);
+  const totalRecebido = lancamentos
+    .filter(l => l.valor > 0)
+    .reduce((acc, l) => acc + l.valor, 0);
+  const totalSaidas = lancamentos
     .filter(l => l.valor < 0)
     .reduce((acc, l) => acc + l.valor, 0);
-  const saldoFinal = saldoInicial + totalRecebido + descontosEstornos;
+  const saldoFinal = saldoInicial + totalRecebido + totalSaidas;
 
   const getBadgeVariant = (tipo: string) => {
     switch (tipo) {
       case "Recebimento":
         return "default";
-      case "Desconto":
-        return "secondary";
-      case "Estorno":
-        return "destructive";
-      case "Transferência":
+      case "Entrada Manual":
         return "outline";
+      case "Saída Manual":
+        return "destructive";
       default:
         return "secondary";
     }
@@ -139,6 +157,40 @@ const FinanceiroCaixa = () => {
     }).format(value);
   };
 
+  const handleNovoLancamento = (data: {
+    tipo: "entrada" | "saida";
+    valor: number;
+    motivo: string;
+    observacoes: string;
+  }) => {
+    const novoLancamento = {
+      id: lancamentos.length + 1,
+      dataHora: new Date().toLocaleString("pt-BR"),
+      tipo: data.tipo === "entrada" ? "Entrada Manual" : "Saída Manual",
+      origem: "Caixa da Unidade",
+      formaPagamento: "Dinheiro",
+      valor: data.tipo === "entrada" ? data.valor : -data.valor,
+      motivo: data.motivo,
+      observacoes: data.observacoes || data.motivo
+    };
+
+    setLancamentos([novoLancamento, ...lancamentos]);
+    setShowLancamentoModal(false);
+
+    toast({
+      title: data.tipo === "entrada" ? "Entrada registrada" : "Saída registrada",
+      description: `Lançamento de ${formatCurrency(data.valor)} registrado com sucesso.`,
+    });
+  };
+
+  const filteredLancamentos = lancamentos.filter(l => {
+    if (tipoFiltro === "todos") return true;
+    if (tipoFiltro === "entradas") return l.valor > 0;
+    if (tipoFiltro === "saidas") return l.valor < 0;
+    if (tipoFiltro === "manuais") return l.tipo.includes("Manual");
+    return true;
+  });
+
   return (
     <div className="min-h-screen bg-background flex">
       <AtendimentoSidebar />
@@ -149,14 +201,17 @@ const FinanceiroCaixa = () => {
         <main className="flex-1 p-6 overflow-auto">
           {/* Header */}
           <div className="mb-6">
-            <h1 className="text-2xl font-bold text-foreground">Caixa</h1>
+            <div className="flex items-center gap-2 mb-1">
+              <Building2 className="h-6 w-6 text-primary" />
+              <h1 className="text-2xl font-bold text-foreground">Caixa da Unidade</h1>
+            </div>
             <p className="text-muted-foreground mt-1">
-              Visualize e acompanhe os lançamentos financeiros do caixa desta unidade.
+              Visualize e gerencie os lançamentos financeiros consolidados do caixa desta unidade.
             </p>
           </div>
 
           {/* Cards de Resumo */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 mb-6">
             <Card className="border-border/50">
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
@@ -203,8 +258,22 @@ const FinanceiroCaixa = () => {
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-xs text-muted-foreground font-medium uppercase tracking-wide">Descontos/Estornos</p>
-                    <p className="text-xl font-bold text-destructive mt-1">{formatCurrency(descontosEstornos)}</p>
+                    <p className="text-xs text-muted-foreground font-medium uppercase tracking-wide">Entradas Manuais</p>
+                    <p className="text-xl font-bold text-emerald-600 mt-1">{formatCurrency(entradasManuais)}</p>
+                  </div>
+                  <div className="h-10 w-10 rounded-lg bg-emerald-100 flex items-center justify-center">
+                    <TrendingUp className="h-5 w-5 text-emerald-600" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="border-border/50">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-xs text-muted-foreground font-medium uppercase tracking-wide">Saídas Manuais</p>
+                    <p className="text-xl font-bold text-destructive mt-1">{formatCurrency(saidasManuais)}</p>
                   </div>
                   <div className="h-10 w-10 rounded-lg bg-destructive/10 flex items-center justify-center">
                     <TrendingDown className="h-5 w-5 text-destructive" />
@@ -217,7 +286,7 @@ const FinanceiroCaixa = () => {
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-xs text-primary font-medium uppercase tracking-wide">Saldo Final</p>
+                    <p className="text-xs text-primary font-medium uppercase tracking-wide">Saldo Atual</p>
                     <p className="text-xl font-bold text-primary mt-1">{formatCurrency(saldoFinal)}</p>
                   </div>
                   <div className="h-10 w-10 rounded-lg bg-primary/20 flex items-center justify-center">
@@ -252,27 +321,20 @@ const FinanceiroCaixa = () => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-sm">Atendente</Label>
-                  <Input
-                    placeholder="Nome do atendente"
-                    value={atendente}
-                    onChange={(e) => setAtendente(e.target.value)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label className="text-sm">Situação</Label>
-                  <Select value={situacao} onValueChange={setSituacao}>
+                  <Label className="text-sm">Tipo de Lançamento</Label>
+                  <Select value={tipoFiltro} onValueChange={setTipoFiltro}>
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="aberto">Aberto</SelectItem>
-                      <SelectItem value="fechado">Fechado</SelectItem>
                       <SelectItem value="todos">Todos</SelectItem>
+                      <SelectItem value="entradas">Somente Entradas</SelectItem>
+                      <SelectItem value="saidas">Somente Saídas</SelectItem>
+                      <SelectItem value="manuais">Lançamentos Manuais</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="flex items-end gap-2">
+                <div className="flex items-end gap-2 lg:col-span-2">
                   <Button className="flex-1">
                     <Search className="h-4 w-4 mr-2" />
                     Filtrar
@@ -286,7 +348,11 @@ const FinanceiroCaixa = () => {
           </Card>
 
           {/* Ações */}
-          <div className="flex gap-3 mb-4">
+          <div className="flex gap-3 mb-4 flex-wrap">
+            <Button onClick={() => setShowLancamentoModal(true)}>
+              <Plus className="h-4 w-4 mr-2" />
+              Novo Lançamento
+            </Button>
             <Button 
               variant="outline" 
               onClick={() => navigate("/atendimento/financeiro/registros")}
@@ -296,14 +362,14 @@ const FinanceiroCaixa = () => {
             </Button>
             <Button variant="outline">
               <Printer className="h-4 w-4 mr-2" />
-              Imprimir Caixa Atual
+              Imprimir Caixa
             </Button>
           </div>
 
           {/* Tabela de Lançamentos */}
           <Card className="border-border/50">
             <CardHeader className="pb-3">
-              <CardTitle className="text-base font-medium">Lançamentos do Caixa</CardTitle>
+              <CardTitle className="text-base font-medium">Lançamentos do Caixa da Unidade</CardTitle>
             </CardHeader>
             <CardContent className="p-0">
               <div className="overflow-x-auto">
@@ -314,13 +380,14 @@ const FinanceiroCaixa = () => {
                       <TableHead className="font-semibold">Tipo</TableHead>
                       <TableHead className="font-semibold">Origem</TableHead>
                       <TableHead className="font-semibold">Forma de Pagamento</TableHead>
+                      <TableHead className="font-semibold">Motivo</TableHead>
                       <TableHead className="font-semibold text-right">Valor</TableHead>
                       <TableHead className="font-semibold">Observações</TableHead>
                       <TableHead className="font-semibold text-center">Ações</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {mockLancamentos.map((lancamento) => (
+                    {filteredLancamentos.map((lancamento) => (
                       <TableRow key={lancamento.id} className="hover:bg-muted/20">
                         <TableCell className="font-medium">{lancamento.dataHora}</TableCell>
                         <TableCell>
@@ -330,6 +397,9 @@ const FinanceiroCaixa = () => {
                         </TableCell>
                         <TableCell className="text-muted-foreground">{lancamento.origem}</TableCell>
                         <TableCell>{lancamento.formaPagamento}</TableCell>
+                        <TableCell className="text-sm">
+                          {lancamento.motivo || "-"}
+                        </TableCell>
                         <TableCell className={`text-right font-semibold ${lancamento.valor < 0 ? 'text-destructive' : 'text-emerald-600'}`}>
                           {formatCurrency(lancamento.valor)}
                         </TableCell>
@@ -350,6 +420,13 @@ const FinanceiroCaixa = () => {
           </Card>
         </main>
       </div>
+
+      {/* Modal de Lançamento Manual */}
+      <LancamentoCaixaModal
+        open={showLancamentoModal}
+        onOpenChange={setShowLancamentoModal}
+        onConfirm={handleNovoLancamento}
+      />
     </div>
   );
 };
