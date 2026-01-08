@@ -13,14 +13,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { toast } from "@/hooks/use-toast";
 import { 
   Wallet,
@@ -28,11 +20,16 @@ import {
   Unlock,
   Printer,
   ExternalLink,
-  CheckCircle
+  Plus,
+  AlertCircle,
+  Clock,
+  User
 } from "lucide-react";
+import NovoRegistroModal from "@/components/financeiro/NovoRegistroModal";
+import FecharRegistroModal from "@/components/financeiro/FecharRegistroModal";
 
 // Mock data - Registros de Caixa
-const mockRegistros = [
+const initialMockRegistros = [
   {
     id: 1,
     codigo: "RC-2024-045",
@@ -43,6 +40,7 @@ const mockRegistros = [
     valorCartao: 320.00,
     valorCheque: 580.00,
     total: 1550.00,
+    saldoInicial: 200.00,
     situacao: "Aberto"
   },
   {
@@ -55,6 +53,7 @@ const mockRegistros = [
     valorCartao: 850.00,
     valorCheque: 200.00,
     total: 2250.00,
+    saldoInicial: 150.00,
     situacao: "Fechado"
   },
   {
@@ -67,6 +66,7 @@ const mockRegistros = [
     valorCartao: 1100.00,
     valorCheque: 0,
     total: 2080.00,
+    saldoInicial: 100.00,
     situacao: "Fechado"
   }
 ];
@@ -80,6 +80,7 @@ const mockDetalhes = [
     paciente: "Carlos Oliveira",
     formaPagamento: "Dinheiro",
     valor: 150.00,
+    origem: "Receita a Receber",
     observacoes: "Pagamento à vista"
   },
   {
@@ -89,6 +90,7 @@ const mockDetalhes = [
     paciente: "Maria Fernandes",
     formaPagamento: "Cartão Crédito",
     valor: 320.00,
+    origem: "Receita a Receber",
     observacoes: "Parcelado 2x"
   },
   {
@@ -98,6 +100,7 @@ const mockDetalhes = [
     paciente: "João Pedro Lima",
     formaPagamento: "Dinheiro",
     valor: 500.00,
+    origem: "Receita a Receber",
     observacoes: ""
   },
   {
@@ -107,14 +110,25 @@ const mockDetalhes = [
     paciente: "Ana Beatriz",
     formaPagamento: "Cheque",
     valor: 580.00,
+    origem: "Receita a Receber",
     observacoes: "Banco Itaú - Cheque 789456"
   }
 ];
 
 const FinanceiroRegistros = () => {
   const navigate = useNavigate();
-  const [selectedRegistro, setSelectedRegistro] = useState<typeof mockRegistros[0] | null>(null);
+  const [registros, setRegistros] = useState(initialMockRegistros);
+  const [selectedRegistro, setSelectedRegistro] = useState<typeof registros[0] | null>(null);
+  const [showNovoModal, setShowNovoModal] = useState(false);
   const [showFecharModal, setShowFecharModal] = useState(false);
+
+  // Simula atendente logado (em produção viria de autenticação)
+  const atendenteLogado = "Maria Silva";
+
+  // Verifica se o atendente logado já tem um registro aberto
+  const registroAbertoAtendente = registros.find(
+    r => r.atendente === atendenteLogado && r.situacao === "Aberto"
+  );
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat("pt-BR", {
@@ -123,12 +137,62 @@ const FinanceiroRegistros = () => {
     }).format(value);
   };
 
-  const handleFecharRegistro = () => {
+  const handleNovoRegistro = (data: { atendente: string; saldoInicial: number }) => {
+    // Verifica se o atendente já tem registro aberto
+    const existeAberto = registros.some(
+      r => r.atendente === data.atendente && r.situacao === "Aberto"
+    );
+
+    if (existeAberto) {
+      toast({
+        title: "Registro já existente",
+        description: `O atendente ${data.atendente} já possui um registro de caixa aberto. Feche o registro atual antes de abrir um novo.`,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const novoRegistro = {
+      id: registros.length + 1,
+      codigo: `RC-2024-${String(registros.length + 46).padStart(3, '0')}`,
+      periodoAbertura: new Date().toLocaleString("pt-BR"),
+      periodoFechamento: null,
+      atendente: data.atendente,
+      valorDinheiro: 0,
+      valorCartao: 0,
+      valorCheque: 0,
+      total: 0,
+      saldoInicial: data.saldoInicial,
+      situacao: "Aberto"
+    };
+
+    setRegistros([novoRegistro, ...registros]);
+    setShowNovoModal(false);
+
+    toast({
+      title: "Registro aberto com sucesso",
+      description: `Registro ${novoRegistro.codigo} criado para ${data.atendente}. Agora você pode receber movimentações de Receitas a Receber.`,
+    });
+  };
+
+  const handleFecharRegistro = (imprimir: boolean) => {
+    if (!selectedRegistro) return;
+
+    setRegistros(registros.map(r => 
+      r.id === selectedRegistro.id
+        ? { ...r, situacao: "Fechado", periodoFechamento: new Date().toLocaleString("pt-BR") }
+        : r
+    ));
+
+    setShowFecharModal(false);
+    setSelectedRegistro(null);
+
     toast({
       title: "Registro fechado com sucesso",
-      description: "Os valores foram consolidados no Caixa da unidade. Deseja imprimir o relatório de movimentação?",
+      description: imprimir 
+        ? "Os valores foram consolidados no Caixa da unidade. O relatório será impresso em instantes."
+        : "Os valores foram consolidados no Caixa da unidade.",
     });
-    setShowFecharModal(false);
   };
 
   return (
@@ -143,12 +207,50 @@ const FinanceiroRegistros = () => {
           <div className="mb-6">
             <h1 className="text-2xl font-bold text-foreground">Registros de Caixa</h1>
             <p className="text-muted-foreground mt-1">
-              Controle os períodos de atendimento e os movimentos financeiros de cada registro de caixa.
+              Gerencie os registros individuais de caixa por atendente e turno.
             </p>
           </div>
 
+          {/* Alerta se não houver registro aberto */}
+          {!registroAbertoAtendente && (
+            <div className="mb-6 flex items-start gap-3 p-4 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-lg">
+              <AlertCircle className="h-5 w-5 text-amber-600 mt-0.5" />
+              <div>
+                <p className="font-medium text-amber-800 dark:text-amber-200">
+                  Você não possui um registro de caixa aberto
+                </p>
+                <p className="text-sm text-amber-700 dark:text-amber-300 mt-1">
+                  Para receber movimentações de Receitas a Receber, é necessário abrir um novo registro de caixa.
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Status do Atendente Logado */}
+          {registroAbertoAtendente && (
+            <div className="mb-6 flex items-start gap-3 p-4 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800 rounded-lg">
+              <Clock className="h-5 w-5 text-emerald-600 mt-0.5" />
+              <div className="flex-1">
+                <p className="font-medium text-emerald-800 dark:text-emerald-200">
+                  Registro de Caixa Ativo: {registroAbertoAtendente.codigo}
+                </p>
+                <p className="text-sm text-emerald-700 dark:text-emerald-300 mt-1">
+                  Aberto em {registroAbertoAtendente.periodoAbertura} • 
+                  Movimentações de Receitas a Receber serão registradas automaticamente.
+                </p>
+              </div>
+              <Badge variant="default" className="bg-emerald-600">
+                <Unlock className="h-3 w-3 mr-1" /> Ativo
+              </Badge>
+            </div>
+          )}
+
           {/* Ações */}
-          <div className="flex gap-3 mb-4">
+          <div className="flex gap-3 mb-4 flex-wrap">
+            <Button onClick={() => setShowNovoModal(true)}>
+              <Plus className="h-4 w-4 mr-2" />
+              Novo Registro de Caixa
+            </Button>
             <Button 
               variant="outline" 
               onClick={() => navigate("/atendimento/financeiro/caixa")}
@@ -161,7 +263,10 @@ const FinanceiroRegistros = () => {
           {/* Grid de Registros */}
           <Card className="mb-6 border-border/50">
             <CardHeader className="pb-3">
-              <CardTitle className="text-base font-medium">Lista de Registros</CardTitle>
+              <CardTitle className="text-base font-medium flex items-center gap-2">
+                <User className="h-4 w-4" />
+                Lista de Registros
+              </CardTitle>
             </CardHeader>
             <CardContent className="p-0">
               <div className="overflow-x-auto">
@@ -171,6 +276,7 @@ const FinanceiroRegistros = () => {
                       <TableHead className="font-semibold">Código</TableHead>
                       <TableHead className="font-semibold">Período</TableHead>
                       <TableHead className="font-semibold">Atendente</TableHead>
+                      <TableHead className="font-semibold text-right">Saldo Inicial</TableHead>
                       <TableHead className="font-semibold text-right">Dinheiro</TableHead>
                       <TableHead className="font-semibold text-right">Cartão</TableHead>
                       <TableHead className="font-semibold text-right">Cheque</TableHead>
@@ -180,7 +286,7 @@ const FinanceiroRegistros = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {mockRegistros.map((registro) => (
+                    {registros.map((registro) => (
                       <TableRow 
                         key={registro.id} 
                         className={`hover:bg-muted/20 cursor-pointer ${selectedRegistro?.id === registro.id ? 'bg-primary/5' : ''}`}
@@ -194,6 +300,7 @@ const FinanceiroRegistros = () => {
                           )}
                         </TableCell>
                         <TableCell>{registro.atendente}</TableCell>
+                        <TableCell className="text-right text-muted-foreground">{formatCurrency(registro.saldoInicial)}</TableCell>
                         <TableCell className="text-right text-emerald-600">{formatCurrency(registro.valorDinheiro)}</TableCell>
                         <TableCell className="text-right text-blue-600">{formatCurrency(registro.valorCartao)}</TableCell>
                         <TableCell className="text-right text-amber-600">{formatCurrency(registro.valorCheque)}</TableCell>
@@ -213,6 +320,7 @@ const FinanceiroRegistros = () => {
                               <Button 
                                 variant="ghost" 
                                 size="sm"
+                                title="Fechar Registro"
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   setSelectedRegistro(registro);
@@ -225,6 +333,7 @@ const FinanceiroRegistros = () => {
                             <Button 
                               variant="ghost" 
                               size="sm"
+                              title="Imprimir"
                               onClick={(e) => e.stopPropagation()}
                             >
                               <Printer className="h-4 w-4" />
@@ -245,11 +354,18 @@ const FinanceiroRegistros = () => {
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-base font-medium">
-                    Detalhes do Registro: {selectedRegistro.codigo}
+                    Movimentações: {selectedRegistro.codigo}
                   </CardTitle>
-                  <Badge variant={selectedRegistro.situacao === "Aberto" ? "default" : "secondary"}>
-                    {selectedRegistro.situacao}
-                  </Badge>
+                  <div className="flex items-center gap-2">
+                    <Badge variant={selectedRegistro.situacao === "Aberto" ? "default" : "secondary"}>
+                      {selectedRegistro.situacao}
+                    </Badge>
+                    {selectedRegistro.situacao === "Fechado" && (
+                      <span className="text-xs text-muted-foreground">
+                        Este registro está fechado e não pode receber novas movimentações.
+                      </span>
+                    )}
+                  </div>
                 </div>
               </CardHeader>
               <CardContent className="p-0">
@@ -260,6 +376,7 @@ const FinanceiroRegistros = () => {
                         <TableHead className="font-semibold">Data</TableHead>
                         <TableHead className="font-semibold">Nº Requisição</TableHead>
                         <TableHead className="font-semibold">Paciente</TableHead>
+                        <TableHead className="font-semibold">Origem</TableHead>
                         <TableHead className="font-semibold">Forma de Pagamento</TableHead>
                         <TableHead className="font-semibold text-right">Valor</TableHead>
                         <TableHead className="font-semibold">Observações</TableHead>
@@ -272,6 +389,11 @@ const FinanceiroRegistros = () => {
                           <TableCell className="font-medium">{detalhe.data}</TableCell>
                           <TableCell className="text-primary font-medium">{detalhe.requisicao}</TableCell>
                           <TableCell>{detalhe.paciente}</TableCell>
+                          <TableCell>
+                            <Badge variant="outline" className="text-xs">
+                              {detalhe.origem}
+                            </Badge>
+                          </TableCell>
                           <TableCell>{detalhe.formaPagamento}</TableCell>
                           <TableCell className="text-right font-semibold text-emerald-600">
                             {formatCurrency(detalhe.valor)}
@@ -293,54 +415,19 @@ const FinanceiroRegistros = () => {
             </Card>
           )}
 
-          {/* Modal de Confirmação de Fechamento */}
-          <Dialog open={showFecharModal} onOpenChange={setShowFecharModal}>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle className="flex items-center gap-2">
-                  <Lock className="h-5 w-5 text-primary" />
-                  Fechar Registro de Caixa
-                </DialogTitle>
-                <DialogDescription>
-                  Ao fechar este registro, os valores serão consolidados automaticamente no Caixa da unidade.
-                </DialogDescription>
-              </DialogHeader>
-              
-              {selectedRegistro && (
-                <div className="space-y-4 py-4">
-                  <div className="grid grid-cols-2 gap-4 p-4 bg-muted/30 rounded-lg">
-                    <div>
-                      <p className="text-sm text-muted-foreground">Registro</p>
-                      <p className="font-medium">{selectedRegistro.codigo}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">Atendente</p>
-                      <p className="font-medium">{selectedRegistro.atendente}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">Total a Consolidar</p>
-                      <p className="font-bold text-primary text-lg">{formatCurrency(selectedRegistro.total)}</p>
-                    </div>
-                  </div>
+          {/* Modais */}
+          <NovoRegistroModal 
+            open={showNovoModal}
+            onOpenChange={setShowNovoModal}
+            onConfirm={handleNovoRegistro}
+          />
 
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <CheckCircle className="h-4 w-4 text-emerald-500" />
-                    Deseja imprimir o relatório de movimentação do caixa?
-                  </div>
-                </div>
-              )}
-
-              <DialogFooter className="gap-2">
-                <Button variant="outline" onClick={() => setShowFecharModal(false)}>
-                  Cancelar
-                </Button>
-                <Button onClick={handleFecharRegistro}>
-                  <Lock className="h-4 w-4 mr-2" />
-                  Fechar e Imprimir
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+          <FecharRegistroModal
+            open={showFecharModal}
+            onOpenChange={setShowFecharModal}
+            registro={selectedRegistro}
+            onConfirm={handleFecharRegistro}
+          />
         </main>
       </div>
     </div>
