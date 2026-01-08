@@ -25,7 +25,6 @@ const menuItems = [
   { icon: LayoutDashboard, title: "Dashboard", path: "/interfaciamento", tooltip: "Visão geral do interfaciamento" },
   { icon: Monitor, title: "Equipamentos", path: "/interfaciamento/equipamentos", tooltip: "Gerenciar equipamentos" },
   { icon: Cable, title: "Protocolos", path: "/interfaciamento/protocolos", tooltip: "Configurar protocolos" },
-  { icon: Link2, title: "Mapeamento de Exames", path: "/interfaciamento/mapeamento", tooltip: "Mapear exames" },
   { icon: Activity, title: "Monitoramento", path: "/interfaciamento/monitoramento", tooltip: "Monitorar conexões" },
   { icon: FileText, title: "Logs de Comunicação", path: "/interfaciamento/logs", tooltip: "Visualizar logs" },
   { icon: Settings, title: "Configurações", path: "/interfaciamento/configuracoes", tooltip: "Configurações gerais" },
