@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Search, Filter, Eye, History } from "lucide-react";
+import { Search, Filter, Eye, History, Upload, Download } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -27,105 +27,123 @@ const historico = [
     id: "1",
     data: "02/01/2026",
     hora: "15:45",
-    paciente: "Maria Silva Santos",
-    documento: "123.456.789-00",
-    origem: "UTI Adulto",
-    destino: "Enfermaria 3",
-    tipo: "Interna",
-    situacao: "Concluída",
-    usuario: "Ana Paula Enfermeira"
+    acao: "Exportação concluída",
+    lote: "LT-2026-0145",
+    parceiro: "Lab Apoio Central",
+    tipo: "Exportação",
+    tipoDados: "Requisições",
+    usuario: "Maria Silva",
+    detalhes: "15 requisições exportadas com sucesso"
   },
   {
     id: "2",
-    data: "01/01/2026",
-    hora: "16:30",
-    paciente: "Carlos Alberto Souza",
-    documento: "789.123.456-00",
-    origem: "Enfermaria 2",
-    destino: "UTI Coronariana",
-    tipo: "Interna",
-    situacao: "Concluída",
-    usuario: "Dr. Carlos Eduardo"
+    data: "02/01/2026",
+    hora: "11:20",
+    acao: "Importação concluída",
+    lote: "LT-2026-0144",
+    parceiro: "Lab Análises Clínicas",
+    tipo: "Importação",
+    tipoDados: "Laudos",
+    usuario: "João Pereira",
+    detalhes: "10 laudos importados, 2 com erro"
   },
   {
     id: "3",
-    data: "31/12/2025",
-    hora: "14:00",
-    paciente: "Fernanda Costa Pereira",
-    documento: "321.654.987-00",
-    origem: "Ambulatório",
-    destino: "Internação",
-    tipo: "Interna",
-    situacao: "Cancelada",
-    usuario: "Maria Enfermeira"
+    data: "02/01/2026",
+    hora: "09:50",
+    acao: "Exportação iniciada",
+    lote: "LT-2026-0143",
+    parceiro: "Clínica São Paulo",
+    tipo: "Exportação",
+    tipoDados: "Requisições",
+    usuario: "Ana Costa",
+    detalhes: "Processando 22 requisições"
   },
   {
     id: "4",
-    data: "30/12/2025",
-    hora: "10:15",
-    paciente: "Roberto Mendes",
-    documento: "654.987.321-00",
-    origem: "Pronto Socorro",
-    destino: "Hospital Especializado",
-    tipo: "Externa",
-    situacao: "Concluída",
-    usuario: "Dr. Fernando Alves"
+    data: "01/01/2026",
+    hora: "16:25",
+    acao: "Erro de importação",
+    lote: "LT-2026-0142",
+    parceiro: "Lab Apoio Central",
+    tipo: "Importação",
+    tipoDados: "Laudos",
+    usuario: "Carlos Eduardo",
+    detalhes: "Falha na conexão com servidor do parceiro"
   },
   {
     id: "5",
-    data: "29/12/2025",
-    hora: "09:30",
-    paciente: "Lucia Helena Costa",
-    documento: "147.258.369-00",
-    origem: "Emergência",
-    destino: "Centro Cirúrgico",
-    tipo: "Interna",
-    situacao: "Concluída",
-    usuario: "Patrícia Técnica"
+    data: "01/01/2026",
+    hora: "10:05",
+    acao: "Exportação concluída",
+    lote: "LT-2026-0141",
+    parceiro: "Hospital Regional",
+    tipo: "Exportação",
+    tipoDados: "Requisições",
+    usuario: "Maria Silva",
+    detalhes: "18 requisições exportadas com sucesso"
   },
   {
     id: "6",
-    data: "28/12/2025",
-    hora: "11:00",
-    paciente: "Pedro Santos Lima",
-    documento: "963.852.741-00",
-    origem: "UTI Pediátrica",
-    destino: "Enfermaria Pediátrica",
-    tipo: "Interna",
-    situacao: "Concluída",
-    usuario: "Dra. Carla Mendes"
+    data: "31/12/2025",
+    hora: "15:35",
+    acao: "Configuração alterada",
+    lote: "-",
+    parceiro: "Lab Especializado",
+    tipo: "Sistema",
+    tipoDados: "-",
+    usuario: "Fernanda Lima",
+    detalhes: "Atualização de De/Para de serviços"
   },
   {
     id: "7",
-    data: "27/12/2025",
-    hora: "08:45",
-    paciente: "Ana Beatriz Ferreira",
-    documento: "159.357.486-00",
-    origem: "Hospital Central",
-    destino: "Clínica São Paulo",
-    tipo: "Externa",
-    situacao: "Concluída",
-    usuario: "Ricardo Enfermeiro"
+    data: "31/12/2025",
+    hora: "14:00",
+    acao: "Novo parceiro cadastrado",
+    lote: "-",
+    parceiro: "Clínica Nova Esperança",
+    tipo: "Sistema",
+    tipoDados: "-",
+    usuario: "Admin",
+    detalhes: "Parceiro configurado para integração via API"
   }
 ];
 
-const getSituacaoBadge = (situacao: string) => {
-  switch (situacao) {
-    case "Concluída":
-      return <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100">Concluída</Badge>;
-    case "Cancelada":
-      return <Badge className="bg-red-100 text-red-700 hover:bg-red-100">Cancelada</Badge>;
-    default:
-      return <Badge variant="secondary">{situacao}</Badge>;
+const getAcaoBadge = (acao: string) => {
+  if (acao.includes("concluída")) {
+    return <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100">{acao}</Badge>;
   }
+  if (acao.includes("Erro")) {
+    return <Badge className="bg-red-100 text-red-700 hover:bg-red-100">{acao}</Badge>;
+  }
+  if (acao.includes("iniciada")) {
+    return <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-100">{acao}</Badge>;
+  }
+  return <Badge variant="secondary">{acao}</Badge>;
 };
 
 const getTipoBadge = (tipo: string) => {
   switch (tipo) {
-    case "Interna":
-      return <Badge variant="outline" className="border-blue-300 text-blue-700">Interna</Badge>;
-    case "Externa":
-      return <Badge variant="outline" className="border-purple-300 text-purple-700">Externa</Badge>;
+    case "Exportação":
+      return (
+        <Badge variant="outline" className="border-blue-300 text-blue-700">
+          <Upload className="h-3 w-3 mr-1" />
+          Exportação
+        </Badge>
+      );
+    case "Importação":
+      return (
+        <Badge variant="outline" className="border-purple-300 text-purple-700">
+          <Download className="h-3 w-3 mr-1" />
+          Importação
+        </Badge>
+      );
+    case "Sistema":
+      return (
+        <Badge variant="outline" className="border-gray-300 text-gray-700">
+          Sistema
+        </Badge>
+      );
     default:
       return <Badge variant="outline">{tipo}</Badge>;
   }
@@ -138,9 +156,10 @@ const TransferenciaHistorico = () => {
 
   const filteredHistorico = historico.filter((h) => {
     const matchesSearch = 
-      h.paciente.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      h.documento.includes(searchTerm) ||
-      h.usuario.toLowerCase().includes(searchTerm.toLowerCase());
+      h.parceiro.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      h.lote.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      h.usuario.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      h.detalhes.toLowerCase().includes(searchTerm.toLowerCase());
     
     const matchesTipo = tipoFilter === "todos" || h.tipo === tipoFilter;
     
@@ -148,16 +167,16 @@ const TransferenciaHistorico = () => {
   });
 
   return (
-    <TransferenciaLayout title="Histórico de Transferências">
+    <TransferenciaLayout title="Histórico">
       <div className="space-y-6">
         {/* Header */}
         <div>
           <h1 className="text-2xl font-semibold text-foreground flex items-center gap-2">
             <History className="h-6 w-6" />
-            Histórico de Transferências
+            Histórico de Integrações
           </h1>
           <p className="text-muted-foreground text-sm mt-1">
-            Registro completo de todas as transferências realizadas para auditoria
+            Registro completo de todas as operações de integração para auditoria
           </p>
         </div>
 
@@ -175,7 +194,7 @@ const TransferenciaHistorico = () => {
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
-                    placeholder="Buscar por paciente, documento ou usuário..."
+                    placeholder="Buscar por parceiro, lote, usuário ou detalhes..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="pl-9"
@@ -190,8 +209,9 @@ const TransferenciaHistorico = () => {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="todos">Todos os Tipos</SelectItem>
-                    <SelectItem value="Interna">Interna</SelectItem>
-                    <SelectItem value="Externa">Externa</SelectItem>
+                    <SelectItem value="Exportação">Exportação</SelectItem>
+                    <SelectItem value="Importação">Importação</SelectItem>
+                    <SelectItem value="Sistema">Sistema</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -211,13 +231,13 @@ const TransferenciaHistorico = () => {
               <TableHeader>
                 <TableRow>
                   <TableHead>Data/Hora</TableHead>
-                  <TableHead>Paciente</TableHead>
-                  <TableHead>Origem</TableHead>
-                  <TableHead>Destino</TableHead>
+                  <TableHead>Ação</TableHead>
+                  <TableHead>Lote</TableHead>
+                  <TableHead>Parceiro</TableHead>
                   <TableHead>Tipo</TableHead>
-                  <TableHead>Usuário Responsável</TableHead>
-                  <TableHead>Situação</TableHead>
-                  <TableHead className="text-right">Ação</TableHead>
+                  <TableHead>Usuário</TableHead>
+                  <TableHead>Detalhes</TableHead>
+                  <TableHead className="text-right">Ver</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -236,26 +256,27 @@ const TransferenciaHistorico = () => {
                           <span className="text-muted-foreground text-sm ml-2">{item.hora}</span>
                         </div>
                       </TableCell>
-                      <TableCell>
-                        <div>
-                          <p className="font-medium">{item.paciente}</p>
-                          <p className="text-xs text-muted-foreground">{item.documento}</p>
-                        </div>
+                      <TableCell>{getAcaoBadge(item.acao)}</TableCell>
+                      <TableCell className="font-mono text-primary">
+                        {item.lote !== "-" ? item.lote : <span className="text-muted-foreground">-</span>}
                       </TableCell>
-                      <TableCell className="text-muted-foreground">{item.origem}</TableCell>
-                      <TableCell className="text-muted-foreground">{item.destino}</TableCell>
+                      <TableCell className="font-medium">{item.parceiro}</TableCell>
                       <TableCell>{getTipoBadge(item.tipo)}</TableCell>
                       <TableCell className="text-muted-foreground">{item.usuario}</TableCell>
-                      <TableCell>{getSituacaoBadge(item.situacao)}</TableCell>
+                      <TableCell className="text-muted-foreground text-sm max-w-[200px] truncate">
+                        {item.detalhes}
+                      </TableCell>
                       <TableCell className="text-right">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => navigate(`/transferencia/${item.id}`)}
-                          title="Visualizar"
-                        >
-                          <Eye className="h-4 w-4" />
-                        </Button>
+                        {item.lote !== "-" && (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => navigate(`/transferencia/lotes/${item.id}`)}
+                            title="Visualizar lote"
+                          >
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                        )}
                       </TableCell>
                     </TableRow>
                   ))

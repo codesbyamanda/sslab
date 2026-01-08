@@ -9,7 +9,8 @@ import {
   Settings,
   ChevronLeft,
   ChevronRight,
-  Send
+  RefreshCw,
+  Package
 } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
@@ -24,31 +25,43 @@ const menuItems = [
     title: "Dashboard",
     icon: LayoutDashboard,
     path: "/transferencia",
-    tooltip: "Visão geral de transferências"
+    tooltip: "Visão geral de integrações"
   },
   {
     title: "Transferências",
     icon: ArrowLeftRight,
     path: "/transferencia/lista",
-    tooltip: "Lista de transferências"
+    tooltip: "Lista de transferências realizadas"
+  },
+  {
+    title: "Processar",
+    icon: RefreshCw,
+    path: "/transferencia/processar",
+    tooltip: "Processar nova transferência"
+  },
+  {
+    title: "Lotes",
+    icon: Package,
+    path: "/transferencia/lotes",
+    tooltip: "Lotes de transferência"
   },
   {
     title: "Histórico",
     icon: History,
     path: "/transferencia/historico",
-    tooltip: "Histórico de movimentações"
+    tooltip: "Histórico de integrações"
   },
   {
     title: "Relatórios",
     icon: FileText,
     path: "/transferencia/relatorios",
-    tooltip: "Relatórios de transferência"
+    tooltip: "Relatórios de integrações"
   },
   {
     title: "Configurações",
     icon: Settings,
     path: "/transferencia/configuracoes",
-    tooltip: "Configurações do módulo"
+    tooltip: "Configurações e parceiros"
   }
 ];
 
@@ -76,14 +89,14 @@ const TransferenciaSidebar = () => {
         <div className="p-5 border-b border-sidebar-border flex-shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-lg bg-petroleo flex items-center justify-center flex-shrink-0">
-              <Send className="h-5 w-5 text-primary-foreground" strokeWidth={2.5} />
+              <ArrowLeftRight className="h-5 w-5 text-primary-foreground" strokeWidth={2.5} />
             </div>
             {!collapsed && (
               <div className="animate-fade-in">
                 <span className="text-base font-semibold text-sidebar-foreground block">
                   Saúde Transferência
                 </span>
-                <span className="text-xs text-sidebar-foreground/60">Gestão de Transferências</span>
+                <span className="text-xs text-sidebar-foreground/60">Integração Laboratorial</span>
               </div>
             )}
           </div>

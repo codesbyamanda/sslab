@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Plus, Search, Filter, Eye, Edit } from "lucide-react";
+import { Search, Filter, Eye, Upload, Download } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,68 +25,62 @@ import TransferenciaLayout from "@/components/transferencia/TransferenciaLayout"
 const transferencias = [
   {
     id: "1",
-    data: "02/01/2026",
-    hora: "14:30",
-    paciente: "Maria Silva Santos",
-    documento: "123.456.789-00",
-    origem: "UTI Adulto",
-    destino: "Enfermaria 3",
-    tipo: "Interna",
+    lote: "LT-2026-0145",
+    parceiro: "Lab Apoio Central",
+    tipoOperacao: "Exportação",
+    tipoDados: "Requisições",
+    dataGeracao: "02/01/2026 14:30",
+    usuario: "Maria Silva",
     situacao: "Concluída"
   },
   {
     id: "2",
-    data: "02/01/2026",
-    hora: "10:15",
-    paciente: "João Pedro Oliveira",
-    documento: "987.654.321-00",
-    origem: "Emergência",
-    destino: "Centro Cirúrgico",
-    tipo: "Interna",
-    situacao: "Em andamento"
+    lote: "LT-2026-0144",
+    parceiro: "Lab Análises Clínicas",
+    tipoOperacao: "Importação",
+    tipoDados: "Laudos",
+    dataGeracao: "02/01/2026 11:15",
+    usuario: "João Pereira",
+    situacao: "Concluída"
   },
   {
     id: "3",
-    data: "01/01/2026",
-    hora: "16:45",
-    paciente: "Ana Carolina Lima",
-    documento: "456.789.123-00",
-    origem: "Hospital Central",
-    destino: "Hospital Regional",
-    tipo: "Externa",
+    lote: "LT-2026-0143",
+    parceiro: "Clínica São Paulo",
+    tipoOperacao: "Exportação",
+    tipoDados: "Requisições",
+    dataGeracao: "02/01/2026 09:45",
+    usuario: "Ana Costa",
     situacao: "Pendente"
   },
   {
     id: "4",
-    data: "01/01/2026",
-    hora: "09:00",
-    paciente: "Carlos Alberto Souza",
-    documento: "789.123.456-00",
-    origem: "Enfermaria 2",
-    destino: "UTI Coronariana",
-    tipo: "Interna",
-    situacao: "Concluída"
+    lote: "LT-2026-0142",
+    parceiro: "Lab Apoio Central",
+    tipoOperacao: "Importação",
+    tipoDados: "Laudos",
+    dataGeracao: "01/01/2026 16:20",
+    usuario: "Carlos Eduardo",
+    situacao: "Erro"
   },
   {
     id: "5",
-    data: "31/12/2025",
-    hora: "11:30",
-    paciente: "Fernanda Costa Pereira",
-    documento: "321.654.987-00",
-    origem: "Ambulatório",
-    destino: "Internação",
-    tipo: "Interna",
-    situacao: "Cancelada"
+    lote: "LT-2026-0141",
+    parceiro: "Hospital Regional",
+    tipoOperacao: "Exportação",
+    tipoDados: "Requisições",
+    dataGeracao: "01/01/2026 10:00",
+    usuario: "Maria Silva",
+    situacao: "Concluída"
   },
   {
     id: "6",
-    data: "30/12/2025",
-    hora: "08:00",
-    paciente: "Roberto Mendes",
-    documento: "654.987.321-00",
-    origem: "Pronto Socorro",
-    destino: "Hospital Especializado",
-    tipo: "Externa",
+    lote: "LT-2026-0140",
+    parceiro: "Lab Especializado",
+    tipoOperacao: "Importação",
+    tipoDados: "Valores de Referência",
+    dataGeracao: "31/12/2025 15:30",
+    usuario: "Fernanda Lima",
     situacao: "Concluída"
   }
 ];
@@ -97,10 +91,10 @@ const getSituacaoBadge = (situacao: string) => {
       return <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100">Concluída</Badge>;
     case "Pendente":
       return <Badge className="bg-amber-100 text-amber-700 hover:bg-amber-100">Pendente</Badge>;
-    case "Em andamento":
-      return <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-100">Em andamento</Badge>;
-    case "Cancelada":
-      return <Badge className="bg-red-100 text-red-700 hover:bg-red-100">Cancelada</Badge>;
+    case "Erro":
+      return <Badge className="bg-red-100 text-red-700 hover:bg-red-100">Erro</Badge>;
+    case "Processando":
+      return <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-100">Processando</Badge>;
     default:
       return <Badge variant="secondary">{situacao}</Badge>;
   }
@@ -108,10 +102,20 @@ const getSituacaoBadge = (situacao: string) => {
 
 const getTipoBadge = (tipo: string) => {
   switch (tipo) {
-    case "Interna":
-      return <Badge variant="outline" className="border-blue-300 text-blue-700">Interna</Badge>;
-    case "Externa":
-      return <Badge variant="outline" className="border-purple-300 text-purple-700">Externa</Badge>;
+    case "Exportação":
+      return (
+        <Badge variant="outline" className="border-blue-300 text-blue-700">
+          <Upload className="h-3 w-3 mr-1" />
+          Exportação
+        </Badge>
+      );
+    case "Importação":
+      return (
+        <Badge variant="outline" className="border-purple-300 text-purple-700">
+          <Download className="h-3 w-3 mr-1" />
+          Importação
+        </Badge>
+      );
     default:
       return <Badge variant="outline">{tipo}</Badge>;
   }
@@ -122,18 +126,19 @@ const TransferenciaLista = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [tipoFilter, setTipoFilter] = useState("todos");
   const [situacaoFilter, setSituacaoFilter] = useState("todos");
+  const [dadosFilter, setDadosFilter] = useState("todos");
 
   const filteredTransferencias = transferencias.filter((t) => {
     const matchesSearch = 
-      t.paciente.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      t.documento.includes(searchTerm) ||
-      t.origem.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      t.destino.toLowerCase().includes(searchTerm.toLowerCase());
+      t.parceiro.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      t.lote.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      t.usuario.toLowerCase().includes(searchTerm.toLowerCase());
     
-    const matchesTipo = tipoFilter === "todos" || t.tipo === tipoFilter;
+    const matchesTipo = tipoFilter === "todos" || t.tipoOperacao === tipoFilter;
     const matchesSituacao = situacaoFilter === "todos" || t.situacao === situacaoFilter;
+    const matchesDados = dadosFilter === "todos" || t.tipoDados === dadosFilter;
     
-    return matchesSearch && matchesTipo && matchesSituacao;
+    return matchesSearch && matchesTipo && matchesSituacao && matchesDados;
   });
 
   return (
@@ -144,12 +149,11 @@ const TransferenciaLista = () => {
           <div>
             <h1 className="text-2xl font-semibold text-foreground">Transferências</h1>
             <p className="text-muted-foreground text-sm mt-1">
-              Gerencie as transferências de pacientes e prontuários
+              Todas as transferências realizadas com laboratórios parceiros
             </p>
           </div>
-          <Button onClick={() => navigate("/transferencia/nova")}>
-            <Plus className="h-4 w-4 mr-2" />
-            Nova Transferência
+          <Button onClick={() => navigate("/transferencia/processar")}>
+            Processar Transferência
           </Button>
         </div>
 
@@ -167,7 +171,7 @@ const TransferenciaLista = () => {
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
-                    placeholder="Buscar por paciente, documento, origem ou destino..."
+                    placeholder="Buscar por parceiro, lote ou usuário..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="pl-9"
@@ -178,27 +182,41 @@ const TransferenciaLista = () => {
               <div className="w-40">
                 <Select value={tipoFilter} onValueChange={setTipoFilter}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Tipo" />
+                    <SelectValue placeholder="Operação" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="todos">Todos os Tipos</SelectItem>
-                    <SelectItem value="Interna">Interna</SelectItem>
-                    <SelectItem value="Externa">Externa</SelectItem>
+                    <SelectItem value="todos">Todas Operações</SelectItem>
+                    <SelectItem value="Exportação">Exportação</SelectItem>
+                    <SelectItem value="Importação">Importação</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               <div className="w-44">
+                <Select value={dadosFilter} onValueChange={setDadosFilter}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Tipo de Dados" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="todos">Todos os Dados</SelectItem>
+                    <SelectItem value="Requisições">Requisições</SelectItem>
+                    <SelectItem value="Laudos">Laudos</SelectItem>
+                    <SelectItem value="Valores de Referência">Valores de Referência</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="w-40">
                 <Select value={situacaoFilter} onValueChange={setSituacaoFilter}>
                   <SelectTrigger>
                     <SelectValue placeholder="Situação" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="todos">Todas as Situações</SelectItem>
+                    <SelectItem value="todos">Todas Situações</SelectItem>
                     <SelectItem value="Pendente">Pendente</SelectItem>
-                    <SelectItem value="Em andamento">Em andamento</SelectItem>
+                    <SelectItem value="Processando">Processando</SelectItem>
                     <SelectItem value="Concluída">Concluída</SelectItem>
-                    <SelectItem value="Cancelada">Cancelada</SelectItem>
+                    <SelectItem value="Erro">Erro</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -217,11 +235,12 @@ const TransferenciaLista = () => {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Data/Hora</TableHead>
-                  <TableHead>Paciente</TableHead>
-                  <TableHead>Origem</TableHead>
-                  <TableHead>Destino</TableHead>
-                  <TableHead>Tipo</TableHead>
+                  <TableHead>Código do Lote</TableHead>
+                  <TableHead>Parceiro</TableHead>
+                  <TableHead>Operação</TableHead>
+                  <TableHead>Tipo de Dados</TableHead>
+                  <TableHead>Data de Geração</TableHead>
+                  <TableHead>Usuário</TableHead>
                   <TableHead>Situação</TableHead>
                   <TableHead className="text-right">Ações</TableHead>
                 </TableRow>
@@ -229,50 +248,33 @@ const TransferenciaLista = () => {
               <TableBody>
                 {filteredTransferencias.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                    <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
                       Nenhuma transferência encontrada
                     </TableCell>
                   </TableRow>
                 ) : (
                   filteredTransferencias.map((transfer) => (
                     <TableRow key={transfer.id} className="hover:bg-muted/50">
-                      <TableCell>
-                        <div>
-                          <span className="font-medium">{transfer.data}</span>
-                          <span className="text-muted-foreground text-sm ml-2">{transfer.hora}</span>
-                        </div>
+                      <TableCell className="font-mono font-medium text-primary">
+                        {transfer.lote}
                       </TableCell>
-                      <TableCell>
-                        <div>
-                          <p className="font-medium">{transfer.paciente}</p>
-                          <p className="text-xs text-muted-foreground">{transfer.documento}</p>
-                        </div>
+                      <TableCell className="font-medium">
+                        {transfer.parceiro}
                       </TableCell>
-                      <TableCell className="text-muted-foreground">{transfer.origem}</TableCell>
-                      <TableCell className="text-muted-foreground">{transfer.destino}</TableCell>
-                      <TableCell>{getTipoBadge(transfer.tipo)}</TableCell>
+                      <TableCell>{getTipoBadge(transfer.tipoOperacao)}</TableCell>
+                      <TableCell className="text-muted-foreground">{transfer.tipoDados}</TableCell>
+                      <TableCell className="text-muted-foreground">{transfer.dataGeracao}</TableCell>
+                      <TableCell className="text-muted-foreground">{transfer.usuario}</TableCell>
                       <TableCell>{getSituacaoBadge(transfer.situacao)}</TableCell>
                       <TableCell className="text-right">
-                        <div className="flex justify-end gap-1">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => navigate(`/transferencia/${transfer.id}`)}
-                            title="Visualizar"
-                          >
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                          {transfer.situacao !== "Concluída" && transfer.situacao !== "Cancelada" && (
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => navigate(`/transferencia/${transfer.id}/editar`)}
-                              title="Editar"
-                            >
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                          )}
-                        </div>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => navigate(`/transferencia/lotes/${transfer.id}`)}
+                          title="Visualizar detalhes"
+                        >
+                          <Eye className="h-4 w-4" />
+                        </Button>
                       </TableCell>
                     </TableRow>
                   ))

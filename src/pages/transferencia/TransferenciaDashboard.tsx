@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { Clock, CheckCircle, XCircle, ArrowRight, TrendingUp } from "lucide-react";
+import { Clock, CheckCircle, XCircle, TrendingUp, ArrowRight, Upload, Download } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -19,12 +19,13 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  ResponsiveContainer
+  ResponsiveContainer,
+  Legend
 } from "recharts";
 
 const kpiData = [
   {
-    title: "Pendentes",
+    title: "Transferências Pendentes",
     value: "12",
     icon: Clock,
     color: "text-amber-600",
@@ -32,7 +33,7 @@ const kpiData = [
     borderColor: "border-amber-200"
   },
   {
-    title: "Concluídas",
+    title: "Transferências Concluídas",
     value: "148",
     icon: CheckCircle,
     color: "text-emerald-600",
@@ -40,7 +41,7 @@ const kpiData = [
     borderColor: "border-emerald-200"
   },
   {
-    title: "Canceladas",
+    title: "Transferências Canceladas",
     value: "8",
     icon: XCircle,
     color: "text-red-600",
@@ -48,7 +49,7 @@ const kpiData = [
     borderColor: "border-red-200"
   },
   {
-    title: "Este Mês",
+    title: "Transferências no Mês",
     value: "45",
     icon: TrendingUp,
     color: "text-blue-600",
@@ -58,59 +59,59 @@ const kpiData = [
 ];
 
 const chartData = [
-  { mes: "Jan", transferencias: 32 },
-  { mes: "Fev", transferencias: 28 },
-  { mes: "Mar", transferencias: 45 },
-  { mes: "Abr", transferencias: 38 },
-  { mes: "Mai", transferencias: 52 },
-  { mes: "Jun", transferencias: 45 }
+  { mes: "Jan", exportacao: 18, importacao: 14 },
+  { mes: "Fev", exportacao: 22, importacao: 16 },
+  { mes: "Mar", exportacao: 28, importacao: 20 },
+  { mes: "Abr", exportacao: 25, importacao: 18 },
+  { mes: "Mai", exportacao: 32, importacao: 24 },
+  { mes: "Jun", exportacao: 29, importacao: 21 }
 ];
 
 const recentTransfers = [
   {
     id: "1",
-    data: "02/01/2026",
-    paciente: "Maria Silva Santos",
-    origem: "UTI Adulto",
-    destino: "Enfermaria 3",
-    tipo: "Interna",
-    situacao: "Concluída"
+    parceiro: "Lab Apoio Central",
+    tipo: "Exportação",
+    tipoDado: "Requisição",
+    lote: "LT-2026-0145",
+    situacao: "Concluída",
+    dataHora: "02/01/2026 14:30"
   },
   {
     id: "2",
-    data: "02/01/2026",
-    paciente: "João Pedro Oliveira",
-    origem: "Emergência",
-    destino: "Centro Cirúrgico",
-    tipo: "Interna",
-    situacao: "Em andamento"
+    parceiro: "Lab Análises Clínicas",
+    tipo: "Importação",
+    tipoDado: "Laudo",
+    lote: "LT-2026-0144",
+    situacao: "Concluída",
+    dataHora: "02/01/2026 11:15"
   },
   {
     id: "3",
-    data: "01/01/2026",
-    paciente: "Ana Carolina Lima",
-    origem: "Hospital Central",
-    destino: "Hospital Regional",
-    tipo: "Externa",
-    situacao: "Pendente"
+    parceiro: "Clínica São Paulo",
+    tipo: "Exportação",
+    tipoDado: "Requisição",
+    lote: "LT-2026-0143",
+    situacao: "Pendente",
+    dataHora: "02/01/2026 09:45"
   },
   {
     id: "4",
-    data: "01/01/2026",
-    paciente: "Carlos Alberto Souza",
-    origem: "Enfermaria 2",
-    destino: "UTI Coronariana",
-    tipo: "Interna",
-    situacao: "Concluída"
+    parceiro: "Lab Apoio Central",
+    tipo: "Importação",
+    tipoDado: "Laudo",
+    lote: "LT-2026-0142",
+    situacao: "Erro",
+    dataHora: "01/01/2026 16:20"
   },
   {
     id: "5",
-    data: "31/12/2025",
-    paciente: "Fernanda Costa",
-    origem: "Ambulatório",
-    destino: "Internação",
-    tipo: "Interna",
-    situacao: "Cancelada"
+    parceiro: "Hospital Regional",
+    tipo: "Exportação",
+    tipoDado: "Requisição",
+    lote: "LT-2026-0141",
+    situacao: "Concluída",
+    dataHora: "01/01/2026 10:00"
   }
 ];
 
@@ -120,12 +121,33 @@ const getSituacaoBadge = (situacao: string) => {
       return <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100">Concluída</Badge>;
     case "Pendente":
       return <Badge className="bg-amber-100 text-amber-700 hover:bg-amber-100">Pendente</Badge>;
-    case "Em andamento":
-      return <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-100">Em andamento</Badge>;
-    case "Cancelada":
-      return <Badge className="bg-red-100 text-red-700 hover:bg-red-100">Cancelada</Badge>;
+    case "Erro":
+      return <Badge className="bg-red-100 text-red-700 hover:bg-red-100">Erro</Badge>;
+    case "Processando":
+      return <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-100">Processando</Badge>;
     default:
       return <Badge variant="secondary">{situacao}</Badge>;
+  }
+};
+
+const getTipoBadge = (tipo: string) => {
+  switch (tipo) {
+    case "Exportação":
+      return (
+        <Badge variant="outline" className="border-blue-300 text-blue-700">
+          <Upload className="h-3 w-3 mr-1" />
+          Exportação
+        </Badge>
+      );
+    case "Importação":
+      return (
+        <Badge variant="outline" className="border-purple-300 text-purple-700">
+          <Download className="h-3 w-3 mr-1" />
+          Importação
+        </Badge>
+      );
+    default:
+      return <Badge variant="outline">{tipo}</Badge>;
   }
 };
 
@@ -138,13 +160,13 @@ const TransferenciaDashboard = () => {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-semibold text-foreground">Dashboard de Transferências</h1>
+            <h1 className="text-2xl font-semibold text-foreground">Dashboard de Integrações</h1>
             <p className="text-muted-foreground text-sm mt-1">
-              Visão geral das transferências de pacientes e prontuários
+              Visão geral das transferências com laboratórios parceiros
             </p>
           </div>
-          <Button onClick={() => navigate("/transferencia/nova")}>
-            Nova Transferência
+          <Button onClick={() => navigate("/transferencia/processar")}>
+            Processar Transferência
           </Button>
         </div>
 
@@ -188,7 +210,9 @@ const TransferenciaDashboard = () => {
                         borderRadius: '8px'
                       }}
                     />
-                    <Bar dataKey="transferencias" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+                    <Legend />
+                    <Bar dataKey="exportacao" name="Exportação" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="importacao" name="Importação" fill="hsl(217, 91%, 60%)" radius={[4, 4, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
@@ -213,8 +237,9 @@ const TransferenciaDashboard = () => {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Paciente</TableHead>
-                    <TableHead>Destino</TableHead>
+                    <TableHead>Parceiro</TableHead>
+                    <TableHead>Tipo</TableHead>
+                    <TableHead>Dados</TableHead>
                     <TableHead>Situação</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -223,13 +248,16 @@ const TransferenciaDashboard = () => {
                     <TableRow 
                       key={transfer.id}
                       className="cursor-pointer hover:bg-muted/50"
-                      onClick={() => navigate(`/transferencia/${transfer.id}`)}
+                      onClick={() => navigate(`/transferencia/lotes/${transfer.id}`)}
                     >
                       <TableCell className="font-medium text-sm">
-                        {transfer.paciente}
+                        {transfer.parceiro}
+                      </TableCell>
+                      <TableCell>
+                        {getTipoBadge(transfer.tipo)}
                       </TableCell>
                       <TableCell className="text-sm text-muted-foreground">
-                        {transfer.destino}
+                        {transfer.tipoDado}
                       </TableCell>
                       <TableCell>
                         {getSituacaoBadge(transfer.situacao)}
