@@ -8,7 +8,8 @@ import {
   AlertTriangle,
   AlertCircle,
   ArrowRight,
-  Clock
+  Clock,
+  Beaker
 } from "lucide-react";
 import { Link } from "react-router-dom";
 
@@ -41,6 +42,14 @@ const kpiCards = [
     color: "text-amber-600",
     bgColor: "bg-amber-100"
   },
+  { 
+    title: "Estimativa de Reagentes", 
+    value: "1.240 mL", 
+    icon: Beaker, 
+    color: "text-purple-600",
+    bgColor: "bg-purple-100",
+    description: "Consumo estimado hoje"
+  },
 ];
 
 const alertasOffline = [
@@ -65,7 +74,7 @@ export default function InterfaciamentoDashboard() {
       </div>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
         {kpiCards.map((card) => (
           <Card key={card.title}>
             <CardContent className="p-6">
@@ -73,6 +82,9 @@ export default function InterfaciamentoDashboard() {
                 <div>
                   <p className="text-sm text-muted-foreground">{card.title}</p>
                   <p className="text-3xl font-bold mt-2">{card.value}</p>
+                  {card.description && (
+                    <p className="text-xs text-muted-foreground mt-1">{card.description}</p>
+                  )}
                 </div>
                 <div className={`p-3 rounded-lg ${card.bgColor}`}>
                   <card.icon className={`w-6 h-6 ${card.color}`} />
