@@ -118,7 +118,6 @@ import InterfaciamentoEquipamentos from "./pages/interfaciamento/Interfaciamento
 import InterfaciamentoEquipamentoDetalhe from "./pages/interfaciamento/InterfaciamentoEquipamentoDetalhe";
 import InterfaciamentoProtocolos from "./pages/interfaciamento/InterfaciamentoProtocolos";
 import InterfaciamentoProtocoloDetalhe from "./pages/interfaciamento/InterfaciamentoProtocoloDetalhe";
-import InterfaciamentoMapeamento from "./pages/interfaciamento/InterfaciamentoMapeamento";
 import InterfaciamentoMonitoramento from "./pages/interfaciamento/InterfaciamentoMonitoramento";
 import InterfaciamentoLogs from "./pages/interfaciamento/InterfaciamentoLogs";
 import InterfaciamentoLogDetalhe from "./pages/interfaciamento/InterfaciamentoLogDetalhe";
@@ -402,7 +401,6 @@ const App = () => (
             <Route path="equipamentos/:id" element={<InterfaciamentoEquipamentoDetalhe />} />
             <Route path="protocolos" element={<InterfaciamentoProtocolos />} />
             <Route path="protocolos/:id" element={<InterfaciamentoProtocoloDetalhe />} />
-            <Route path="mapeamento" element={<InterfaciamentoMapeamento />} />
             <Route path="monitoramento" element={<InterfaciamentoMonitoramento />} />
             <Route path="logs" element={<InterfaciamentoLogs />} />
             <Route path="logs/:id" element={<InterfaciamentoLogDetalhe />} />
