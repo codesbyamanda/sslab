@@ -136,7 +136,7 @@ const LotesTransferencia = () => {
               Consulte todos os lotes gerados nas transferências
             </p>
           </div>
-          <Button onClick={() => navigate("/transferencia/processar")}>
+          <Button onClick={() => navigate("/transferencia/processar?novoLote=true")}>
             Novo Lote
           </Button>
         </div>

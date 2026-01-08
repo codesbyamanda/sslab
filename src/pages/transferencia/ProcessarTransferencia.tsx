@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { ArrowLeft, RefreshCw, Upload, Download, FolderOpen, Globe, CheckCircle, XCircle, AlertTriangle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -27,7 +27,7 @@ const parceiros = [
   { id: "5", nome: "Lab Especializado", tipoIntegracao: "API" }
 ];
 
-const lotes = [
+const lotesExistentes = [
   { id: "1", codigo: "LT-2026-0145", data: "02/01/2026", itens: 15 },
   { id: "2", codigo: "LT-2026-0144", data: "02/01/2026", itens: 8 },
   { id: "3", codigo: "LT-2026-0143", data: "01/01/2026", itens: 22 }
@@ -35,22 +35,32 @@ const lotes = [
 
 const ProcessarTransferencia = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const isNovoLote = searchParams.get("novoLote") === "true";
+  
   const [parceiro, setParceiro] = useState("");
   const [tipoOperacao, setTipoOperacao] = useState("exportar");
   const [tipoDados, setTipoDados] = useState("");
-  const [tipoLote, setTipoLote] = useState("novo");
+  const [tipoLote, setTipoLote] = useState(isNovoLote ? "novo" : "novo");
   const [loteExistente, setLoteExistente] = useState("");
   const [usarApi, setUsarApi] = useState(true);
   const [pastaOrigem, setPastaOrigem] = useState("");
   const [pastaDestino, setPastaDestino] = useState("");
   const [processando, setProcessando] = useState(false);
   const [progresso, setProgresso] = useState(0);
+  const [loteGerado, setLoteGerado] = useState<string | null>(null);
   const [resumo, setResumo] = useState<{
     exportados: number;
     importados: number;
     processados: number;
     erros: number;
   } | null>(null);
+
+  useEffect(() => {
+    if (isNovoLote) {
+      setTipoLote("novo");
+    }
+  }, [isNovoLote]);
 
   const parceiroSelecionado = parceiros.find(p => p.id === parceiro);
 
@@ -65,11 +75,13 @@ const ProcessarTransferencia = () => {
     setResumo(null);
 
     // Simula processamento
+    const novoLoteId = `LT-2026-${String(Math.floor(Math.random() * 9000) + 1000)}`;
     const interval = setInterval(() => {
       setProgresso(prev => {
         if (prev >= 100) {
           clearInterval(interval);
           setProcessando(false);
+          setLoteGerado(novoLoteId);
           setResumo({
             exportados: tipoOperacao === "exportar" ? 15 : 0,
             importados: tipoOperacao === "importar" ? 12 : 0,
@@ -228,7 +240,7 @@ const ProcessarTransferencia = () => {
                     <SelectValue placeholder="Selecione um lote" />
                   </SelectTrigger>
                   <SelectContent>
-                    {lotes.map((l) => (
+                    {lotesExistentes.map((l) => (
                       <SelectItem key={l.id} value={l.id}>
                         {l.codigo} - {l.data} ({l.itens} itens)
                       </SelectItem>
@@ -338,6 +350,14 @@ const ProcessarTransferencia = () => {
                 <div className="flex items-center gap-2 p-3 bg-amber-50 rounded-lg text-amber-700 text-sm">
                   <AlertTriangle className="h-4 w-4" />
                   <span>Foram encontrados {resumo.erros} erros durante o processamento. Verifique o lote para mais detalhes.</span>
+                </div>
+              )}
+
+              {loteGerado && (
+                <div className="flex justify-end">
+                  <Button onClick={() => navigate(`/transferencia/lotes/1`)}>
+                    Visualizar Lote {loteGerado}
+                  </Button>
                 </div>
               )}
             </CardContent>
