@@ -1,6 +1,7 @@
 import LaboratorioLayout from "@/components/laboratorio/LaboratorioLayout";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 import { 
   Map, 
   Package, 
@@ -12,7 +13,14 @@ import {
   Files, 
   Settings, 
   FileBarChart,
-  ArrowRight
+  ArrowRight,
+  FlaskConical,
+  Clock,
+  FileCheck2,
+  AlertTriangle,
+  Cog,
+  Send,
+  SendHorizonal
 } from "lucide-react";
 
 interface QuickAction {
@@ -21,6 +29,45 @@ interface QuickAction {
   icon: React.ElementType;
   path: string;
 }
+
+interface KPIBadgeProps {
+  title: string;
+  value: string;
+  icon: React.ElementType;
+  iconBg?: string;
+  iconColor?: string;
+  valueColor?: string;
+  delay?: number;
+}
+
+const KPIBadge = ({
+  title,
+  value,
+  icon: Icon,
+  iconBg = "bg-primary/10",
+  iconColor = "text-primary",
+  valueColor = "text-foreground",
+  delay = 0
+}: KPIBadgeProps) => {
+  return (
+    <Card 
+      className="card-premium animate-fade-in-up"
+      style={{ animationDelay: `${delay}ms`, animationFillMode: "both" }}
+    >
+      <CardContent className="p-4">
+        <div className="flex items-center justify-between">
+          <div className="flex-1">
+            <p className={cn("text-2xl font-bold", valueColor)}>{value}</p>
+            <p className="text-sm text-muted-foreground">{title}</p>
+          </div>
+          <div className={cn("w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0", iconBg)}>
+            <Icon className={cn("h-5 w-5", iconColor)} />
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
 
 const mapaTrabalhoActions: QuickAction[] = [
   { title: "Lotes de Amostras", description: "Gerenciar lotes", icon: Package, path: "/laboratorio/lotes-amostras" },
@@ -36,6 +83,65 @@ const laudoActions: QuickAction[] = [
   { title: "Gerar Laudos Lote", description: "Emissão em lote", icon: Files, path: "/laboratorio/gerar-laudos-lote" },
 ];
 
+const kpiBadges = [
+  { 
+    title: "Amostras hoje", 
+    value: "127", 
+    icon: FlaskConical, 
+    iconBg: "bg-primary/10",
+    iconColor: "text-primary",
+    valueColor: "text-foreground"
+  },
+  { 
+    title: "Laudos pendentes", 
+    value: "42", 
+    icon: Clock, 
+    iconBg: "bg-amber-500/10",
+    iconColor: "text-amber-500",
+    valueColor: "text-foreground"
+  },
+  { 
+    title: "Laudos liberados", 
+    value: "89", 
+    icon: FileCheck2, 
+    iconBg: "bg-accent/10",
+    iconColor: "text-accent",
+    valueColor: "text-accent"
+  },
+  { 
+    title: "Itens urgentes", 
+    value: "5", 
+    icon: AlertTriangle, 
+    iconBg: "bg-warning/10",
+    iconColor: "text-warning",
+    valueColor: "text-warning"
+  },
+  { 
+    title: "Amostras em produção", 
+    value: "34", 
+    icon: Cog, 
+    iconBg: "bg-blue-500/10",
+    iconColor: "text-blue-500",
+    valueColor: "text-blue-500"
+  },
+  { 
+    title: "Amostras enviadas", 
+    value: "78", 
+    icon: Send, 
+    iconBg: "bg-green-500/10",
+    iconColor: "text-green-500",
+    valueColor: "text-green-500"
+  },
+  { 
+    title: "Amostras não enviadas", 
+    value: "15", 
+    icon: SendHorizonal, 
+    iconBg: "bg-red-500/10",
+    iconColor: "text-red-500",
+    valueColor: "text-red-500"
+  },
+];
+
 const LaboratorioHome = () => {
   const navigate = useNavigate();
 
@@ -48,6 +154,22 @@ const LaboratorioHome = () => {
           <p className="text-muted-foreground mt-1">
             Controle das rotinas técnicas: do recebimento do material até digitação e emissão do laudo.
           </p>
+        </div>
+
+        {/* KPI Badges */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-4">
+          {kpiBadges.map((badge, index) => (
+            <KPIBadge
+              key={badge.title}
+              title={badge.title}
+              value={badge.value}
+              icon={badge.icon}
+              iconBg={badge.iconBg}
+              iconColor={badge.iconColor}
+              valueColor={badge.valueColor}
+              delay={index * 50}
+            />
+          ))}
         </div>
 
         {/* Main Blocks */}
@@ -150,34 +272,6 @@ const LaboratorioHome = () => {
                 </div>
                 <ArrowRight className="h-5 w-5 text-muted-foreground" />
               </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Stats Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <Card className="card-premium">
-            <CardContent className="p-4">
-              <p className="text-2xl font-bold text-foreground">127</p>
-              <p className="text-sm text-muted-foreground">Amostras hoje</p>
-            </CardContent>
-          </Card>
-          <Card className="card-premium">
-            <CardContent className="p-4">
-              <p className="text-2xl font-bold text-foreground">42</p>
-              <p className="text-sm text-muted-foreground">Laudos pendentes</p>
-            </CardContent>
-          </Card>
-          <Card className="card-premium">
-            <CardContent className="p-4">
-              <p className="text-2xl font-bold text-accent">89</p>
-              <p className="text-sm text-muted-foreground">Laudos liberados</p>
-            </CardContent>
-          </Card>
-          <Card className="card-premium">
-            <CardContent className="p-4">
-              <p className="text-2xl font-bold text-warning">5</p>
-              <p className="text-sm text-muted-foreground">Itens urgentes</p>
             </CardContent>
           </Card>
         </div>
