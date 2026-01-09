@@ -20,8 +20,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Package, Search, Filter, Eye } from "lucide-react";
+import { Package, Search, Filter, Eye, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import NovoLoteModal from "@/components/laboratorio/NovoLoteModal";
 
 interface LoteAmostra {
   id: string;
@@ -54,6 +55,7 @@ const LaboratorioLotesAmostras = () => {
   const [unidade, setUnidade] = useState("");
   const [setor, setSetor] = useState("");
   const [status, setStatus] = useState("");
+  const [novoLoteModalOpen, setNovoLoteModalOpen] = useState(false);
 
   const getStatusBadge = (status: LoteAmostra["status"]) => {
     const config = statusConfig[status];
@@ -65,15 +67,26 @@ const LaboratorioLotesAmostras = () => {
     return <span className={variantClasses[config.variant]}>{config.label}</span>;
   };
 
+  const handleLoteCriado = (loteId: string) => {
+    // Aqui poderia atualizar a lista de lotes ou navegar para o detalhe
+    console.log("Lote criado:", loteId);
+  };
+
   return (
     <LaboratorioLayout title="Lotes de Amostras">
       <div className="space-y-6 animate-fade-in">
-        {/* Header */}
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">Lotes de Amostras</h1>
-          <p className="text-muted-foreground mt-1">
-            Gerencie os lotes relacionados à geração e organização do mapa de trabalho.
-          </p>
+        {/* Header com botão de ação */}
+        <div className="flex items-start justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-foreground">Lotes de Amostras</h1>
+            <p className="text-muted-foreground mt-1">
+              Gerencie os lotes relacionados à geração e organização do mapa de trabalho.
+            </p>
+          </div>
+          <Button onClick={() => setNovoLoteModalOpen(true)}>
+            <Plus className="h-4 w-4 mr-2" />
+            Novo Lote
+          </Button>
         </div>
 
         {/* Filtros */}
@@ -212,6 +225,13 @@ const LaboratorioLotesAmostras = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* Modal Novo Lote */}
+      <NovoLoteModal 
+        open={novoLoteModalOpen} 
+        onOpenChange={setNovoLoteModalOpen}
+        onLoteCriado={handleLoteCriado}
+      />
     </LaboratorioLayout>
   );
 };
