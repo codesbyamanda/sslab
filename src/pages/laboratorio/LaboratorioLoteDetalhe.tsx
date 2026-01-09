@@ -31,7 +31,7 @@ const mockLoteData = {
   unidade: "Unidade Central",
   setorBancada: "Bioquímica / Bancada 01",
   qtdAmostras: 45,
-  status: "processando" as const,
+  status: "em_transicao" as const,
 };
 
 const mockAmostras: AmostraLote[] = [
@@ -45,10 +45,10 @@ const mockAmostras: AmostraLote[] = [
   { id: "8", numeroAmostra: "A-001234-08", numeroRequisicao: "REQ-2024-005682", paciente: "Fernanda Costa Souza", material: "Fezes", exameServico: "Parasitológico", situacao: "pendente", urgente: false, dataHoraColeta: "16/12/2024 08:15" },
 ];
 
-const statusConfig = {
-  aberto: { label: "Aberto", className: "badge-warning" },
-  processando: { label: "Processando", className: "badge-neutral" },
-  concluido: { label: "Concluído", className: "badge-success" },
+const statusConfig: Record<string, { label: string; className: string }> = {
+  aberto: { label: "Aberto", className: "badge-success" },
+  em_transicao: { label: "Em Transição", className: "badge-warning" },
+  fechado: { label: "Fechado", className: "badge-neutral" },
 };
 
 const situacaoConfig = {

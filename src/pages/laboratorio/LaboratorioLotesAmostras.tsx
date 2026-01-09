@@ -31,21 +31,21 @@ interface LoteAmostra {
   unidade: string;
   setorBancada: string;
   qtdAmostras: number;
-  status: "aberto" | "processando" | "concluido";
+  status: "aberto" | "em_transicao" | "fechado";
 }
 
 const mockLotes: LoteAmostra[] = [
-  { id: "1", numeroLote: "L-2024-001234", dataHora: "16/12/2024 08:30", unidade: "Unidade Central", setorBancada: "Bioquímica / Bancada 01", qtdAmostras: 45, status: "processando" },
-  { id: "2", numeroLote: "L-2024-001233", dataHora: "16/12/2024 07:15", unidade: "Unidade Central", setorBancada: "Hematologia / Bancada 01", qtdAmostras: 32, status: "concluido" },
-  { id: "3", numeroLote: "L-2024-001232", dataHora: "15/12/2024 16:45", unidade: "Unidade Norte", setorBancada: "Bioquímica / Bancada 02", qtdAmostras: 28, status: "concluido" },
+  { id: "1", numeroLote: "L-2024-001234", dataHora: "16/12/2024 08:30", unidade: "Unidade Central", setorBancada: "Bioquímica / Bancada 01", qtdAmostras: 45, status: "em_transicao" },
+  { id: "2", numeroLote: "L-2024-001233", dataHora: "16/12/2024 07:15", unidade: "Unidade Central", setorBancada: "Hematologia / Bancada 01", qtdAmostras: 32, status: "fechado" },
+  { id: "3", numeroLote: "L-2024-001232", dataHora: "15/12/2024 16:45", unidade: "Unidade Norte", setorBancada: "Bioquímica / Bancada 02", qtdAmostras: 28, status: "fechado" },
   { id: "4", numeroLote: "L-2024-001231", dataHora: "15/12/2024 14:20", unidade: "Unidade Central", setorBancada: "Microbiologia / Bancada 01", qtdAmostras: 15, status: "aberto" },
-  { id: "5", numeroLote: "L-2024-001230", dataHora: "15/12/2024 10:00", unidade: "Unidade Sul", setorBancada: "Urinálise / Bancada 01", qtdAmostras: 52, status: "concluido" },
+  { id: "5", numeroLote: "L-2024-001230", dataHora: "15/12/2024 10:00", unidade: "Unidade Sul", setorBancada: "Urinálise / Bancada 01", qtdAmostras: 52, status: "fechado" },
 ];
 
 const statusConfig = {
-  aberto: { label: "Aberto", variant: "warning" as const },
-  processando: { label: "Processando", variant: "default" as const },
-  concluido: { label: "Concluído", variant: "success" as const },
+  aberto: { label: "Aberto", className: "badge-success" },
+  em_transicao: { label: "Em Transição", className: "badge-warning" },
+  fechado: { label: "Fechado", className: "badge-neutral" },
 };
 
 const LaboratorioLotesAmostras = () => {
@@ -54,17 +54,12 @@ const LaboratorioLotesAmostras = () => {
   const [dataFim, setDataFim] = useState("");
   const [unidade, setUnidade] = useState("");
   const [setor, setSetor] = useState("");
-  const [status, setStatus] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
   const [novoLoteModalOpen, setNovoLoteModalOpen] = useState(false);
 
   const getStatusBadge = (status: LoteAmostra["status"]) => {
     const config = statusConfig[status];
-    const variantClasses = {
-      warning: "badge-warning",
-      default: "badge-neutral",
-      success: "badge-success",
-    };
-    return <span className={variantClasses[config.variant]}>{config.label}</span>;
+    return <span className={config.className}>{config.label}</span>;
   };
 
   const handleLoteCriado = (loteId: string) => {
@@ -149,15 +144,15 @@ const LaboratorioLotesAmostras = () => {
               </div>
               <div>
                 <Label>Status</Label>
-                <Select value={status} onValueChange={setStatus}>
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
                   <SelectTrigger className="mt-1.5">
                     <SelectValue placeholder="Todos" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">Todos</SelectItem>
                     <SelectItem value="aberto">Aberto</SelectItem>
-                    <SelectItem value="processando">Processando</SelectItem>
-                    <SelectItem value="concluido">Concluído</SelectItem>
+                    <SelectItem value="em_transicao">Em Transição</SelectItem>
+                    <SelectItem value="fechado">Fechado</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
