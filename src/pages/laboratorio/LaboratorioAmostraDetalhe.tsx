@@ -51,14 +51,20 @@ import {
   Thermometer,
 } from "lucide-react";
 
+// Status de condição da amostra (condição física)
+type StatusCondicao = "normal" | "nao_localizada" | "acidentada" | "inadequada" | "insuficiente" | "descartada";
+
+// Situação do processo/fluxo operacional
+type SituacaoProcesso = "aberta" | "executada" | "liberada" | "cancelada" | "nao_executada";
+
 interface AmostraDetalhe {
   id: string;
   numeroAmostra: string;
   paciente: string;
   dataHoraColeta: string;
   setorBancada: string;
-  status: "colhida" | "em_analise" | "concluida" | "repetir";
-  urgente: boolean;
+  statusCondicao: StatusCondicao;
+  situacaoProcesso: SituacaoProcesso;
   material: string;
   numeroRequisicao: string;
 }
@@ -111,8 +117,8 @@ const mockAmostra: AmostraDetalhe = {
   paciente: "Maria Silva Santos",
   dataHoraColeta: "16/12/2024 08:15",
   setorBancada: "Bioquímica / Bancada 01",
-  status: "em_analise",
-  urgente: true,
+  statusCondicao: "normal",
+  situacaoProcesso: "executada",
   material: "Sangue Total (EDTA)",
   numeroRequisicao: "REQ-2024-005678",
 };
@@ -233,11 +239,23 @@ const mockHistorico: EventoHistorico[] = [
   },
 ];
 
-const statusConfig = {
-  colhida: { label: "Colhida", className: "badge-neutral" },
-  em_analise: { label: "Em Análise", className: "badge-warning" },
-  concluida: { label: "Concluída", className: "badge-success" },
-  repetir: { label: "Repetir", className: "badge-error" },
+// Configuração visual para status de condição da amostra
+const statusCondicaoConfig: Record<StatusCondicao, { label: string; className: string }> = {
+  normal: { label: "Normal", className: "badge-success" },
+  nao_localizada: { label: "Não localizada", className: "badge-warning" },
+  acidentada: { label: "Acidentada", className: "badge-error" },
+  inadequada: { label: "Inadequada", className: "badge-error" },
+  insuficiente: { label: "Insuficiente", className: "badge-warning" },
+  descartada: { label: "Descartada", className: "badge-neutral" },
+};
+
+// Configuração visual para situação do processo/fluxo operacional
+const situacaoProcessoConfig: Record<SituacaoProcesso, { label: string; className: string }> = {
+  aberta: { label: "Aberta", className: "badge-neutral" },
+  executada: { label: "Executada", className: "badge-warning" },
+  liberada: { label: "Liberada", className: "badge-success" },
+  cancelada: { label: "Cancelada", className: "badge-error" },
+  nao_executada: { label: "Não Executada", className: "badge-error" },
 };
 
 const situacaoExameConfig = {
@@ -428,7 +446,8 @@ const LaboratorioAmostraDetalhe = () => {
 
   if (!amostra) return null;
 
-  const statusBadge = statusConfig[amostra.status];
+  const situacaoBadge = situacaoProcessoConfig[amostra.situacaoProcesso];
+  const condicaoBadge = statusCondicaoConfig[amostra.statusCondicao];
 
   return (
     <LaboratorioLayout title="Detalhes da Amostra">
@@ -467,13 +486,7 @@ const LaboratorioAmostraDetalhe = () => {
                 <ArrowLeft className="h-4 w-4" />
               </Button>
               <h1 className="text-2xl font-bold text-foreground">Detalhes da Amostra</h1>
-              <span className={statusBadge.className}>{statusBadge.label}</span>
-              {amostra.urgente && (
-                <span className="badge-error flex items-center gap-1">
-                  <AlertTriangle className="h-3 w-3" />
-                  Urgente
-                </span>
-              )}
+              <span className={situacaoBadge.className}>{situacaoBadge.label}</span>
             </div>
             <p className="text-muted-foreground ml-11">
               <span className="font-mono font-medium text-foreground">{amostra.numeroAmostra}</span>
@@ -510,19 +523,12 @@ const LaboratorioAmostraDetalhe = () => {
                 <p className="font-medium text-foreground">{amostra.setorBancada}</p>
               </div>
               <div>
-                <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Status</p>
-                <span className={statusBadge.className}>{statusBadge.label}</span>
+                <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Situação</p>
+                <span className={situacaoBadge.className}>{situacaoBadge.label}</span>
               </div>
               <div>
-                <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Urgência</p>
-                {amostra.urgente ? (
-                  <span className="badge-error flex items-center gap-1 w-fit">
-                    <AlertTriangle className="h-3 w-3" />
-                    Sim
-                  </span>
-                ) : (
-                  <p className="text-muted-foreground">Não</p>
-                )}
+                <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Condição</p>
+                <span className={condicaoBadge.className}>{condicaoBadge.label}</span>
               </div>
               <div>
                 <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Material</p>

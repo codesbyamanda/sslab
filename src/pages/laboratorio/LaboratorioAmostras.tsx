@@ -31,8 +31,11 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { TestTube2, Search, Filter, Eye, AlertTriangle, FileText, Loader2 } from "lucide-react";
+import { TestTube2, Search, Filter, Eye, FileText, Loader2 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+
+// Status de condição da amostra (condição física)
+type StatusCondicao = "normal" | "nao_localizada" | "acidentada" | "inadequada" | "insuficiente" | "descartada";
 
 interface Amostra {
   id: string;
@@ -40,24 +43,26 @@ interface Amostra {
   paciente: string;
   dataColeta: string;
   setorBancada: string;
-  status: "colhida" | "em_analise" | "concluida" | "repetir";
-  urgente: boolean;
+  statusCondicao: StatusCondicao;
   servicos: string[];
 }
 
 const mockAmostras: Amostra[] = [
-  { id: "1", numeroAmostra: "A-2024-089234", paciente: "Maria Silva Santos", dataColeta: "16/12/2024 08:15", setorBancada: "Bioquímica / Bancada 01", status: "em_analise", urgente: true, servicos: ["HMG", "GLI", "HB1AC", "CREA", "UREIA"] },
-  { id: "2", numeroAmostra: "A-2024-089233", paciente: "João Pedro Oliveira", dataColeta: "16/12/2024 08:00", setorBancada: "Hematologia / Bancada 01", status: "concluida", urgente: false, servicos: ["HMG", "COL", "TRI"] },
-  { id: "3", numeroAmostra: "A-2024-089232", paciente: "Ana Carolina Lima", dataColeta: "16/12/2024 07:45", setorBancada: "Bioquímica / Bancada 02", status: "colhida", urgente: false, servicos: ["GLI", "TGO"] },
-  { id: "4", numeroAmostra: "A-2024-089231", paciente: "Carlos Eduardo Souza", dataColeta: "16/12/2024 07:30", setorBancada: "Microbiologia / Bancada 01", status: "em_analise", urgente: false, servicos: ["URO"] },
-  { id: "5", numeroAmostra: "A-2024-089230", paciente: "Fernanda Costa", dataColeta: "15/12/2024 17:00", setorBancada: "Urinálise / Bancada 01", status: "repetir", urgente: true, servicos: ["EAS", "URO", "CRE", "GLI", "HMG", "COL"] },
+  { id: "1", numeroAmostra: "A-2024-089234", paciente: "Maria Silva Santos", dataColeta: "16/12/2024 08:15", setorBancada: "Bioquímica / Bancada 01", statusCondicao: "normal", servicos: ["HMG", "GLI", "HB1AC", "CREA", "UREIA"] },
+  { id: "2", numeroAmostra: "A-2024-089233", paciente: "João Pedro Oliveira", dataColeta: "16/12/2024 08:00", setorBancada: "Hematologia / Bancada 01", statusCondicao: "normal", servicos: ["HMG", "COL", "TRI"] },
+  { id: "3", numeroAmostra: "A-2024-089232", paciente: "Ana Carolina Lima", dataColeta: "16/12/2024 07:45", setorBancada: "Bioquímica / Bancada 02", statusCondicao: "nao_localizada", servicos: ["GLI", "TGO"] },
+  { id: "4", numeroAmostra: "A-2024-089231", paciente: "Carlos Eduardo Souza", dataColeta: "16/12/2024 07:30", setorBancada: "Microbiologia / Bancada 01", statusCondicao: "inadequada", servicos: ["URO"] },
+  { id: "5", numeroAmostra: "A-2024-089230", paciente: "Fernanda Costa", dataColeta: "15/12/2024 17:00", setorBancada: "Urinálise / Bancada 01", statusCondicao: "acidentada", servicos: ["EAS", "URO", "CRE", "GLI", "HMG", "COL"] },
 ];
 
-const statusConfig = {
-  colhida: { label: "Colhida", class: "badge-neutral" },
-  em_analise: { label: "Em Análise", class: "badge-warning" },
-  concluida: { label: "Concluída", class: "badge-success" },
-  repetir: { label: "Repetir", class: "badge-error" },
+// Configuração visual para status de condição da amostra
+const statusCondicaoConfig: Record<StatusCondicao, { label: string; class: string }> = {
+  normal: { label: "Normal", class: "badge-success" },
+  nao_localizada: { label: "Não localizada", class: "badge-warning" },
+  acidentada: { label: "Acidentada", class: "badge-error" },
+  inadequada: { label: "Inadequada", class: "badge-error" },
+  insuficiente: { label: "Insuficiente", class: "badge-warning" },
+  descartada: { label: "Descartada", class: "badge-neutral" },
 };
 
 const ServicosCell = ({ servicos }: { servicos: string[] }) => {
@@ -119,8 +124,7 @@ const LaboratorioAmostras = () => {
   const [paciente, setPaciente] = useState("");
   const [dataColeta, setDataColeta] = useState("");
   const [setor, setSetor] = useState("");
-  const [status, setStatus] = useState("");
-  const [urgencia, setUrgencia] = useState("");
+  const [statusCondicao, setStatusCondicao] = useState("");
   const [isExporting, setIsExporting] = useState(false);
 
   const handleExportPDF = async () => {
@@ -173,7 +177,7 @@ const LaboratorioAmostras = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
               <div>
                 <Label htmlFor="numeroAmostra">Nº Amostra</Label>
                 <Input
@@ -220,30 +224,19 @@ const LaboratorioAmostras = () => {
                 </Select>
               </div>
               <div>
-                <Label>Status</Label>
-                <Select value={status} onValueChange={setStatus}>
+                <Label>Condição</Label>
+                <Select value={statusCondicao} onValueChange={setStatusCondicao}>
                   <SelectTrigger className="mt-1.5">
                     <SelectValue placeholder="Todos" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">Todos</SelectItem>
-                    <SelectItem value="colhida">Colhida</SelectItem>
-                    <SelectItem value="em_analise">Em Análise</SelectItem>
-                    <SelectItem value="concluida">Concluída</SelectItem>
-                    <SelectItem value="repetir">Repetir</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label>Urgência</Label>
-                <Select value={urgencia} onValueChange={setUrgencia}>
-                  <SelectTrigger className="mt-1.5">
-                    <SelectValue placeholder="Todos" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Todos</SelectItem>
-                    <SelectItem value="urgente">Urgente</SelectItem>
                     <SelectItem value="normal">Normal</SelectItem>
+                    <SelectItem value="nao_localizada">Não localizada</SelectItem>
+                    <SelectItem value="acidentada">Acidentada</SelectItem>
+                    <SelectItem value="inadequada">Inadequada</SelectItem>
+                    <SelectItem value="insuficiente">Insuficiente</SelectItem>
+                    <SelectItem value="descartada">Descartada</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -299,15 +292,14 @@ const LaboratorioAmostras = () => {
                   <TableHead>Data Coleta</TableHead>
                   <TableHead>Setor / Bancada</TableHead>
                   <TableHead>Serviços</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="text-center">Urgência</TableHead>
+                  <TableHead>Condição</TableHead>
                   <TableHead className="text-right">Ações</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {mockAmostras.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={8} className="h-32 text-center">
+                    <TableCell colSpan={7} className="h-32 text-center">
                       <div className="flex flex-col items-center justify-center text-muted-foreground">
                         <TestTube2 className="h-10 w-10 mb-2 opacity-50" />
                         <p>Nenhuma amostra encontrada com os filtros aplicados.</p>
@@ -325,17 +317,9 @@ const LaboratorioAmostras = () => {
                         <ServicosCell servicos={amostra.servicos} />
                       </TableCell>
                       <TableCell>
-                        <span className={statusConfig[amostra.status].class}>
-                          {statusConfig[amostra.status].label}
+                        <span className={statusCondicaoConfig[amostra.statusCondicao].class}>
+                          {statusCondicaoConfig[amostra.statusCondicao].label}
                         </span>
-                      </TableCell>
-                      <TableCell className="text-center">
-                        {amostra.urgente && (
-                          <span className="badge-error flex items-center gap-1 justify-center">
-                            <AlertTriangle className="h-3 w-3" />
-                            Urgente
-                          </span>
-                        )}
                       </TableCell>
                       <TableCell className="text-right">
                         <TooltipProvider>
