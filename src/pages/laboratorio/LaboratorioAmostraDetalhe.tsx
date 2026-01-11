@@ -446,8 +446,8 @@ const LaboratorioAmostraDetalhe = () => {
 
   if (!amostra) return null;
 
-  const situacaoBadge = situacaoProcessoConfig[amostra.situacaoProcesso];
-  const condicaoBadge = statusCondicaoConfig[amostra.statusCondicao];
+  const situacaoBadge = situacaoProcessoConfig[amostra.situacaoProcesso] || { label: "Desconhecido", className: "badge-neutral" };
+  const condicaoBadge = statusCondicaoConfig[amostra.statusCondicao] || { label: "Desconhecido", className: "badge-neutral" };
 
   return (
     <LaboratorioLayout title="Detalhes da Amostra">
